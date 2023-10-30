@@ -17,7 +17,7 @@ void demo() {
 大写变小写chara=char(int(chara)+32);
 ```
 
-![image-20231030201806399](C:\Users\86157\AppData\Roaming\Typora\typora-user-images\image-20231030201806399.png)
+转移字符
 
 ```c++
 //水平制表\t
@@ -28,6 +28,17 @@ cout << "aaaaaa\thellowor1d" << endl;
 aaaa    helloworld
 aa      hellowor1d
 aaaaaa  hellowor1d
+//垂直制表\v
+cout << "aaaa\vhelloworld" << endl;
+cout << "aa\vhellowor1d" << endl;
+cout << "aaaaaa\vhellowor1d" << endl;
+//输出：
+aaaa
+helloworld
+aa
+hellowor1d
+aaaaaa
+hellowor1d
 ```
 
 ```c++
