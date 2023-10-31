@@ -4,7 +4,7 @@ C++面向对象的三大特征为：封装、继承、多态
 
 C++面向对象：封装（相似的类型抽象为一个类来封装）、继承（子类继承父类，把父类中所有的属性和行为拿过来，不用再声明）、多态（一个函数名称有多个接口，都是一个名称，父类指针指向子类对象，对象不同，调用同一接口，产生不同的形态）
 
-## *类
+## *封装
 
 ### **成员权限									
 
@@ -48,6 +48,46 @@ void demo() {
 	Person p;//实例化对象p
 	p.setName("Amaz1ng");
 	cout << p.m_name;
+}
+```
+
+#### ***友元
+
+```c++
+class GoodFriend;
+class Person {
+	void func();
+	void friendFunc();
+};
+class Building {
+	//友元的三种实现
+	friend void friendfunc(Building* p);//1、全局函数做友元
+	friend void Person::friendFunc();   //2、成员函数做友元
+	friend class GoodFriend;            //3、类做友元
+public:
+	string m_SittingRoom = "客厅";
+protected:
+	string m_BedRoom1 = "卧室1";
+private:
+	string m_BedRoom2 = "卧室2";
+};
+
+void friendfunc(Building* p) {
+	cout << p->m_BedRoom1 << p->m_BedRoom2 << p->m_SittingRoom;
+}
+class GoodFriend {
+	Building p;
+	void visit() {
+		cout << p.m_BedRoom1 << p.m_BedRoom2 << p.m_SittingRoom;
+	}
+};
+void Person::func() {
+	Building p;
+	cout << p.m_SittingRoom;
+}
+void Person::friendFunc() {
+	Building p;
+	cout << p.m_BedRoom1 << p.m_BedRoom2 << p.m_SittingRoom;
 }
 ```
 
