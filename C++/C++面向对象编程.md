@@ -326,13 +326,17 @@ void demo() {
 
 #### ***拷贝构造
 
-默认情况下，编译器至少给一个类添加3个函数：
+默认情况下，编译器至少给一个类添加4个函数：
+
+
 
 默认构造函数(无参，函数体为空)
 
 默认析构函数(无参，函数体为空)
 
 默认拷贝构造函数(浅拷贝)
+
+默认赋值运算符operator=,对属性进行值拷贝
 
 当用户定义有参构造函数 编译器不提供默认无参构造函数
 
@@ -396,7 +400,7 @@ public:
 ```c++
 class Base {
 public:
-	int* m_data = nullptr;
+	int* m_data = nullptr;//数据成员 指向堆区资源的指针
 
 	void copy() {//给数据成员m_data分配内存
 		m_data = new int;//分配空间
@@ -560,10 +564,10 @@ D:
  cd D:\MyCode\MyCode
 ```
 
-4.输入cl /d1 reportSingleClassLayoutBase "main.cpp"
+4.输入cl /d1 reportSingleClassLayout类名 "文件名"
 
 ```c++
-cl /d1 reportSingleClassLayout类名 "文件名"
+cl /d1 reportSingleClassLayoutBase "main.cpp"
 ```
 
 ### **继承中的同名成员处理方式
@@ -713,24 +717,24 @@ class SheepTuo1 size(8)://继承了两份m_age 大小为8字节
         | +---
         +---
             
-class SheepTuo2 size(12)://继承两个父类的虚指针(每个大小为4B)和一个m_age
+class SheepTuo2 size(12)://继承两个父类的虚基类指针(每个大小为4B)和一个m_age
         +---
  0      | +--- (base class Sheep2)
- 0      | | {vbptr}//虚指针
+ 0      | | {vbptr}//虚基类指针
         | +---
  4      | +--- (base class Tuo2)
- 4      | | {vbptr}//虚指针
+ 4      | | {vbptr}//虚基类指针
         | +---
         +---
         +--- (virtual base Animal)
  8      | m_age
         +---
 
-SheepTuo2::$vbtable@Sheep2@://虚表
+SheepTuo2::$vbtable@Sheep2@://虚基类表
  0      | 0
  1      | 8 (SheepTuo2d(Sheep2+0)Animal)//偏移量
 
-SheepTuo2::$vbtable@Tuo2@://虚表
+SheepTuo2::$vbtable@Tuo2@://虚基类表
  0      | 0
  1      | 4 (SheepTuo2d(Tuo2+0)Animal)//偏移量
 vbi:       class  offset o.vbptr  o.vbte fVtorDisp
@@ -874,8 +878,405 @@ void demo() {
 
 ##### 拷贝赋值
 
+拷贝构造是创建一个新对象，拷贝赋值是更新一个已存在的对象
 
+```c++
+class Base {
+public:
+	int* m_data = nullptr;//数据成员 指向堆区资源的指针
+
+	void copy() {//给数据成员m_data分配内存
+		m_data = new int;//分配空间
+		memset(m_data, 0, sizeof(int));//初始化已分配的内存
+	}
+	Base() { m_data = new int(10); }//默认构造函数
+	Base& operator=(const Base& p) {//拷贝赋值函数
+		cout << "调用了拷贝赋值函数" << endl;
+		if (this == &p)return *this;//避免自我赋值
+		if (m_data != nullptr) {
+			delete m_data;
+			m_data = nullptr;
+		}
+		if (m_data == nullptr) copy();
+		memcpy(m_data, p.m_data, sizeof(int));
+		return *this;
+	}
+};
+void demo() {
+	Base p1, p2;
+	int* p = new int(20);
+	p1.m_data = p;
+	p2 = p1;//调用拷贝赋值函数
+}
+```
 
 
 
 ##### 移动赋值
+
+移动赋值函数语法:类名& operator=(类名&& 源对象){…}
+
+```c++
+class Base {
+public:
+	int* m_data = nullptr;//数据成员 指向堆区资源的指针
+	Base() = default;
+	Base(Base&& p) {//移动构造函数
+		cout << "调用移动构造函数" << endl;
+		if (m_data != nullptr)delete m_data;//如果已分配内存 先释放掉
+		m_data = p.m_data;//把资源从源对象中转移过来
+		p.m_data = nullptr;//把源对象中的指针置为空
+	}
+	Base& operator=(Base&& p) {//移动赋值函数
+		cout << "调用了移动赋值函数" << endl;
+		if (this == &p)return *this;//避免自我赋值
+		if (m_data != nullptr) {//如果已分配内存 先释放掉
+			delete m_data;
+			m_data = nullptr;
+		}
+		m_data = p.m_data;
+		p.m_data = nullptr;
+		return *this;
+	}
+};
+Base func() {
+	Base p;
+	return p;
+}
+void demo() {
+	Base p1;
+	p1 = func();//移动赋值
+	Base p2 = func();//移动构造
+}
+```
+
+#### ***重载关系运算符
+
+```c++
+class Person {
+public:
+	string m_Name;
+	int m_Age;
+
+	bool operator==(Person& p) {//重载关系运算符==
+		if (this->m_Name == p.m_Name && this->m_Age == p.m_Age) {
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+```
+
+#### ***重载函数调用运算符() 仿函数
+
+由于重载后使用的方式非常像函数(本质是一个类)的调用，因此称为仿函数
+
+仿函数没有固定写法，非常灵活
+
+```c++
+class Myprint {
+public:
+	void operator()(string text) {
+		cout << text << endl;
+	}
+};
+void demo() {
+	Myprint p;
+	p("hello");
+}
+```
+
+### **虚函数
+
+C++中，基类将类型相关的函数与派生类不做改变直接继承的函数区分对待，对于前者，基类希望它的派生类各自定义适合自身的版本，此时将这些函数声明成虚函数。一旦某个函数被声明成虚函数，在所有的派生类中，它都是虚函数。
+
+#### ***动态多态
+
+动态多态满足条件:1.有继承关系2.子类重写父类的虚函数
+动态多态的使用:父类的指针或者引用执行子类对象
+
+```c++
+//基类
+class Animal {
+public:
+	void _speak() {//普通函数 地址早绑定 在编译阶段确定函数地址
+		cout << "动物在说话" << endl;
+	}
+	virtual void speak() {//虚函数 地址晚绑定 在运行阶段确定函数地址
+		cout << "动物在说话" << endl;
+	}
+};
+//派生类
+class Cat : public Animal {
+	void _speak() {//普通函数
+		cout << "猫在说话" << endl;
+	}
+	//重写:函数返回值类型函数名参数列表都相同称为重写
+	//子类重写虚函数
+	void speak() {//虚函数
+		cout << "猫在说话" << endl;
+	}
+};
+
+//动态多态满足条件:1.有继承关系2.子类重写父类的虚函数
+//动态多态的使用:父类的指针或者引用执行子类对象
+void doSpeak(Animal& animal) { //Animal &animal = cat;父类的引用执行子类对象
+	animal._speak();//"动物在说话"
+	animal.speak();//"猫在说话"
+}
+void demo() {
+	Cat cat;
+	doSpeak(cat);
+}
+```
+
+#### ***多态原理剖析
+
+使用VS开发人员命令提示符剖析多态
+
+虚表vtable：当类中含有virtual关键字修饰的方法时，编译器会自动为该类生成虚表；
+
+虚表指针vptr：在含有虚函数的类实例化对象时，对象地址的**前四个字节**存储着指向虚表的指针；
+
+在派生类实例化对象时，程序会自动调用构造函数，在构造函数中创建虚表，并对虚表初始化。在构造派生类的对象时，会先调用基类的构造函数，此时编译器只“看到了”基类，并且为基类对象初始化虚表指针，令它指向基类的虚表；当调用派生类的构造函数时，接着为派生类对象初始化虚表指针，令它指向派生类的虚表
+
+当派生类对基类的虚函数没有覆盖（override），派生类的虚表指针直接指向基类的虚表；当派生类对基类的虚函数有覆盖时，派生类的虚表指针指向自己的虚表；当派生类中有自己的虚函数时，将该虚函数地址添加在自己的虚表里面
+
+```c++
+class Animal {
+public:
+	void speak() {//普通函数
+		cout << "动物在说话" << endl;
+	}
+};
+class Animal    size(1)://空类
+        +---
+        +---
+```
+
+```c++
+class Animal {
+public:
+	virtual void speak() {//改为虚函数
+		cout << "动物在说话" << endl;
+	}
+};
+
+class Animal    size(4)://类大小为一个虚函数表指针(简称虚表指针)大小(4B)
+        +---
+ 0      | {vfptr}//虚表指针 指向虚函数表
+        +---
+
+Animal::$vftable@://虚函数表
+        | &Animal_meta
+        |  0
+ 0      | &Animal::speak//表内记录了虚函数地址
+
+Animal::speak this adjustor: 0
+```
+
+```c++
+class Cat : public Animal {};//子类直接继承
+
+class Cat       size(4):
+        +---
+ 0      | +--- (base class Animal)
+ 0      | | {vfptr}
+        | +---
+        +---
+
+Cat::$vftable@:
+        | &Cat_meta
+        |  0
+ 0      | &Animal::speak//子类的虚表复制父类内容
+```
+
+```c++
+class Cat : public Animal {//子类重写虚函数
+	void speak() {//虚函数
+		cout << "猫在说话" << endl;
+	}
+};
+
+class Cat       size(4):
+        +---
+ 0      | +--- (base class Animal)
+ 0      | | {vfptr}
+        | +---
+        +---
+
+Cat::$vftable@:
+        | &Cat_meta
+        |  0
+ 0      | &Cat::speak//子类将虚函数覆盖成&Cat::speak
+
+Cat::speak this adjustor: 0
+```
+
+当父类的指针或者引用指向子类对象的时候Animal &animal = cat;，发生多态
+
+#### ***override与final C++11
+
+使用override来说明派生类中的虚函数。让编译器帮我们检测这个被override标记的函数有没有覆盖已存在的虚函数。防止程序员在重写虚函数的时候，不小心写错了形参列表，导致没有覆盖掉虚函数；将虚函数标记为final后，不允许这个类的后续的直接或者间接的派生类再覆盖这个虚函数。
+
+```c++
+class Base {
+	virtual void fun1(int num);
+	virtual void fun2();
+	void fun3(int num);
+};
+class Son1 :Base {
+	void fun1(int num) override;//正确
+	void fun2(int num) override;//错误! Base中没有f2(int)版的虚函数
+	void fun3(int num) override;//错误! fun3不是虚函数
+};
+class Son2 :Base {
+	void fun1(int num) override;//正确
+	void fun2() final;//不允许后续的直接或者间接派生类重写覆盖fun2
+};
+class Grandson1 :Son1 {
+	void fun1(int num) override;//虚函数即使被重写了 依然是虚函数
+	void fun2() override; //虚函数即使被重写了 依然是虚函数
+};
+class Grandson2 : Son2 {
+	void fun20 override; //错误! 不允许重写final后的的虚函数
+};
+class Grandson3 :Grandson2 {
+	void fun2() override;//!不允许重写final后的的虚函教
+};
+```
+
+#### ***纯虚函数和抽象类
+
+在多态中，通常父类中虚函数的实现是毫无意义的，主要都是调用子类重写的内容
+因此可以将虚函数改为纯虚函数
+纯虚函数语法:virtual 返回值类型 函数名 (参数列表)  = 0;
+
+含纯虚函数（纯虚析构等）的类为抽象类，无法实例化对象
+
+抽象类的子类必须重写父类的纯虚函数 否则也属于抽象类
+
+```c++
+//纯虚函数和抽象类
+class Base {//含纯虚函数 为抽象类
+public:
+	//纯虚函数
+	virtual void func() = 0;
+};
+void demo() {
+	//1.抽象类无法实例化对象
+	//Base a;    //new Base;
+	//2.抽象类的子类必须要重写父类中的纯虚函数，否则也属于抽象类
+	class Son1 :public Base {};
+	// Son1 a;
+	class Son2 : public Base {
+	public:
+		virtual void func() {
+			cout << "func()函数调用" << endl;
+		}
+	};
+	Base* base = new Son2;
+	base->func();
+}
+```
+
+##### 虚析构和纯虚析构
+
+多态使用时，如果子类中有属性开辟到堆区，那么父类指针在释放时无法调用到子类的析构代码 导致内存泄漏
+
+虚析构和纯虚析构用来解决通过父类释放子类对象的，如果子类中没有堆数据，可以不写虚析构和纯虚析构
+
+纯虚构函数 需要声明也需要实现
+虚析构语法：virtual ~类名(){}
+
+纯虚析构语法:
+virtual ~类名() = 0;
+纯虚析构函数，需要声明也需要实现
+类名::~类名(){}
+
+```c++
+class Animal {
+public:
+	Animal() {
+		cout << "Animal构造函数调用" << endl;
+	}
+	virtual void speak() {//虚函数
+		cout << "动物在说话" << endl;
+	}
+	~Animal() {
+		cout << "Animal析构函数调用" << endl;
+	}
+};
+class Cat : public Animal {
+public:
+	int* a;
+	Cat(int a) {
+		cout << "Cat构造函数调用" << endl;
+		this->a = new int(a);//子类将数据开辟到堆区
+	}
+	~Cat() {
+		cout << "Cat析构函数调用" << endl;
+		if (a != nullptr) {
+			delete a;
+			a = nullptr;
+		}
+	}
+	void speak() {//虚函数
+		cout << "猫在说话" << endl;
+	}
+};
+void doSpeak(Animal& animal) { //Animal &animal = cat;父类的引用执行子类对象
+	animal.speak();
+}
+void demo() {
+	Animal* animal = new Cat(2);
+	animal->speak();
+	delete animal;
+}
+输出://父类指针在释放时无法调用到子类的析构代码 导致内存泄漏
+Animal构造函数调用
+Cat构造函数调用
+猫在说话
+Animal析构函数调用
+```
+
+将Animal的析构函数改成虚析构函数后
+
+```c++
+virtual ~Animal() {cout << "Animal析构函数调用" << endl;}
+输出：
+Animal构造函数调用
+Cat构造函数调用
+猫在说话
+Cat析构函数调用
+Animal析构函数调用
+```
+
+也可以将析构函数改成纯虚析构函数
+
+```c++
+virtual ~Animal() = 0;//纯虚析构函数声明
+//纯虚析构函数 需要声明也需要实现
+//类外实现
+Animal::~Animal() { cout << "Animal纯虚析构函数调用" << endl; }
+
+class Animal    size(4):
+        +---
+ 0      | {vfptr}
+        +---
+
+Animal::$vftable@:
+        | &Animal_meta
+        |  0
+ 0      | &Animal::speak//虚函数
+ 1      | &Animal::{dtor}//表示(纯)虚析构地址
+
+Animal::speak this adjustor: 0
+Animal::{dtor} this adjustor: 0
+Animal::__delDtor this adjustor: 0
+Animal::__vecDelDtor this adjustor: 0
+```
+
