@@ -506,3 +506,234 @@ public:
 };
 ```
 
+## *继承
+
+### **继承中的对象模型
+
+语法： class 子类（派生类） : 继承方式 父类（基类）
+
+继承方式：
+
+公共public继承：父类的公共部分继承到子类公共部分 保护部分继承到子类保护部分 
+
+保护protected继承：父类的公共部分和保护部分都继承到子类保护部分
+
+私有private继承）：父类的公共部分和保护部分都继承到子类私有部分
+
+父类的私有部分也继承下来了 只是被编译器隐藏了 访问不到
+
+```c++
+class Base {
+public:
+	int a;
+protected:
+	int b;
+private:
+	int c;
+};
+class Son :private Base {
+public:
+	int d;
+};
+void demo() {
+	Base a;
+	Son b;
+	cout << "a.size= " << sizeof(a) << endl;
+	cout << "b.size= " << sizeof(b) << endl;
+}
+输出：
+a.size= 12
+b.size= 16
+```
+
+1.打开VS开发人员命令提示符(Developer PowerShell for VS)
+
+2.跳转盘符 
+
+```c++
+D:
+```
+
+3.cd到代码所在文件目录
+
+```c++
+ cd D:\MyCode\MyCode
+```
+
+4.输入cl /d1 reportSingleClassLayoutBase "main.cpp"
+
+```c++
+cl /d1 reportSingleClassLayout类名 "文件名"
+```
+
+### **继承中的同名成员处理方式
+
+当子类与父类出现同名的成员。针对成员函数，子类会隐藏父类中的同名成员函数 包括重载
+子类对象访问子类同名成员直接访问即可
+子类对象访问父类同名成员需要加作用域
+
+```c++
+//同名非静态成员的处理方式
+class Base {
+public:
+	int m_a = 10;
+	void func() {
+		cout << "Base下func()调用" << endl;
+	}
+	void func(int a) {
+		m_a = a;
+		cout << "Base下func(int)调用" << endl;
+	}
+};
+class Son :public Base {
+public:
+	int m_a = 20;
+	void func() {
+		cout << "Son下func()调用" << endl;
+	}
+};
+void demo() {
+	//同名成员属性处理方式
+	Son a;
+	//访问子类同名成员直接访问即可
+	cout << "a.m_a = " << a.m_a << endl;
+	//访问父类同名成员需要加作用域
+	cout << "Base 下的a.m_a = " << a.Base::m_a << endl;
+
+	//同名成员函数处理方式
+	Son b;
+	b.func();
+	//b.func(10);子类会隐藏父类中的所有同名成员函数 包括重载
+	//通过加作用域来访问父类的成员函数
+	b.Base::func();
+	b.Base::func(10);
+}
+```
+
+```c++
+//同名静态成员的处理方式
+class Base {
+public:
+	static int m_a;
+	static void func() {
+		cout << "Base下func()调用" << endl;
+	}
+};
+int Base::m_a = 10;
+class Son :public Base {
+public:
+	static int m_a;
+	static void func() {
+		cout << "Son下func()调用" << endl;
+	}
+};
+int Son::m_a = 20;
+void demo() {
+	//同名静态成员属性处理方式
+	Son a;
+	//1、通过对象访问
+	//访问子类同名成员直接访问即可
+	cout << "a.m_a = " << a.m_a << endl;
+	//访问父类同名成员需要加作用域
+	cout << "Base 下的a.m_a = " << a.Base::m_a << endl;
+	//2、通过类名访问
+	cout << "a.m_a = " << Son::m_a << endl;
+	cout << "Base 下的a.m_a = " << Son::Base::m_a << endl;
+
+	//同名静态成员函数处理方式
+	Son b;
+	//1、通过对象访问
+	b.func();
+	b.Base::func();
+	//2、通过类名访问
+	Son::func();
+	Son::Base::func();
+}
+```
+
+### **多继承语法
+
+C++允许一个类继承多个类
+语法:class子类∶继承方式 父类1,继承方式 父类2...
+多继承可能会引发父类中有同名成员出现，需要加作用域区分
+
+#### ***菱形(钻石)继承问题
+
+羊继承了动物的数据，驼同样继承了动物的数据，羊驼继承了羊和驼的数据。当羊驼使用数据时，就会产生二义性。羊驼继承自动物的数据继承了两份，其实我们应该清楚，这份数据我们只需要一份就可以。
+
+#### ***虚继承
+
+```c++
+class Animal {
+public:
+	int m_age;
+};
+class Sheep1 :public Animal {};
+class Tuo1 :public Animal {};
+class SheepTuo1 :public Sheep1, public Tuo1 {};
+//虚继承
+class Sheep2 :virtual public Animal {};
+class Tuo2 :virtual public Animal {};
+class SheepTuo2 :public Sheep2, public Tuo2 {};
+void demo() {
+	SheepTuo1 a;
+	//父类有相同的数据 加作用域区分
+	a.Sheep1::m_age = 18;
+	a.Tuo1::m_age = 20;
+	cout << "a.Sheep1::m_age= " << a.Sheep1::m_age << endl;
+	cout << "a.Tuo1::m_age= " << a.Tuo1::m_age << endl;
+	//cout << "a.m_age= " << a.m_age << endl; 错误，a.m_age指代不明确
+
+	//虚继承
+	//父类继承之前加上 virtual 变成 虚继承
+	//Animal类称为 虚基类
+	SheepTuo2 b;
+	b.Sheep2::m_age = 18;
+	b.Tuo2::m_age = 20;
+	cout << "b.Sheep2::m_age= " << b.Sheep2::m_age << endl;
+	cout << "b.Tuo2::m_age= " << b.Tuo2::m_age << endl;
+	cout << "b.m_age= " << b.m_age << endl;
+}
+```
+
+使用VS开发人员命令提示符查看 SheepTuo1和SheepTuo2的区别
+
+```c++
+class SheepTuo1 size(8)://继承了两份m_age 大小为8字节
+        +---
+ 0      | +--- (base class Sheep1)
+ 0      | | +--- (base class Animal)
+ 0      | | | m_age
+        | | +---
+        | +---
+ 4      | +--- (base class Tuo1)
+ 4      | | +--- (base class Animal)
+ 4      | | | m_age
+        | | +---
+        | +---
+        +---
+            
+class SheepTuo2 size(12)://继承两个父类的虚指针(每个大小为4B)和一个m_age
+        +---
+ 0      | +--- (base class Sheep2)
+ 0      | | {vbptr}//虚指针
+        | +---
+ 4      | +--- (base class Tuo2)
+ 4      | | {vbptr}//虚指针
+        | +---
+        +---
+        +--- (virtual base Animal)
+ 8      | m_age
+        +---
+
+SheepTuo2::$vbtable@Sheep2@://虚表
+ 0      | 0
+ 1      | 8 (SheepTuo2d(Sheep2+0)Animal)//偏移量
+
+SheepTuo2::$vbtable@Tuo2@://虚表
+ 0      | 0
+ 1      | 4 (SheepTuo2d(Tuo2+0)Animal)//偏移量
+vbi:       class  offset o.vbptr  o.vbte fVtorDisp
+          Animal       8       0       4 0            
+```
+
