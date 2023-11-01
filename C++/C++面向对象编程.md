@@ -737,3 +737,145 @@ vbi:       class  offset o.vbptr  o.vbte fVtorDisp
           Animal       8       0       4 0            
 ```
 
+## *多态
+
+多态分为两类
+静态多态:函数重载和运算符重载属于静态多态，复用函数名
+
+动态多态:派生类和虚函数实现运行时多态
+
+静态多态和动态多态区别:
+静态多态的函数地址早绑定   编译阶段确定函数地址
+
+动态多态的函数地址晚绑定   运行阶段确定函数地址
+
+### **重载运算符
+
+#### ***重载加号运算符
+
+```c++
+class Person {
+public:
+	int m_a = 10;
+	int m_b = 20;
+	int m_c = 30;
+
+	//通过成员函数重载加号运算符
+	Person operator+ (Person& p) {
+		Person temp;
+		temp.m_a = this->m_a + p.m_a;
+		temp.m_b = this->m_b + p.m_b;
+		temp.m_c = this->m_c + p.m_c;
+		return temp;
+	}
+};
+//通过全局函数重载加号运算符
+Person operator+ (Person& p1, Person& p2) {
+	Person temp;
+	temp.m_a = p1.m_a + p2.m_a;
+	temp.m_b = p1.m_b + p2.m_b;
+	temp.m_c = p1.m_c + p2.m_c;
+	return temp;
+}
+//重载
+Person operator+ (Person& p1, int num) {
+	Person temp;
+	temp.m_a = p1.m_a + num;
+	temp.m_b = p1.m_b + num;
+	temp.m_c = p1.m_c + num;
+	return temp;
+}
+void demo() {
+	Person p1, p2;
+	//使用成员函数重载加号运算符
+	Person p3 = p1.operator+(p2);
+	Person p3 = p1 + p2;//可以简化为这种形式 成员函数和全局函数都可以这样简化 注释掉其中一个
+	//使用全局函数重载加号运算符
+	Person p4 = operator+(p1, p2);
+	Person p4 = p1 + p2;//可以简化为这种形式 
+	//重载版本
+	Person p5 = p1 + 2;
+}
+```
+
+#### ***重载左移运算符
+
+```c++
+class Person {
+public:
+	int m_a = 10;
+	int m_b = 20;
+	//利用成员函数重载左移运算符 p.operator<<(cout)简化版本 p<<cout
+	//不会利用成员函数重载<<运算符 因为无法实现cout在左侧
+	//void operator<<(cout)
+};
+//只能通过全局函数重载左移运算符
+void operator<<(ostream& cout, Person& p) {//本质 operator<<(cout,p); 简化 cout<<p;
+	cout << "m_a= " << p.m_a << " m_b= " << p.m_b;
+}
+void demo() {
+	Person p1, p2;
+	operator<<(cout, p1);//本质
+	cout << p1; //简化
+}
+//想在cout<<p后面加上<<endl;
+ostream& operator<<(ostream& cout, Person& p) {//本质 operator<<(cout,p); 简化 cout<<p;
+	cout << "m_a= " << p.m_a << " m_b= " << p.m_b;
+	return cout;
+}
+void demo() {
+	Person p1, p2;
+	operator<<(cout, p1) << endl;//本质
+	cout << p1 << endl; //简化
+}
+```
+
+#### ***重载递增运算符
+
+​                         前置返回 引用，后置返回 值
+
+```c++
+class MyInteger {
+public:
+	int m_a;
+	MyInteger() {
+		m_a = 10;
+	}
+	//前置++ 返回引用
+	MyInteger& operator++() {
+		//先++
+		m_a++;
+		//再返回
+		return *this;
+	}
+	//后置++ 返回的是值 因为后置中使用了temp局部变量(存放在栈区的数据在函数执行完后自动释放)
+	MyInteger operator++(int) {//用占位参数int来实现函数重载 且只能用int
+		MyInteger temp = *this;//先记录当前本身的值
+		m_a++;//后递增
+		return temp;
+	}
+};
+ostream& operator<<(ostream& cout, MyInteger p) {
+	cout << "m_a= " << p.m_a;
+	return cout;
+}
+void demo() {
+	MyInteger p1, p2;
+	cout << p1 << endl;
+	cout << p1++ << endl;
+	cout << p1 << endl;
+	cout << p2 << endl;
+	cout << ++p2 << endl;
+	cout << p2 << endl;
+}
+```
+
+#### ***重载赋值运算符
+
+##### 拷贝赋值
+
+
+
+
+
+##### 移动赋值
