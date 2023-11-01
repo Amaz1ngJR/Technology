@@ -378,7 +378,7 @@ void demo() {
 指针就是地址，*指针 是地址里存的数据，空指针（null和内存编号为0-255）无法直接访问如任何*p操作。
 
 ```c++
-void demo(){
+void demo() {
 	int a = 10;
 	int * p;
 	p = &a;
