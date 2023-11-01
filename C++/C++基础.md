@@ -377,15 +377,17 @@ void demo() {
 
 指针就是地址，*指针 是地址里存的数据，空指针（null和内存编号为0-255）无法直接访问如任何*p操作。
 
-```
-int a = 10;
-int * p;
-p = &a;
-cout<<"a的地址为 "<<&a<<endl;
-cout<<"指针p为 "<<p<<endl;
-
-*p=100;
-cout<<"a为 "<<a<<endl;
+```c++
+void demo(){
+	int a = 10;
+	int * p;
+	p = &a;
+	cout<<"a的地址为 "<<&a<<endl;
+	cout<<"指针p为 "<<p<<endl;
+	
+	*p=100;
+	cout<<"a为 "<<a<<endl;
+}
 ```
 
 
