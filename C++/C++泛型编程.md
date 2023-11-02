@@ -348,7 +348,8 @@ vector与array非常相似，也称单端数组。但是array是静态空间的�
 
 因此一旦引起空间重新配置，指向原vector的所有迭代器都失效了！！！
 
-插入图片
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/86a50249-2a08-476f-95ac-fc72e545ade2)
+
 
 ##### vector构造函数
 
@@ -546,7 +547,8 @@ void demo() {
 
 list的插入insert和接合splice不会使迭代器失效
 
-插入图片
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/393abe92-98a4-4f87-86ea-f0c978f3e166)
+
 
 ##### list构造函数
 
@@ -882,7 +884,8 @@ void demo() {
 
 栈#include< stack > 没有迭代器
 
-插入图片
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/db939b7c-4484-4bb5-adff-1ece912a478b)
+
 
 ```c++
 //栈的所有操作
@@ -907,7 +910,8 @@ void demo() {
 
 \#include< queue > 队列
 
-插入图片
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/670f3411-10fa-4346-9391-7d80569ac0be)
+
 
 ```c++
 //队的所有操作
