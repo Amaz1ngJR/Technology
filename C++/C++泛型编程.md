@@ -314,4 +314,3 @@ void demo() {
 
 ##### 类模板的可变参数
 
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/a0a9d725-6bad-44bc-9f7b-b8e48c37203e)
