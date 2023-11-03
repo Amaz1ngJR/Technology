@@ -807,6 +807,8 @@ void demo() {
 
 \#include< deque > 双端数组 随机访问迭代器
 
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/3c3de878-905c-4ea2-89e7-8fe486bfec73)
+
 ##### deque构造函数
 
 ```c++
