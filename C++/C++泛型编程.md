@@ -166,8 +166,8 @@ void printPerson1(Person<string, int>& p) {}
 ```c++
 template<class T1,class T2>
 void printPerson2(Person<T1, T2>& p) {
-    cout << "T1的数据类型为: " << typeid(T1).name() << endl; 
-    cout << "T2的数据类型为: " << typeid(T2).name() << endl; 
+	cout << "T1的数据类型为: " << typeid(T1).name() << endl; 
+	cout << "T2的数据类型为: " << typeid(T2).name() << endl; 
 }
 ```
 
@@ -438,7 +438,7 @@ void demo() {
 	v1.insert(v1.begin(), 2, p1);//插2个进去
 	v1.emplace(v1.begin(), p1);//类比emplace_back
 	//删除
-    v1.pop_back();//容器尾部删除
+    	v1.pop_back();//容器尾部删除
 	v1.erase(v1.begin());//删除迭代器指向的元素
 	v1.erase(v1.begin(), v1.end());//删除[)区间
 	v1.clear();//清空
@@ -611,7 +611,7 @@ void demo() {
 	p1.emplace(p1.begin(), 1);//类比emplace_back
 	//删除
 	p1.pop_back();//容器尾部删除
-    p1.pop_front();//容器开头删除
+    	p1.pop_front();//容器开头删除
 	p1.erase(p1.begin());//删除迭代器指向的元素
 	p1.erase(p1.begin(), p1.end());//删除[)区间
 	p1.remove(1);//删除容器中所有是1的元素
