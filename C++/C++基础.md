@@ -917,9 +917,9 @@ void demo() {
 	auto f4 = [&] {cout << a++ << b++ << c++; };
 	auto f5 = [=, &b] {cout << b++; };
 	auto f6 = [&, b] {cout << a++ << b << c++; };
-    //显式捕获的变量必须使用和默认捕获不同的方式捕获;
-    //如果希望修改捕获的值，加上mutable,但是lambda函数外部,这个值不会变
-    auto f7 = [=]()mutable {cout << a++; };
+    	//显式捕获的变量必须使用和默认捕获不同的方式捕获;
+	//如果希望修改捕获的值，加上mutable,但是lambda函数外部,这个值不会变
+	auto f7 = [=]()mutable {cout << a++; };
 }
 
 ```
