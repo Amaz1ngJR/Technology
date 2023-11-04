@@ -967,6 +967,7 @@ void demo() {
 | std::multiset      | 红黑树   | 有序     | 是               | 否           | O(logn)  | O(logn)  |
 | std::unordered_set | 哈希表   | 无序     | 否               | 否           | O(1)     | O(1)     |
 
+#include< unordered_set >
 ```c++
 //set常用操作
 void demo() {
