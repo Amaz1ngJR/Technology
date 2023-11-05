@@ -354,7 +354,8 @@ vector与array非常相似，也称单端数组。但是array是静态空间的�
 
 ```c++
 void demo() {
-	vector<int>a = { 1,2,3,4,5 };//初始化列表 非拷贝构造、拷贝赋值
+	vector<int>a = { 1,2,3,4,5 };//初始化列表
+	vector<int>a{ 1,2,3,4,5 };//初始化列表
     
 	vector<int>v0;//默认构造
 	vector<int>v1(3);//构造一个大小为3的v1
