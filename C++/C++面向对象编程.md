@@ -279,6 +279,8 @@ class Person {
 public:
 	int m_age;
 	int m_id;
+	//Person() = default;//启用默认构造函数
+	//~Person() = delete;//删除默认析构函数
 	Person() { cout << "调用无参(默认)构造函数" << endl; }
 	Person(int a) {
 		m_age = a;
