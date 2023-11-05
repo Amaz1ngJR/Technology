@@ -1250,7 +1250,7 @@ void demo() {
 
 ##### find
 
-(begin(),end(),val)
+(begin(),end(),val)         返回迭代器
 
 ```c++
 void demo() {
@@ -1262,7 +1262,7 @@ void demo() {
 
 ##### find_if 
 
-(begin(),end(),_pred)
+(begin(),end(),_pred)      返回迭代器
 
 //基本等同find只不过第三个参数变成了谓词或函数
 
@@ -1323,7 +1323,7 @@ void demo() {
 
 ##### adjacent_find
 
-//查找相邻重复元素 返回相邻元素的第一个位置的迭代器
+//查找相邻重复元素   返回相邻元素的第一个位置的迭代器
 
 (begin(),end())
 
@@ -1339,7 +1339,7 @@ void demo() {
 
 ##### binary_search 
 
-//二分查找(begin(),end(),val) 注意无序序列不可用
+//二分查找(begin(),end(),val) 注意无序序列不可用     返回bool
 
 ```c++
 void demo() {
@@ -1350,9 +1350,62 @@ void demo() {
 }
 ```
 
+##### lower_bound
+
+//在已排序的容器中二分查找第一个大于或等于给定值的元素的位置    返回一个迭代器
+
+```c++
+void demo() {
+	std::vector<int> vec = { 1,2,4,4,5,6,7,8,9 };
+	int target = 5;
+	auto it = std::lower_bound(vec.begin(), vec.end(), target);
+	if (it != vec.end()) {
+		std::cout << "第一个不小于 " << target << " 的元素的位置是：" << std::distance(vec.begin(), it) << std::endl;
+	}
+	else {
+		std::cout << "容器中没有不小于 " << target << " 的元素。" << std::endl;
+	}
+}
+```
+
+##### upper_bound
+
+//在已排序的容器中二分查找第一个大于给定值的元素的位置 返回一个迭代器
+
+```c++
+void demo() {
+	std::vector<int> vec = { 1,2,4,4,5,6,7,8,9 };
+	int target = 5;
+	auto it = std::upper_bound(vec.begin(), vec.end(), target);
+	if (it != vec.end()) {
+		std::cout << "第一个大于 " << target << " 的元素的位置是：" << std::distance(vec.begin(), it) << std::endl;
+	}
+	else {
+		std::cout << "容器中没有大于 " << target << " 的元素。" << std::endl;
+	}
+}
+```
+
+##### equal_range
+
+在已排序的容器中查找等于给定值的元素范围 返回一个 pair 其中包含两个迭代器 分别指向容器中等于给定值的元素的起始位置和结束位置[)
+
+```c++
+void demo() {
+	vector<int>vec = { 1, 2, 2, 2, 2, 3 };
+	int target = 2;
+	auto range = std::equal_range(vec.begin(), vec.end(), target);
+	std::cout << "等于 " << target << " 的元素范围是："
+		<< std::distance(vec.begin(), range.first) << " 到 "
+		<< std::distance(vec.begin(), range.second) << std::endl;
+}
+```
+
+### ***常用计数算法
+
 ##### count
 
-返回元素出现的次数(begin(),end(),val)
+返回元素出现的次数(begin(),end(),val)        返回int
 
 ```c++
 void demo() {
@@ -1365,11 +1418,34 @@ void demo() {
 
 类比find_if (begin(),end(),_pred)
 
+##### distance
+
+计算两个指针或迭代器之间元素的个数
+
+```c++
+void demo() {
+	std::vector<int> vec = { 1,2,3,4,5,6,7,8,9 };
+	auto first = vec.begin();
+	auto last = vec.end();
+	//ptrdiff_t 是一个有符号整数类型 通常用于表示两个指针（或迭代器）之间的距离
+	//在不同的系统上，指针的大小可能不同 因此使用 ptrdiff_t 类型可以提高代码的可移植性
+	std::ptrdiff_t dist = std::distance(first, last);
+	std::cout << "容器中的元素个数是：" << dist << std::endl;
+}
+void demo() {
+	int array[] = { 1, 2, 3, 4, 5 };
+	int* first = array;
+	int* last = array + 7;//不会发现越界
+	std::ptrdiff_t distance = last - first;
+	std::cout << "两个指针之间的距离是：" << distance << std::endl;
+}
+```
+
 #### ***常用排序算法
 
 ##### sort
 
-(begin(),end(),_pred)//第三个参数不填默认快排实现升序排列 
+(begin(),end(),_pred)//第三个参数不填默认快排实现升序排列
 
 ```c++
 void demo() {
