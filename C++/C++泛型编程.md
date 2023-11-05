@@ -339,7 +339,7 @@ random_access_iterator随机访问迭代器 读写操作,可以以跳跃的方�
 
 #### ***vector
 
-#include< vector > 单端数组 随机访问迭代器
+#include< vector > #include< array > 单端数组 随机访问迭代器
 
 vector与array非常相似，也称单端数组。但是array是静态空间的，vector可以动态扩展空间(配置原则：如果原大小为0，则配置1个元素大小，如果原大小不为0，则配置原大小的两倍)
 
@@ -543,7 +543,7 @@ void demo() {
 
 #### ***list
 
-#include< list >双向循环链表 双向迭代器
+#include< list >双向循环链表 双向迭代器  #include< forward_list >单向链表 前向迭代器
 
 list的插入insert和接合splice不会使迭代器失效
 
@@ -960,7 +960,7 @@ void demo() {
 
 #### ***set
 
-\#include< set > #include< unordered_set > 双向迭代器
+#include< set >  双向迭代器    #include< unordered_set >  #include< unordered_multiset > 前向迭代器
 
 | 集合               | 底层实现 | 是否有序 | 数值是否可以重复 | 能否更改数值 | 查询效率 | 增删效率 |
 | ------------------ | -------- | -------- | ---------------- | ------------ | -------- | -------- |
@@ -995,7 +995,7 @@ void demo() {
 
 #### ***map
 
-\#include< map > 双向迭代器
+\#include< map > 双向迭代器     #include< unordered_map >  #include< unordered_multimap > 前向迭代器
 
 | 映射               | 底层实现 | 是否有序 | 数值是否可以重复 | 能否更改数值 | 查询效率 | 增删效率 |
 | ------------------ | -------- | -------- | ---------------- | ------------ | -------- | -------- |
