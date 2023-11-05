@@ -501,17 +501,20 @@ void demo() {
 }
 ```
 
+###  **空指针nullptr
+空指针是不会指向有效数据的指针 
+以前c/c++用0表示空指针 这带来一些问题 0既可以表示指针常量 又可以表示整型常量
+NULL是宏 可能是int也可能是long 取决于各个平台的实现 
+如果有两个重载函数func(int) func(a*) 函数调用func(NULL)和func(0)会优先调用前者
 
+C++11新增了nullptr来表示空指针 它是指针类型 但为了向后兼容 nullptr==0仍为true
 
 ## *智能指针
 
 普通指针需要程序员来释放内存，使用智能指针#include<memory>来管理指针的释放
-
-智能指针有四类：auto_ptr(C++17已弃用)、unique_ptr 、shared_ptr、weak_ptr
-
-一般使用unique_ptr，shared_ptr、weak_ptr用于多线程。
-
 智能指针是类模板，不是指针 在栈上创建智能指针对象，将普通指针交给智能指针对象，智能指针对象过期时，调用析构函数释放普通指针的内存。
+智能指针有四类：auto_ptr(C++17已弃用)、unique_ptr 、shared_ptr、weak_ptr
+一般使用unique_ptr，shared_ptr、weak_ptr用于多线程。
 
 为了正确使用智能指针，必须坚持一些基本规范:
 ·不使用相同的内置指针值初始化(或reset)多个智能指针。
