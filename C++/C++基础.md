@@ -177,7 +177,11 @@ typedef int myint//将int改名为myint
 myint distance;
 ```
 
-
+const和constexpr
+```c++
+const修饰只读变量
+constexpr修饰常量
+```
 
 ### **存储类
 
