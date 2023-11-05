@@ -294,27 +294,66 @@ void demo() {
 ```
 
 ### **可变参数模板 C++11
+参数包的展开方式：
+1.模板特化+递归
+2.模板特化+继承
 
 #### 函数模板的可变参数
 
-
 ```c++
 void show() {};//基本情况:当没有剩余参数时，终止递归
-template<typename T, typename... Args>
-void show(T firstArg, Args...args) {
-	cout << firstArg << endl;
-	show(args...);
+
+template<typename T, typename... Args> //... Args称为折叠参数
+//thisArg用T来定义 表示递归取出来的已展开的参数 args用Args定义 表示尚未展开的参数包
+void show(T thisArg, Args...args) {
+	cout << thisArg << endl;//显示本次展开的参数
+	cout << "还有" << sizeof...(args) << "个参数未展开" << endl;
+	show(args...);//递归调用自身 继续展开参数
 }
+
 void demo() {
 	show(2.12, 5, "hello", 'a');
 }
 ```
-
+如果一个函数要两个参数 第二个参数是可变参数 就用一个普通模板嵌套一个可变参数模板
 
 
 #### 类模板的可变参数
 
+```c++
+// 基本情况：当没有剩余的参数时，停止递归
+template <typename... Ts>
+class Tuple {};
 
+//第一个参数递归取出来的已展开的参数，剩余的参数为尚未展开的参数包
+template <typename T, typename... Ts>
+class Tuple<T, Ts...> {
+private:
+	T value; // 头部元素
+	Tuple<Ts...> tail; // 尾部元组
+
+public:
+	// 构造函数，接受已展开的参数和剩余元素
+	Tuple(T t, Ts... ts) : value(t), tail(ts...) {}
+
+	// 获取已展开的参数的方法
+	T getHead() const {
+		return value;
+	}
+
+	// 获取参数包的方法
+	Tuple<Ts...> getTail() const {
+		return tail;
+	}
+};
+void demo() {
+	// 创建一个包含整数、浮点数和字符串的元组
+	Tuple<int, double, std::string> myTuple(1, 3.14, "Hello");
+	std::cout << "Head: " << myTuple.getHead() << std::endl;
+	std::cout << "Tail Head: " << myTuple.getTail().getHead() << std::endl;
+	std::cout << "Tail Tail Head: " << myTuple.getTail().getTail().getHead() << std::endl;
+}
+```
 
 ## *STL标准模板库
 
