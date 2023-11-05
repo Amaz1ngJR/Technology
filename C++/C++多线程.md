@@ -1,9 +1,8 @@
 # C++多线程
 
-## 线程的创建与管理
+## 时间操作chrono库 C++11
+#include< chrono >
 
 
-## 线程同步
-
-
-## 线程池
+## 线程库 thread库 C++11
+#include< thread >
