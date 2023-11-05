@@ -331,16 +331,13 @@ class Tuple<T, Ts...> {
 private:
 	T value; // 头部元素
 	Tuple<Ts...> tail; // 尾部元组
-
 public:
 	// 构造函数，接受已展开的参数和剩余元素
 	Tuple(T t, Ts... ts) : value(t), tail(ts...) {}
-
 	// 获取已展开的参数的方法
 	T getHead() const {
 		return value;
 	}
-
 	// 获取参数包的方法
 	Tuple<Ts...> getTail() const {
 		return tail;
