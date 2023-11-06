@@ -52,6 +52,7 @@ void demo() {
 ```
 
 #### ***友元
+友元函数不属于类的成员函数 不能被继承
 
 ```c++
 class GoodFriend;
