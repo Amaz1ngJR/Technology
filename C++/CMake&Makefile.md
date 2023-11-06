@@ -13,7 +13,7 @@ add_definitions(/utf-8) #设置utf-8格式
 add_executable(main main.cpp func.cpp .cpp …) #使用指定的源文件来生成目标可执行文件
 include_directories("include" "D:/include1" "D:/MyCode/include2") #指定头文件的搜索路径
 add_definitions(/D_USE_MATH_DEFINES -D_CRT_SECURE_NO_DEPRECATE) #添加宏定义
-cmake . #生成Makefile文件
+#使用cmake . 命令生成Makefile文件
 
 #自动添加
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src2/func.*") #自动将src目录下.cpp以及src2目录下名为func的文件加入到项目中 记为SOURCES(可改名)
