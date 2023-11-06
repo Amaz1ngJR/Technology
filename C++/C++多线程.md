@@ -52,5 +52,25 @@ void demo() {
 #include< thread >
 ### *线程的创建与管理
 ```c++
+void demo() {
+	thread t;//默认构造 创建一个不代表任何线程的thread对象
+	//t.join();// 试图等待一个不代表任何线程的线程将导致程序崩溃
 
+	thread t1(threadFunction, "线程", 1);// 创建一个新线程 执行threadFunction函数 传递参数Args
+	if (t1.joinable())t1.join();//joinable()函数检查线程对象是否已经被join()或者detach()
+
+	//thread t2 = t1; // 尝试拷贝thread对象 会导致编译错误 (拷贝构造不可用)
+
+	thread t2 = move(t1); // 使用移动构造函数将t1的所有权转移到t2
+	if (t2.joinable())t2.join(); //t1 t2同时join()会出错
+
+	MyThread myThread;
+	thread t3(myThread); // 使用函数对象创建线程
+	t3.join(); // 等待线程执行完毕
+
+	thread t4([]() {
+		cout << "Hello from Lambda thread!" << endl;
+		}); // 使用Lambda表达式创建线程
+	t4.join(); // 等待线程执行完毕
+}
 ```
