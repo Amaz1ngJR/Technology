@@ -6,8 +6,7 @@
 
 ```cmake
 #CMakeLists.txt:
-cmake_minimum_required(VERSION 2.9)#设置cmake最低版本
-(PowerShell cmake --version)
+cmake_minimum_required(VERSION 2.9)#设置cmake最低版本(PowerShell cmake --version)
 project(MyProject) #设置项目名称
 set(CMAKE_CXX_STANDARD 14) #设置C++14标准
 add_definitions(/utf-8) #设置utf-8格式
