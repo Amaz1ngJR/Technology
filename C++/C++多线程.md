@@ -19,7 +19,7 @@ void demo() {
 }
 ```
 
-### 系统时间
+### *系统时间
 ```c++
 void demo() {
 	//(1) 静态成员区数chrono::system_clock::now()用于获取系统时间 (C++时间)
@@ -33,6 +33,17 @@ void demo() {
 	cout << put_time(tm_now, "%Y-%m-%d %H:%M:%S") << endl;
 	cout << put_time(tm_now, "%Y-%m-%d") << endl;
 	cout << put_time(tm_now, "%H:%M:%S") << endl;
+}
+```
+
+### *计时器
+```c++
+void demo() {
+	chrono::steady_clock::time_point start = chrono::steady_clock::now(); //计时开始
+	for (int i = 0; i < 9999999; i++) {}
+	chrono::steady_clock::time_point end = chrono::steady_clock::now(); //计时结束
+	auto dt = end - start;   //单位是纳秒
+	cout << "take time " << (double)dt.count() / (1000 * 1000 * 1000) << "秒" << endl;
 }
 ```
 
