@@ -50,3 +50,7 @@ void demo() {
 
 ## 线程库 thread库 C++11
 #include< thread >
+### *线程的创建与管理
+```c++
+
+```
