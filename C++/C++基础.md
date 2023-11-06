@@ -1283,3 +1283,26 @@ int deal_files() {
 }
 ```
 
+## *异常
+```c++
+void demo(int a) {
+	try {//try里是可能抛出异常的代码
+		if (a == 1)cout << "程序正常进行" << endl;
+		else if (a == 2)throw"出现异常";//抛出C风格字符串char*异常
+		else if (a == 3)throw 'a';// 抛出字符char异常
+		else throw 1;//抛出int 异常
+	}
+	catch (const char* e) { // 捕获C风格字符串异常
+		std::cerr << "捕获到异常: " << e << std::endl;
+	}
+	catch (char e) { // 捕获字符异常
+		std::cerr << "捕获到异常: " << e << std::endl;
+	}
+	catch (int e) { // 捕获整数异常
+		std::cerr << "捕获到异常: " << e << std::endl;
+	}
+	catch (...) { // 捕获其他类型异常
+		std::cerr << "捕获到未知类型异常" << std::endl;
+	}
+}
+```
