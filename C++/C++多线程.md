@@ -41,6 +41,7 @@ void demo() {
 void demo() {
 	chrono::steady_clock::time_point start = chrono::steady_clock::now(); //计时开始
 	for (int i = 0; i < 9999999; i++) {}
+	std::this_thread::sleep_for(std::chrono::seconds(2)); // 等待2秒
 	chrono::steady_clock::time_point end = chrono::steady_clock::now(); //计时结束
 	auto dt = end - start;   //单位是纳秒
 	cout << "take time " << (double)dt.count() / (1000 * 1000 * 1000) << "秒" << endl;
