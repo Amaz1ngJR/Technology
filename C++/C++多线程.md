@@ -52,6 +52,19 @@ void demo() {
 #include< thread >
 ### *线程的创建与管理
 ```c++
+constexpr int NUM_THREADS = 5; //线程数量
+
+void threadFunction(string ss, int threadID) {//线程函数
+	cout << "调用" << ss << threadID << endl;
+	this_thread::sleep_for(chrono::seconds(1));//休眠1秒
+}
+
+class MyThread {
+public:
+	void operator()() {
+		cout << "Hello from thread!" << endl;
+	}
+};
 void demo() {
 	thread t;//默认构造 创建一个不代表任何线程的thread对象
 	//t.join();// 试图等待一个不代表任何线程的线程将导致程序崩溃
@@ -72,5 +85,13 @@ void demo() {
 		cout << "Hello from Lambda thread!" << endl;
 		}); // 使用Lambda表达式创建线程
 	t4.join(); // 等待线程执行完毕
+
+	thread threads[NUM_THREADS]; // 创建一个包含5个线程的数组
+	for (int i = 0; i < NUM_THREADS; ++i) {// 创建并启动5个线程
+		threads[i] = thread(threadFunction, "数组线程", i); // 将线程函数和该函数的参数传递给线程
+	}
+	for (int i = 0; i < NUM_THREADS; ++i) {// 等待所有线程结束
+		threads[i].join(); //等待线程结束
+	}
 }
 ```
