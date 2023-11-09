@@ -91,7 +91,7 @@ void demo() {
 	for (int i = 0; i < NUM_THREADS; ++i) {// 创建并启动5个线程
 		threads[i] = thread(threadFunction, "数组线程", i); // 将线程函数和该函数的参数传递给线程
 	}
-	for (int i = 0; i < NUM_THREADS; ++i) {// 等待所有线程结束
+	for (int i = 0; i < NUM_THREADS; ++i) {//这段循环如果放到上面那个循环中 速度会变慢
 		threads[i].join(); //等待线程结束
 	}
 }
