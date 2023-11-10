@@ -430,6 +430,29 @@ void demo() {
 	v1.resize(20);//重新指定容器长度为20 若容器变长 以默认值填充新位置 变短则删除超出部分
 	v1.resize(20, 100);//将填充的默认值修改成100
 }
+void demo() {//区分vector<int>v(size)和v.reserve(size)
+	vector<int>v1(10), v2(10);
+	cout << "v1的大小为 " << v1.size() <<
+		" v2的大小为 " << v2.size() << endl;
+	//v1的大小为 10 v2的大小为 10 
+	for (int i = 0; i < 10; i++) {
+		v1.emplace_back(i);
+		v2.push_back(i);
+	}
+	cout << "v1的大小为 " << v1.size() <<
+		" v2的大小为 " << v2.size() << endl;
+	//v1的大小为 20 v2的大小为 20
+	for (auto it = v1.begin(); it != v1.end(); it++) {
+		cout << *it;//能够访问前面10个元素 都为0
+	}
+
+	vector<int>v3;
+	v3.reserve(10);
+	for (int i = 0; i < 10; i++) {
+		v3.emplace_back(i);
+	}
+	cout << "v3的大小为 " << v3.size();//v3的大小仍为10
+}
 ```
 
 由于vector是动态扩容的 预留容量会随着插入次数的增多而变大
