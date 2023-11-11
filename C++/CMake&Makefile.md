@@ -25,9 +25,9 @@ add_compile_options(-g -Wunused) #给后续的目标加上编译选项(调试、
 target_compile_options(main PUBLIC -Wall) #给指定目标加上编译选项
 
 #多目标编译 生成多个可执行文件
-{add_executable(main ${SOURCES} main.cpp)
+add_executable(main ${SOURCES} main.cpp)
 add_executable(main1 ${SOURCES} main.cpp1)
-add_executable(main2 ${SOURCES} main.cpp2)}(没有{})
+add_executable(main2 ${SOURCES} main.cpp2)
 
 #编译器
 # linux平台的GCC编译器
@@ -59,19 +59,24 @@ target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core Qt5::Gui) #添加Qt
 set(QT_CMAKE_PATH "D:/iQT/5.14.2/msvc2017_64/lib/cmake")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT_CMAKE_PATH})
 set(CMAKE_PREFIX_PATH "path/to/your/opencv")#在指定的路径中查找库
+
 find_package(OpenCV REQUIRED)
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})#链接
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
 
 #编译
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES})#使用指定的文件来生成目标可执行文件
 set(MUL_SOURCES ./mul/mul.cpp) #引用
 add_library(mul STATIC ${MUL_SOURCES})#指定从某些源文件创建静态库
 add_library(mul SHARED ${MUL_SOURCES})#指定从某些源文件创建动态库
+
 
 #链接main.cpp中#include "mul.h"
 link_directories(D:/lib) #链接库目录到所有目标
 link_libraries(mul) #链接库名称到所有目标
 target_link_directories(main PUBLIC ./) #链接库目录到指定目标
 target_link_libraries(main mul) #链接库名称到指定目标
+target_link_libraries(${PROJECT_NAME}  ${OpenCV_LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARIES} glut GL)#添加依赖项
 
 ```
 
