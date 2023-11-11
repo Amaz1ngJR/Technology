@@ -1,6 +1,7 @@
 # CMake&Makefile
 
-插入图片
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bbfa13ba-9c62-48dd-887a-7fb848f70423)
+
 
 ## CMake
 
