@@ -6,21 +6,27 @@
 ## CMake
 
 ```cmake
+#使用cmake . 命令生成Makefile文件
+#rm -rf CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile
+
 #CMakeLists.txt:
+------------------------基础---------------------
 cmake_minimum_required(VERSION 2.9)#设置cmake最低版本(PowerShell cmake --version)
 project(MyProject) #设置项目名称
 set(CMAKE_CXX_STANDARD 14) #设置C++14标准
-add_definitions(/utf-8) #设置utf-8格式
+add_definitions(/utf-8) #设置utf-8格式 Linux下add_compile_options(-fexec-charset=UTF-8)
+
+#添加文件
 add_executable(main main.cpp func.cpp .cpp …) #使用指定的源文件来生成目标可执行文件
 include_directories("include" "D:/include1" "D:/MyCode/include2") #指定头文件的搜索路径
 add_definitions(/D_USE_MATH_DEFINES -D_CRT_SECURE_NO_DEPRECATE) #添加宏定义
-#使用cmake . 命令生成Makefile文件
-
 #自动添加
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src2/func.*") #自动将src目录下.cpp以及src2目录下名为func的文件加入到项目中 记为SOURCES(可改名)
-add_executable(main ${SOURCES})
-FILE(GLOB HEAD_FILES "./*.h")#查找设置当前文件夹中所有的头文件
+#file(GLOB_RECURSE SOURCES "src/*.cpp" "src2/func.*") #自动将src目录下.cpp以及src2目录下名为func的文件加入到项目中 记为SOURCES(可改名)
+file(GLOB SRC_FILES "/home/yjr/MyCode/MyCode/*.cpp") #自动将目录下.cpp添加到项目中
+FILE(GLOB HEAD_FILES "/home/yjr/MyCode/MyCode/*.h" "/home/yjr/MyCode/include/*.hpp")#查找设置当前文件夹中所有的头文件
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEAD_FILES})#使用指定的文件来生成目标可执行文件
 
+----------------------其他选项----------------------
 #添加编译选项
 add_compile_options(-g -Wunused) #给后续的目标加上编译选项(调试、警告)
 target_compile_options(main PUBLIC -Wall) #给指定目标加上编译选项
