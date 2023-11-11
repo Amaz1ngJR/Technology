@@ -178,6 +178,6 @@ exe:$(obj)
 	g++ $(myArgs) $^ -o $@
 $(obj): %.o: %.c
 	g++ -c $< -o $@ $(myArgs)
-clean: 
-	-rm -rf $(obj) exe   #使用clean :先使用make clean -n 模拟删除(提示删除内容) 再make clean
+clean:  #使用clean :先使用make clean -n 模拟删除(提示删除内容) 再make clean
+	-rm -rf $(obj) exe   
 ```
