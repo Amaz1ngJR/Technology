@@ -1,6 +1,3 @@
-
-Linux 没有盘符，只有一个根目录/，所有文件都在它下面
-
 # *配置
 
 ```
@@ -9,9 +6,11 @@ Win + R： mstsc 远程连接
 
 ## **vim配置
 
+Linux 没有盘符，只有一个根目录/，所有文件都在它下面
+
 默认路径/etc/vim/vimrc,可以在~/路径下创建.vimrc进行配置 vim ~/.vimrc
 
-```c++
+```bash
 set ai/ autoindent        "自动缩进，与上一行保持一致的自动空格
 set cindent               "以C/C++模式缩进
 set smartindent           "为c程序提供自动缩进
