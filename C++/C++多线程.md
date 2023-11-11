@@ -125,7 +125,7 @@ void demo() {
 }
 ```
 ### *线程安全
-### **call_once函数
+#### **call_once函数
 ```c++
 std::mutex MutexCout; // 创建互斥锁 #include <mutex>
 once_flag onceflag;   //once_flag全局变量 本质是取值为0和1的锁
