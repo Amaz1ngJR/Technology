@@ -92,16 +92,89 @@ M/makefile：
 一个规则 两个函数 三个自动变量 模式规则 静态模式规则 伪目标
 
 ## *一个规则
-
-目标：依赖条件
-
-(一个tab缩进)命令
-
 ```makefile
+#	目标：依赖条件
+#		(一个tab缩进)命令
 exe:main.c             #默认最终目标是第一个exe 可以加all关键字更改makefile最终生成目标
-    g++ main.o -g -o exe
+	g++ main.o -g -o exe
 exe:main.o             #检查依赖条件是否存在
 	g++ main.o -o exe
 main.o:main.c          #如果依赖条件不存在 寻找是否有规则可以生成改依赖文件
-    g++ -c main.c -o main.o
+	g++ -c main.c -o main.o
+```
+## *两个函数
+```makefile
+#两个函数
+src = $(wildcard *.c)  #找到当前目录下所有.c文件 赋值给src
+obj = $(patsubst %.c,%.o,$(src))   #将参数3( $(src) )里所有包含参数1(%.c)的文件替换成参数3(%.o)
+
+#剩余部分
+ALL:exe
+exe: $(obj)
+	g++ $(obj) -o exe
+```
+## *三个自动变量
+```makefile
+#         $@ : 在规则的 命令 里使用 表示规则中的目标；
+#         $< : 在规则的 命令 里使用 表示规则中的第一个依赖条件 如果应用于模式规则中，可以将依赖条件列表中的依赖依次取出，套用模式规则；
+#         $^ : 在规则的 命令 里使用 表示规则中的所有依赖条件、组成一个列表，以空格隔开，如果这个列表中有重复的项则取消重复项；
+
+exe: $(obj)
+	g++ $^ -o $@
+add.o: add.c
+	g++ -c $< -o $@
+sub.o: sub.c
+	g++ -c $< -o $@
+```
+## *模式规则
+```makefile
+#	%.o:%.c
+#		(一个tab缩进)命令
+
+exe: $(obj)
+	g++ $^ -o $@
+%.o:%.c
+	g++ -c $< -o $@
+```
+## *静态模式识别
+```makefile
+#	$(obj):%.o:%.c
+#		(一个tab缩进)命令
+
+exe: $(obj)
+	g++ $^ -o $@
+$(obj): %.o: %.c
+	g++ -c $< -o $@
+%.o:%.s
+	g++ -S $< -o $@
+```
+## *添加参数
+```makefile
+myArgs = -Wall -g
+all:exe
+exe: $(obj)
+	g++ $^ -o $@ $(myArgs)
+$(obj): %.o: %.c
+	g++ -c $< -o $@ $(myArgs)
+```
+## *伪目标
+```makefile
+#makefile下添加了名为clean或者all的文件 在执行make clean的时候会有歧义 使用伪目标:
+ .PHONY:clean ALL 
+```
+## *最终的makefile
+```makefile
+myArgs = -Wall -g   #参数
+.PHONY:clean ALL    #伪目标
+#两个函数
+src = $(wildcard *.c)  #找到当前目录下所有.c文件 赋值给src
+obj = $(patsubst %.c,%.o,$(src))   #将参数3( $(src) )里所有包含参数1(%.c)的文件替换成参数3(%.o)
+ALL:exe
+
+exe:$(obj)
+	g++ $(myArgs) $^ -o $@
+$(obj): %.o: %.c
+	g++ -c $< -o $@ $(myArgs)
+clean: 
+	-rm -rf $(obj) exe   #使用clean :先使用make clean -n 模拟删除(提示删除内容) 再make clean
 ```
