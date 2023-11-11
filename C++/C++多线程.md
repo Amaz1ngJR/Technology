@@ -100,3 +100,27 @@ void demo() {
 	}
 }
 ```
+#### ** this_thread全局函数
+
+thread::get_id() thread::yield() thread::sleep_for() thread::sleep_until()
+```c++
+void thread_func(int a, const string& str) {//线程函数
+	if (a == 1)this_thread::yield();//让线程主动让出自己抢到的CPU时间片
+	std::thread::id thisThreadId = std::this_thread::get_id();//获得线程id
+	cout << "第" << a << "个线程ID：" << thisThreadId << str << endl;
+	auto now = std::chrono::system_clock::now();// 获取当前时间点
+	auto sleepUntilTime = now + std::chrono::seconds(2); //定义要休眠到的时间点
+	std::this_thread::sleep_until(sleepUntilTime);//使当前线程休眠直到指定的时间点
+	for (int i = 0; i < 3; i++) {
+		cout << "开始休眠" << endl;
+		this_thread::sleep_for(chrono::seconds(1));//让线程休眠一秒
+	}
+}
+void demo() {
+	thread t1(thread_func, 1, "调用1");
+	thread t2(thread_func, 2, "调用2");
+	swap(t1, t2);//交换两个线程对象
+	t1.join();
+	t2.join();
+}
+```
