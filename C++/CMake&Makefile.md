@@ -1,9 +1,4 @@
-# CMake&Makefile
-
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bbfa13ba-9c62-48dd-887a-7fb848f70423)
-
-
-## CMake
+# CMake
 
 ```cmake
 #使用cmake . 命令生成Makefile文件
@@ -87,15 +82,26 @@ target_link_libraries(${PROJECT_NAME}  ${OpenCV_LIBS} ${GLUT_LIBRARY} ${OPENGL_L
 
 ```
 
-## Makefile
+# Makefile
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bbfa13ba-9c62-48dd-887a-7fb848f70423)
+
+使用objdump -dS 二进制文件.o 将机器代码转成汇编代码
 
 M/makefile：
 
 一个规则 两个函数 三个自动变量 模式规则 静态模式规则 伪目标
 
-### *一个规则
+## *一个规则
 
 目标：依赖条件
 
 (一个tab缩进)命令
 
+```makefile
+exe:main.c             #默认最终目标是第一个exe 可以加all关键字更改makefile最终生成目标
+    g++ main.o -g -o exe
+exe:main.o             #检查依赖条件是否存在
+	g++ main.o -o exe
+main.o:main.c          #如果依赖条件不存在 寻找是否有规则可以生成改依赖文件
+    g++ -c main.c -o main.o
+```
