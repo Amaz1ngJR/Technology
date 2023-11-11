@@ -124,3 +124,33 @@ void demo() {
 	t2.join();
 }
 ```
+### *线程安全
+### **call_once函数
+```c++
+std::mutex MutexCout; // 创建互斥锁 #include <mutex>
+once_flag onceflag;   //once_flag全局变量 本质是取值为0和1的锁
+
+void once_func(const int a, const string& str) {
+	cout << "once_func调用 a= " << a << ",str = " << str << endl;
+}
+
+void thread_func(int a, const string& str) {//线程函数
+	call_once(onceflag, once_func, a, "只调用一次");
+	for (int i = 0; i < 3; i++) {
+		{
+			std::lock_guard<std::mutex> lock(MutexCout); // 锁定互斥锁
+			std::thread::id thisThreadId = std::this_thread::get_id();
+			cout << "第" << a << "个线程ID：" << thisThreadId << str << endl;
+		} // 锁定作用域结束后互斥锁自动释放
+		Sleep(1000);// 休眠1秒 Linux: Sleep(1)
+	}
+}
+
+void demo() {
+	thread t1(thread_func, 1, "调用1");
+	thread t2(thread_func, 2, "调用2");
+	swap(t1, t2);//交换两个线程对象
+	t1.join();
+	t2.join();
+}
+```
