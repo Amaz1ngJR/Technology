@@ -215,4 +215,10 @@ find /path/to/search -name "*.txt" -type f -size +1M
 //\; 是告诉 find 命令 在每个 -exec 命令的结尾使用分号来表示命令的结束
 find /path/to/search -name "*.log" -exec rm {} \; 
 ```
-
+## vim/vi 编辑器
+vim 兼容全部的vi功能
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/03489074-c40d-4d1e-990b-131f3e5e246b)
+|         模式           |           命令             |         描述           |
+|         命令模式           |           命令             |         描述           |
+|         命令模式           |           命令             |         描述           |
+|         命令模式           |           命令             |         描述           |
