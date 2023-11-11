@@ -85,7 +85,10 @@ target_link_libraries(${PROJECT_NAME}  ${OpenCV_LIBS} ${GLUT_LIBRARY} ${OPENGL_L
 # Makefile
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bbfa13ba-9c62-48dd-887a-7fb848f70423)
 
-使用objdump -dS 二进制文件.o 将机器代码转成汇编代码
+```bash
+#使用objdump -dS 二进制文件.o 将机器代码转成汇编代码
+objdump -dS main.o
+```
 
 M/makefile：
 
