@@ -3,8 +3,9 @@
 ```
 Win + R： mstsc 远程连接
 ```
+## *用户和权限
 
-## **vim配置
+## vim配置
 
 Linux 没有盘符，只有一个根目录/，所有文件都在它下面
 
@@ -47,7 +48,7 @@ set langmenu=zh_CN.UTF-8
 set helplang=cn
 ```
 
-## **Byobu使用
+## Byobu使用
 
 安装byobu
 
@@ -234,8 +235,6 @@ Ctrl + L = clear 清空终端内容
 删除虚拟环境      conda remove -n  <环境名name> --all
 复制虚拟环境      conda create --name new_name --clone old_name
 ```
-# *用户和权限
-
 # *vim/vi 编辑器
 vim 兼容全部的vi功能
 
