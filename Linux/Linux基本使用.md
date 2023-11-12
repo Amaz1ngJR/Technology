@@ -215,7 +215,28 @@ find /path/to/search -name "*.txt" -type f -size +1M
 //\; 是告诉 find 命令 在每个 -exec 命令的结尾使用分号来表示命令的结束
 find /path/to/search -name "*.log" -exec rm {} \; 
 ```
-## vim/vi 编辑器
+##快捷键
+```bash
+Ctrl + C 强制停止
+Ctrl + D 退出账号的登录 退出某些特点程序的专属页面 不能用于退出vi/vim
+ctrl + R = history !内容 输入内容去匹配历史命令 然后回车键可以自己执行 键盘左、右键可以得到此命令
+Ctrl + A 跳到命令开头
+Ctrl + E 跳到命令结尾
+Ctrl + U 删除这行命令
+Ctrl + 键盘左/右键 向左/右跳一个单词
+Ctrl + L = clear 清空终端内容
+```
+## 虚拟环境相关
+```bash
+创建虚拟环境      conda create -n <环境名name> python=0.0
+进/出虚拟环境     conda activate <环境名name>/conda deactivate
+查看所有虚拟环境  conda env list 所有包 conda list 
+删除虚拟环境      conda remove -n  <环境名name> --all
+复制虚拟环境      conda create --name new_name --clone old_name
+```
+# 用户和权限
+
+# vim/vi 编辑器
 vim 兼容全部的vi功能
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/03489074-c40d-4d1e-990b-131f3e5e246b)
