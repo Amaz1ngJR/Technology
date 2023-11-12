@@ -234,9 +234,9 @@ Ctrl + L = clear 清空终端内容
 删除虚拟环境      conda remove -n  <环境名name> --all
 复制虚拟环境      conda create --name new_name --clone old_name
 ```
-# 用户和权限
+# *用户和权限
 
-# vim/vi 编辑器
+# *vim/vi 编辑器
 vim 兼容全部的vi功能
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/03489074-c40d-4d1e-990b-131f3e5e246b)
