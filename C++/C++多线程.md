@@ -50,6 +50,7 @@ void demo() {
 
 ## 线程库 thread库 C++11
 #include< thread >
+### *查看逻辑处理器(线程)数量
 ```c++
 void demo() {
 	// 获取计算机的核数
