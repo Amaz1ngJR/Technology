@@ -57,6 +57,11 @@ void demo() {
 	cout<<"拥有"<<numCores<<"个核"<<endl;
 }
 ```
+Linux系统下使用命令
+```bash
+nproc --all
+lscpu
+```
 ### *线程的创建与管理
 #### **创建线程
 ```c++
