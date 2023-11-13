@@ -50,6 +50,13 @@ void demo() {
 
 ## 线程库 thread库 C++11
 #include< thread >
+```c++
+void demo() {
+	// 获取计算机的核数
+	unsigned int numCores = std::thread::hardware_concurrency();
+	cout<<"拥有"<<numCores<<"个核"<<endl;
+}
+```
 ### *线程的创建与管理
 #### **创建线程
 ```c++
