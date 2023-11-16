@@ -821,8 +821,10 @@ void demo() {
 	//插入
 	str.insert(7, "!!!");//下标7插入"!!!"
 	str.insert(0, 3, '!');//下标0开始插入3个字符'!'
+	str.push_back('!');
 	cout << str;
 	//删除
+	str.pop_back();
 	str.erase(0, 3);//删除下标0-3的元素
 	cout << str;
 }
