@@ -1307,7 +1307,16 @@ void demo() {
 	for_each(w.begin(), w.end(), print01());
 }
 ```
-
+##### iota
+//给元素递增赋值(source.begin(),source.end(),star)
+```c++
+void demo() {
+	vector<int> a(10);
+	iota(a.begin(), a.end(), 1);
+	/*for (int i = 0; i < 10; i++)
+		a[i] = i + 1;*/
+}
+```
 #### ***常用查找算法
 
 ##### find
