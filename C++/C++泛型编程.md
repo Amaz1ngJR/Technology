@@ -1421,7 +1421,8 @@ void demo() {
 	int target = 5;
 	auto it = std::lower_bound(vec.begin(), vec.end(), target);
 	if (it != vec.end()) {
-		std::cout << "第一个不小于 " << target << " 的元素的位置是：" << std::distance(vec.begin(), it) << std::endl;
+		std::cout << "第一个不小于 " << target << " 的元素的位置是："
+			<< std::distance(vec.begin(), it) << std::endl;
 	}
 	else {
 		std::cout << "容器中没有不小于 " << target << " 的元素。" << std::endl;
