@@ -1307,16 +1307,6 @@ void demo() {
 	for_each(w.begin(), w.end(), print01());
 }
 ```
-##### iota
-//给元素递增赋值(source.begin(),source.end(),star)
-```c++
-void demo() {
-	vector<int> a(10);
-	iota(a.begin(), a.end(), 1);
-	/*for (int i = 0; i < 10; i++)
-		a[i] = i + 1;*/
-}
-```
 #### ***常用查找算法
 
 ##### find
@@ -1513,6 +1503,23 @@ void demo() {
 ```
 
 #### ***常用排序算法
+##### iota
+//给元素递增赋值(source.begin(),source.end(),star)
+```c++
+void demo() {
+	vector<int> a(10);
+	iota(a.begin(), a.end(), 1);
+	/*for (int i = 0; i < 10; i++)
+		a[i] = i + 1;*/
+	//用法：不改变二维数组q的位置 得到q排序后的位置
+	vector<vector<int>>q;
+	vector<int>qid(q.size());
+	iota(qid.begin(), qid.end(), 0);
+	//返回二维数组q按第一个元素从大到小排序后位置结果
+	sort(qid.begin(), qid.end(), [&](int i, int j) {
+		return q[i][0] > q[j][0];});
+}
+```
 
 ##### sort
 
