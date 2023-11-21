@@ -114,9 +114,9 @@ void demo() {
 | [atanh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-atanh.html) | 返回数字的弧双曲正切                    |
 | [cbrt()](https://www.nhooo.com/cpp/cpp-library-function-cmath-cbrt.html) | 计算数字的立方根                        |
 | ceil(x)| 返回数字x的向上取整                     |
-| [floor(x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-floor.html) | 返回数字x的向下取整                     |
-| [copysign(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-copysign.html) | 它以y的符号返回x的大小。                |
-| [cos(弧度)](https://www.nhooo.com/cpp/cpp-library-function-cmath-cos.html) | 返回参数的余弦                          |
+| floor(x)| 返回数字x的向下取整                     |
+| copysign(x,y)| 它以y的符号返回x的大小。                |
+| cos(弧度) | 返回参数的余弦                          |
 | [cosh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-cosh.html) | 返回某个角度的双曲余弦值                |
 | [exp()](https://www.nhooo.com/cpp/cpp-library-function-cmath-exp.html) | 它计算升为幂x的指数e。                  |
 | [exp2()](https://www.nhooo.com/cpp/cpp-library-function-cmath-exp2.html) | 它计算x的以2为底的指数。                |
