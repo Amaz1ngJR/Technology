@@ -113,7 +113,7 @@ void demo() {
 | [atan2(y,x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-atan2.html) | 返回坐标的反正切 弧度制角度 [-PI,PI]    |
 | [atanh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-atanh.html) | 返回数字的弧双曲正切                    |
 | [cbrt()](https://www.nhooo.com/cpp/cpp-library-function-cmath-cbrt.html) | 计算数字的立方根                        |
-| [ceil(x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-ceil.html) | 返回数字x的向上取整                     |
+| ceil(x)| 返回数字x的向上取整                     |
 | [floor(x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-floor.html) | 返回数字x的向下取整                     |
 | [copysign(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-copysign.html) | 它以y的符号返回x的大小。                |
 | [cos(弧度)](https://www.nhooo.com/cpp/cpp-library-function-cmath-cos.html) | 返回参数的余弦                          |
@@ -133,24 +133,24 @@ void demo() {
 | [ldexp()](https://www.nhooo.com/cpp/cpp-library-function-cmath-ldexp.html) | 将x和2的乘积返回到幂e                   |
 | [llrint()](https://www.nhooo.com/cpp/cpp-library-function-cmath-llrint.html) | 使用当前舍入模式舍入参数                |
 | [llround()](https://www.nhooo.com/cpp/cpp-library-function-cmath-llround.html) | 将参数四舍五入到最接近的long long int值 |
-| [log(a)](https://www.nhooo.com/cpp/cpp-library-function-cmath-log.html) | 返回数字的自然对数     ln(a)            |
-| [log10(a)](https://www.nhooo.com/cpp/cpp-library-function-cmath-log10.html) | 返回数字的以10为底的对数 log(a)         |
+| log(a) | 返回数字的自然对数     ln(a)            |
+| log10(a) | 返回数字的以10为底的对数 log(a)         |
 | [log1p()](https://www.nhooo.com/cpp/cpp-library-function-cmath-log1p.html) | 返回x + 1的自然对数。                   |
-| [log2(x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-log2.html) | 它计算x的以2为底的对数。                |
-| [logb(x)](https://www.nhooo.com/cpp/cpp-library-function-cmath-logb.html) | 返回\| x \|的对数                       |
+| log2(x) | 它计算x的以2为底的对数。                |
+| logb(x) | 返回\| x \|的对数                       |
 | [lrint()](https://www.nhooo.com/cpp/cpp-library-function-cmath-lrint.html) | 使用当前舍入模式舍入参数                |
 | [lround()](https://www.nhooo.com/cpp/cpp-library-function-cmath-lround.html) | 返回最接近参数的long int值              |
 | [modf()](https://www.nhooo.com/cpp/cpp-library-function-cmath-modf.html) | 将数字分解为整数和小数部分              |
 | [nan()](https://www.nhooo.com/cpp/cpp-library-function-cmath-nan.html) | 返回NaN值                               |
 | [nearbyint](https://www.nhooo.com/cpp/cpp-library-function-cmath-nearbyint)() | 将参数舍入为使用当前舍入模式            |
-| [pow(a,b)](https://www.nhooo.com/cpp/cpp-library-function-cmath-pow.html) | 计算幂 a的b次方                         |
+| pow(a,b) | 计算幂 a的b次方                         |
 | [restder(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-remainder.html) | 返回x / y的余数                         |
 | [remquo(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-remquo.html) | 计算机余数并存储x / y的商               |
 | [rint()](https://www.nhooo.com/cpp/cpp-library-function-cmath-rint.html) | 使用当前舍入模式舍入参数                |
 | [round()](https://www.nhooo.com/cpp/cpp-library-function-cmath-round.html) | 返回最接近参数的整数值                  |
 | [sin(弧度)](https://www.nhooo.com/cpp/cpp-library-function-cmath-sin.html) | 返回参数的正弦                          |
 | [sinh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-sinh.html) | 返回某个角度的双曲正弦                  |
-| [sqrt(a)](https://www.nhooo.com/cpp/cpp-library-function-cmath-sqrt.html) | 计算数字a的算术平方根                   |
+| sqrt(a)| 计算数字a的算术平方根                   |
 | [tan()](https://www.nhooo.com/cpp/cpp-library-function-cmath-tan.html) | 返回参数的切线                          |
 | [tanh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-tanh.html) | 返回角度的双曲正切                      |
 | [trunc()](https://www.nhooo.com/cpp/cpp-library-function-cmath-trunc.html) | 截断数字的符号部分                      |
