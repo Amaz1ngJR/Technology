@@ -7,11 +7,10 @@ SQL:操作关系型数据库的**编程语言** 定义了一套操作关系型�
 # 配置介绍
 Linux Ubuntu下安装MySQL8.0
 ```bash
-Linux Ubuntu下安装MySQL8.0
-安装：sudo apt install -y mysql-server
-启动：/etc/init.d/mysql start
-停止：/etc/init.d/mysql stop
-查看状态：/etc/init.d/mysql status
+sudo apt install -y mysql-server  //安装
+/etc/init.d/mysql start           //启动
+/etc/init.d/mysql stop            //停止
+/etc/init.d/mysql status          //查看状态
 ```
 登录
 ```bash
