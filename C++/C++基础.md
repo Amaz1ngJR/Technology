@@ -143,15 +143,11 @@ void demo() {
 | [modf()](https://www.nhooo.com/cpp/cpp-library-function-cmath-modf.html) | 将数字分解为整数和小数部分              |
 | [nan()](https://www.nhooo.com/cpp/cpp-library-function-cmath-nan.html) | 返回NaN值                               |
 | [nearbyint](https://www.nhooo.com/cpp/cpp-library-function-cmath-nearbyint)() | 将参数舍入为使用当前舍入模式            |
-| [nextafter()](https://www.nhooo.com/cpp/cpp-library-function-cmath-nextafter.html) | 它表示x在y方向上的下一个可表示值。      |
-| [nexttoward()](https://www.nhooo.com/cpp/cpp-library-function-cmath-nexttoward.html) | 它表示x在y方向上的下一个可表示值。      |
 | [pow(a,b)](https://www.nhooo.com/cpp/cpp-library-function-cmath-pow.html) | 计算幂 a的b次方                         |
 | [restder(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-remainder.html) | 返回x / y的余数                         |
 | [remquo(x,y)](https://www.nhooo.com/cpp/cpp-library-function-cmath-remquo.html) | 计算机余数并存储x / y的商               |
 | [rint()](https://www.nhooo.com/cpp/cpp-library-function-cmath-rint.html) | 使用当前舍入模式舍入参数                |
 | [round()](https://www.nhooo.com/cpp/cpp-library-function-cmath-round.html) | 返回最接近参数的整数值                  |
-| [scalbln(x,n)](https://www.nhooo.com/cpp/cpp-library-function-cmath-scalbln.html) | 计算x和FLT_RADX乘以n的乘积。            |
-| [scalbn(x,n)](https://www.nhooo.com/cpp/cpp-library-function-cmath-scalbn.html) | 计算x和FLT_RADX乘以n的乘积。            |
 | [sin(弧度)](https://www.nhooo.com/cpp/cpp-library-function-cmath-sin.html) | 返回参数的正弦                          |
 | [sinh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-sinh.html) | 返回某个角度的双曲正弦                  |
 | [sqrt(a)](https://www.nhooo.com/cpp/cpp-library-function-cmath-sqrt.html) | 计算数字a的算术平方根                   |
