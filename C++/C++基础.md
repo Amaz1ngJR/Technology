@@ -104,7 +104,7 @@ void demo() {
 
 | 函数                                                         | 功能                                    |
 | :----------------------------------------------------------- | --------------------------------------- |
-| [abs(a)](https://www.nhooo.com/cpp/cpp-library-function-cmath-abs.html) | 返回参数a的绝对值                       |
+| abs(a) | 返回参数a的绝对值                       |
 | [acos()](https://www.nhooo.com/cpp/cpp-library-function-cmath-acos.html) | 返回反余弦数字                          |
 | [acosh()](https://www.nhooo.com/cpp/cpp-library-function-cmath-acosh.html) | 返回数字的双曲余弦值                    |
 | [asin()](https://www.nhooo.com/cpp/cpp-library-function-cmath-asin.html) | 返回反正弦值                            |
