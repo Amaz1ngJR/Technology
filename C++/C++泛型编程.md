@@ -826,8 +826,7 @@ void demo() {
 	cout << str;
 	//删除
 	str.pop_back();//删除末尾元素
-	str.erase(0);//删除开头的元素 str.size()也跟着改变
-	str.erase(0, 3);//删除下标0-3区间的元素
+	str.erase(0, 1);//删除下标0开始的1个元素
 
 	cout << str;
 }
