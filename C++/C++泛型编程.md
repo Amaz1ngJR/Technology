@@ -822,10 +822,13 @@ void demo() {
 	str.insert(7, "!!!");//下标7插入"!!!"
 	str.insert(0, 3, '!');//下标0开始插入3个字符'!'
 	str.push_back('!');
+
 	cout << str;
 	//删除
-	str.pop_back();
-	str.erase(0, 3);//删除下标0-3的元素
+	str.pop_back();//删除末尾元素
+	str.erase(0);//删除开头的元素 str.size()也跟着改变
+	str.erase(0, 3);//删除下标0-3区间的元素
+
 	cout << str;
 }
 ```
