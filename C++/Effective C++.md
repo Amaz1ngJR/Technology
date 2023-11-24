@@ -34,4 +34,12 @@ private:
 ```
 ### 对于形似函数的宏 最好改用inline函数替换#define
 
-## 尽可能使用cosnt
+## 尽可能使用const
+```c++
+class P{};
+const P operator*(const P& a, const P& b);//函数返回值为const
+//防止出现下面现象
+P a, b, c;
+//错误的将if(a * b == c)写成if (a * b = c)
+//将使c赋值到a*b的结果中
+```
