@@ -228,12 +228,7 @@ public:
 ```c++
 class Person {
 public:
-	int m_a = 10;
-	mutable int m_b = 20;
-	void showPerson() const {//常函数
-		//this->m_a = 20; 常函数内不可以修改成员属性
-		this->m_b = 30;//成员属性声明时加关键字mutable后 可以修改
-	}
+	void showPerson() const;//常函数
 };
 ```
 
@@ -244,8 +239,12 @@ public:
 class Person {
 public:
 	int m_a = 10;
+	mutable int m_b = 20;
 	void showPerson() const {//常函数
 		cout << m_a;
+		//this->m_a = 20; 常函数内不可以修改成员属性
+		this->m_b = 30;//成员属性声明时加关键字mutable后 可以修改
+		//func();//常函数不能调用类的非常函数 因为非常函数可以修改类的成员变量
 	}
 	void func(){}//非 常函数
 };
