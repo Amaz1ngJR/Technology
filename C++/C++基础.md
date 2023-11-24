@@ -457,6 +457,7 @@ const修饰指针（按*和const出现的顺序命名，*是指针，const是常
 
 1. const修饰指针--常量指针const*
 ```c++
+int cosnt * p = a;
 const int * p = a;//特点：指针的指向可以修改，但是指针指向的值不可以修改
 ```
 2. const修饰常量--指针常量*const
