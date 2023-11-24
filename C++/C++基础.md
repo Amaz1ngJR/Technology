@@ -252,6 +252,7 @@ private:
 	enum { Number = 8 };//"the enum hack" 令Number成为5的一个记号
 	int a[Number];
 };
+```
 ### **存储类
 
 #### auto
