@@ -29,4 +29,5 @@ private:
 	enum { Number = 8 };//"the enum hack" 令Number成为5的一个记号
 	int a[Number];
 };
+//取一个const的地址是合法的 取enum和一个#define的地址通常不合法 如果不想让别的指针或引用指向某个整数常量 可以使用enum
 ```
