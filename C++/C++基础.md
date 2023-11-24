@@ -222,7 +222,36 @@ enum Color {
     BLUE
 };//RED=0 GREEN=2 BLUE=3
 ```
+### 对于单纯常量 最好用const或enum替换#define
+```c++
+#define NUMBER 1234 //如果发生错误 编译器给出的信息是1234 而不是NUMBER 如果这部分不是自己写的 来自某个头文件 会很难发现错误
+//使用constexpr来定义常量替换#define
+constexpr NUMBER = 1234;
+```
+class专属常量 无法使用#define创建一个class专属常量 
+```c++
+class Players {
+private:
+	static constexpr int Number = 8; //常量声明式 位于头文件
+	int a[Number];//使用该常量
+};
+//有些编译器必须要看到定义式 在实现(非头文件)文件下提供定义式:
+constexpr int Players::Number; //常量定义式 由于声明获得初值 因此定义时不在设初值
 
+//有些编译器不让在声明的时候获得初值 改成下面的形式
+class Players {
+private:
+	static constexpr int Number; //常量声明式 位于头文件
+	int a[Number];//使用该常量
+};
+constexpr int Players::Number = 8;//常量定义式 位于实现文件
+
+//当编译器不允许 static整数型class常量完成 in class初值设定 可改用:
+class Players {
+private:
+	enum { Number = 8 };//"the enum hack" 令Number成为5的一个记号
+	int a[Number];
+};
 ### **存储类
 
 #### auto
@@ -457,7 +486,7 @@ const修饰指针（按*和const出现的顺序命名，*是指针，const是常
 
 1. const修饰指针--常量指针const*
 ```c++
-int cosnt * p = a;
+int const * p = a;
 const int * p = a;//特点：指针的指向可以修改，但是指针指向的值不可以修改
 ```
 2. const修饰常量--指针常量*const
@@ -978,6 +1007,8 @@ void func(const int& a);//const int& a=10;合法
 适用：代码执行时间很短
 
 不适用：内联函数不能递归
+
+对于形似函数的宏 最好改用inline函数替换#define
 
 ### **lambda表达式 匿名函数
 
