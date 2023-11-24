@@ -370,6 +370,7 @@ forward_iterator前向迭代器 读写操作,并能向前推进迭代器  读写
 bidirectional_iterator双向迭代器 读写操作,并能向前和向后操作  读写，支持++、--
 random_access_iterator随机访问迭代器 读写操作,可以以跳跃的方式访问任意数据  读写，支持++、--、[n]、 -n、<、<=、>、>=
 ```
+“修饰迭代器”
 ```c++
 void demo(){
 	std::vector<int>v;
