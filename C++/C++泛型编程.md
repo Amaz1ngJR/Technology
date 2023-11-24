@@ -359,8 +359,8 @@ STL几乎所有的代码都采用了模板类或者模板函数
 STL大体上分为6大组件:容器(container)、算法(algorithm)、迭代器(iterator)：扮演容器与算法之间的胶合剂 算法要通过迭代器才能访问到容器里的内容，每个容器都有专属的迭代器(类似指针)、仿函数(functors)、配接器(adapters)、空间配置器(allocators)
 
 
-
-每个容器都有自己专属的迭代器 迭代器的使用非常类似于指针，初学阶段我们可以先理解迭代器为指针
+### **STL迭代器
+每个容器都有自己专属的迭代器 迭代器的使用非常类似于指针
 迭代器种类:
 
 ```c++
@@ -369,6 +369,19 @@ output_iterator输出迭代器 对数据的只写访问  只写，支持++
 forward_iterator前向迭代器 读写操作,并能向前推进迭代器  读写，支持++、==、!=
 bidirectional_iterator双向迭代器 读写操作,并能向前和向后操作  读写，支持++、--
 random_access_iterator随机访问迭代器 读写操作,可以以跳跃的方式访问任意数据  读写，支持++、--、[n]、 -n、<、<=、>、>=
+```
+```c++
+void demo(){
+	std::vector<int>v;
+	const std::vector<int>::iterator it1 = v.begin(); //it1的作用像个 T* const
+	*it1 = 10;//正确 指针指向的值可以修改
+	//it1++;//错误 指针的指向不能修改
+	std::vector<int>::const_iterator it2 = v.begin();//it2的作用像个const T*
+	//*it2 = 10;//错误 指针指向的值不可修改
+	it2++;//正确 指针的指向可以修改
+	std::vector<int>::const_pointer ptr = v.data();//data()返回指向v第一个元素的指针 ptr类似T* const
+	std::vector<int>::const_reference ref = v[0]; //ref类似const T&
+}
 ```
 
 ### **STL常见容器
