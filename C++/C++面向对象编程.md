@@ -754,6 +754,32 @@ vbi:       class  offset o.vbptr  o.vbte fVtorDisp
 
 动态多态的函数地址晚绑定   运行阶段确定函数地址
 
+### **成员函数(常量性)重载
+```c++
+class Text {
+public:
+	Text(string a) { this->text = a; }
+	//注意重载的函数返回值都是char&而不是char
+	const char& operator[](std::size_t position) const {
+		cout << "调用 const" << endl;
+		return text[position];
+	}
+	char& operator[](std::size_t position) {
+		cout << "调用 non-const" << endl;
+		return text[position];
+	}
+private:
+	string text;
+};
+void demo() {
+	Text p("hello");
+	cout << p[0] << endl;//正确 读
+	p[0] = 'H';//正确 写
+	const Text q("hello");
+	cout << q[0] << endl;//正确 读
+	//q[0] = 'H';//错误 写
+}
+```
 ### **重载运算符
 (.)(::)(?:)不能被重载
 
