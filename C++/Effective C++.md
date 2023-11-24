@@ -5,3 +5,28 @@
 //使用constexpr来定义常量替换#define
 constexpr NUMBER = 1234;
 ```
+class专属常量 无法使用#define创建一个class专属常量 
+```c++
+class Players {
+private:
+	static constexpr int Number = 8; //常量声明式 位于头文件
+	int a[Number];//使用该常量
+};
+//有些编译器必须要看到定义式 在实现(非头文件)文件下提供定义式:
+constexpr int Players::Number; //常量定义式 由于声明获得初值 因此定义时不在设初值
+
+//有些编译器不让在声明的时候获得初值 改成下面的形式
+class Players {
+private:
+	static constexpr int Number; //常量声明式 位于头文件
+	int a[Number];//使用该常量
+};
+constexpr int Players::Number = 8;//常量定义式 位于实现文件
+
+//当编译器不允许 static整数型class常量完成 in class初值设定 可改用:
+class Players {
+private:
+	enum { Number = 8 };//"the enum hack" 令Number成为5的一个记号
+	int a[Number];
+};
+```
