@@ -1,5 +1,6 @@
 # Effective C++
 ## 尽量以const、enum、inline替换#define
+### 对于单纯常量 最好用const或enum替换#define
 ```c++
 #define NUMBER 1234 //如果发生错误 编译器给出的信息是1234 而不是NUMBER 如果这部分不是自己写的 来自某个头文件 会很难发现错误
 //使用constexpr来定义常量替换#define
@@ -31,3 +32,6 @@ private:
 };
 //取一个const的地址是合法的 取enum和一个#define的地址通常不合法 如果不想让别的指针或引用指向某个整数常量 可以使用enum
 ```
+### 对于形似函数的宏 最好改用inline函数替换#define
+
+## 尽可能使用cosnt
