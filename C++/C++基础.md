@@ -222,7 +222,7 @@ enum Color {
     BLUE
 };//RED=0 GREEN=2 BLUE=3
 ```
-### 对于单纯常量 最好用const或enum替换#define
+#### 用constexpr或enum替换#define常量
 ```c++
 #define NUMBER 1234 //如果发生错误 编译器给出的信息是1234 而不是NUMBER 如果这部分不是自己写的 来自某个头文件 会很难发现错误
 //使用constexpr来定义常量替换#define
