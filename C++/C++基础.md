@@ -184,9 +184,18 @@ void demo() {
 typedef int myint//将int改名为myint
 myint distance;
 ```
+
+const和constexpr
+```c++
+const修饰只读变量
+constexpr修饰常量
+```
+
 enum
 
 类似bool都表示一组有限的离散值的数据类型
+
+取一个const的地址是合法的 取enum和一个#define的地址通常不合法 如果不想让别的指针或引用指向某个整数常量 可以使用enum
 ```c++
 enum Color {
     RED,
@@ -212,11 +221,6 @@ enum Color {
     GREEN = 2,
     BLUE
 };//RED=0 GREEN=2 BLUE=3
-```
-const和constexpr
-```c++
-const修饰只读变量
-constexpr修饰常量
 ```
 
 ### **存储类
