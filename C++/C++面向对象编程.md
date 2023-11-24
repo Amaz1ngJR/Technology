@@ -754,6 +754,16 @@ vbi:       class  offset o.vbptr  o.vbte fVtorDisp
 动态多态的函数地址晚绑定   运行阶段确定函数地址
 
 ### **成员函数(常量性)重载
+
+尽可能的使用const
+```c++
+class P{};
+const P operator*(const P& a, const P& b);//函数返回值为const
+//防止出现下面现象
+P a, b, c;
+//错误的将if(a * b == c)写成if (a * b = c)
+//将使c赋值到a*b的结果中
+```
 ```c++
 class Text {
 public:
