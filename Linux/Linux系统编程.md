@@ -110,6 +110,11 @@ ar rcs libmylib.a file1.o file2.o
 4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
 ```
 
-## 文件IO
+## 文件
 
-## 文件操作
+### 文件前置
+```bash
+od-tcx filename  //查看文件的16进制表示形式
+od-tcd filename  //查看文件的10进制表示形式
+```
+
