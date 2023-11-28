@@ -340,6 +340,20 @@ touch/mkdir file1 file2 file3 //创建多个文件/文件夹
 touch/mkdir /path/to/filename //特定(相对、绝对、特殊)路径下创建文件/文件夹
 mkdir -p Dir/dir3/dir2/dir1   //递归在Dir下创建dir3 dir3下创建dir2 ...
 ```
+## 硬链接和软链接
+硬链接是同步的 一处修改 都修改 类似指针 只不过这里用的是Inode（每个文件的索引）
+```bash
+ln 文件/文件夹名 链接名  //创建硬链接
+ln test.txt test
+stat test.txt
+stat test
+```
+```bash
+ln -s 参数1：文件/文件夹 参数2：要链接去的目的地   //创建软链接
+//为了保证这个软链接在任意目录下都能使用 参数1写绝对路径 软链接大小为路径大小
+ln -s /etc/yum ~/yum
+ls -l //展示创建的链接
+```
 ## rm/rmdir 删除文件/文件夹
 ```bash
 rm filename              //删除文件
