@@ -77,6 +77,96 @@ chmod -R 权限 文件夹名   //将文件夹以及文件夹内的全部内容�
 
 chown [-R] [用户] [:][用户组] 文件或文件夹名   //root用户下 修改文件、文件夹的所属用户、用户组
 ```
+## 日期与时间
+date查看日期 日期计算
+```bash
+date  //查看系统的时间
+date -d [+格式化字符串]  //-d 按照给定的字符串显示日期
+%Y 年
+%y 年份后两位 00-99
+%m 月
+%d 日
+%H 时
+%M 分
+%S 秒
+date -d "-1 day" // 一般用于日期计算
+```
+timedatectl 时区相关
+```bash
+timedatectl  //查看当前时区
+timedatectl list-timezones  //列出所有可用的时区
+sudo timedatectl set-timezone Asia/Shanghai  //设置时区
+```
+使用ntp程序自动校准系统时间
+```bash
+sudo apt install ntp  //安装ntp
+systemctl start ntpd //启动
+systemctl enable ntpd //开机自启
+```
+
+## IP地址与主机名
+```bash
+ping [-c num(检查次数)] ip或主机名  //检查指定的网络服务器是否联通
+nmap 被查看IP  //使用nmap(需要安装)查看一个IP地址的对外端口
+netstat -anp|grep 端口号  //查看指定端口的IP占用（安装net-tools）
+```
+```bash
+ifconfig //查看本机的ip地址
+hostname //查看主机名
+hostnamectl set-hostname 主机名  //root下修改主机名
+```
+## 主机状态监控
+
+## 下载、压缩、服务
+### 软件下载安装
+CentOS:yum 和Ubuntu:apt 完全一致 需要root权限或者sudo 需要联网
+```bash
+yum [-y] [install | remove | search] 软件名称
+-y 自动确认 install 安装 remove 卸载 search 搜索
+```
+```bash
+sudo yum update  //更新所有已安装的软件包
+sudo yum update package-name  //更新特定软件包
+yum list installed  //列出已安装的软件包
+yum info package-name  //查看软件包信息
+sudo yum clean all  //清理缓存
+yum deplist package-name  //查找依赖关系
+```
+### 网络文件下载
+```bash
+wget [-b] url(下载链接) //下载网络文件 -b 后台下载
+curl url  //发送http网络请求 可用于下载文件、获取信息
+curl -O http://example.com/file.zip  //保存下载的文件
+curl -o localfile.zip http://example.com/file.zip //指定保存的文件名
+```
+### 压缩与解压缩
+针对.tar/.gz/.bz2的压缩包
+```bash
+tar[-c|-x -z|-j -v -f -C] 参数1 参数2…
+-c 创建压缩文件 用于压缩模式 -x 解压模式 -v查看压缩、解压进度
+(-z表示gzip -j表示bzip2不使用默认tarball格式)
+-f 要创建的文件 或要解压的文件 必须在所有选项的最后一个
+-C 选择解压的目的地(单独使用) 不加表示解压到当前目录
+
+tar -xvf test.tar -C /home/yjr    //将test.tar解压至/home/yjr
+tar --delete -f test.tar file1   //将test.tar中的file1删除
+tar -rvf test.tar newfile     //将newfile加入到test.tar中
+```
+针对.zip的压缩包
+```bash
+zip [-r] 参数1，参数2，…  //压缩 -r:被压缩的包含文件夹
+zip test.zip newfile    //将newfile加入到test.zip中
+zip -d test.zip file1 file2 ...  //将test.zip中的file1 file2 ...删除
+
+unzip [-d] 压缩包名 //解压 -d(不同于zip)选择解压的目的地
+```
+### 服务
+Linux系统很多软件能够被systemctl管理
+```bash
+systemctl start | stop | restart | status | enable | disable 服务名  //启动|停止|重启|查看状态|开机自启|开机不自启 一个服务
+systemctl list-units --type=service  //列出所有正在运行的服务
+systemctl is-enabled mysql  //查看服务mysql是否开机启动
+```
 ## vim配置
 
 Linux 没有盘符，只有一个根目录/，所有文件都在它下面
@@ -355,46 +445,3 @@ vim 兼容全部的vi功能
 
 光标处 按着r 再按别的键 可以将光标值改为所按下的键的值 按x删除 按s删除并进入输入模式
 
-# *软件、压缩、服务
-## 软件下载安装
-CentOS:yum 和Ubuntu:apt 完全一致 需要root权限或者sudo 需要联网
-```bash
-yum [-y] [install | remove | search] 软件名称
--y 自动确认 install 安装 remove 卸载 search 搜索
-```
-```bash
-sudo yum update  //更新所有已安装的软件包
-sudo yum update package-name  //更新特定软件包
-yum list installed  //列出已安装的软件包
-yum info package-name  //查看软件包信息
-sudo yum clean all  //清理缓存
-yum deplist package-name  //查找依赖关系
-```
-## 压缩与解压缩
-针对.tar/.gz/.bz2的压缩包
-```bash
-tar[-c|-x -z|-j -v -f -C] 参数1 参数2…
--c 创建压缩文件 用于压缩模式 -x 解压模式 -v查看压缩、解压进度
-(-z表示gzip -j表示bzip2不使用默认tarball格式)
--f 要创建的文件 或要解压的文件 必须在所有选项的最后一个
--C 选择解压的目的地(单独使用) 不加表示解压到当前目录
-
-tar -xvf test.tar -C /home/yjr    //将test.tar解压至/home/yjr
-tar --delete -f test.tar file1   //将test.tar中的file1删除
-tar -rvf test.tar newfile     //将newfile加入到test.tar中
-```
-针对.zip的压缩包
-```bash
-zip [-r] 参数1，参数2，…  //压缩 -r:被压缩的包含文件夹
-zip test.zip newfile    //将newfile加入到test.zip中
-zip -d test.zip file1 file2 ...  //将test.zip中的file1 file2 ...删除
-
-unzip [-d] 压缩包名 //解压 -d(不同于zip)选择解压的目的地
-```
-## 服务
-Linux系统很多软件能够被systemctl管理
-```bash
-systemctl start | stop | restart | status | enable | disable 服务名  //启动|停止|重启|查看状态|开机自启|开机不自启 一个服务
-systemctl list-units --type=service  //列出所有正在运行的服务
-systemctl is-enabled mysql  //查看服务mysql是否开机启动
-```
