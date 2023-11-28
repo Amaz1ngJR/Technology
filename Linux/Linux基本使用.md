@@ -4,7 +4,79 @@
 Win + R： mstsc 远程连接
 ```
 ## *用户和权限
+## 切换用户
+su [ 选项 ]  [ 用户名 ]
+```bash
+su  //用户名省略切换到root
+su - // - 表示重新加载新用户的环境变量
+su -c 'ls /root' // c 表示允许在切换用户时指定要执行的命令
+```
+普通用户切换其他用户需要输入密码 root用户切换到其他用户 无需密码
+## 配置sudo认证
+切换到root用户 执行
+```bash
+visudo  //会自动通过vi编辑器打开/etc/sudoers
+```
+在文件的最后添加 并wq保存
+```
+yjr ALL=(ALL:ALL)         NOPASSWD:ALL
+```
+## 用户和用户组
+参看系统中的用户和用户组
+```bash
+getent passwd  //查看当前系统中有哪些用户
+//输出：  用户名：密码(x)：用户ID：组ID：描述信息：HOME目录：执行终端(默认bash)
+getent group  //查看当前系统中有哪些用户组
+//输出：  组名称：组认证(x)：组ID
+```
+增、删、改、查 用户和用户组(root用户下)
+```bash
+useradd [-g -d] 用户名  //创建用户
+//-g指定用户的组(已经存在的组) 不指定会创建同名组并自动加入 如已存在同名组 必须使用-g
+//-d指定用户HOME路径 不指定HOME目录默认在: /home/用户名
+groupadd 用户组名       //创建用户组
 
+userdel [-r] 用户名    //删除用户 -r删除用户的HOME目录
+groupdel 用户组名      //删除用户组
+
+usermod -aG 用户组 用户名 //将指定用户加入指定用户组
+
+id [用户名]         //查看用户所属组 不提供用户名则查看自身
+```
+## 权限控制信息
+```
+ll  //参看详细的权限控制信息
+-表示文件 d表示文件夹 l表示软链接 r表示读/查看权限 w表示写/修改权限 x表示执行/CD进入权限
+```
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/7e44ca43-cc66-4dfc-ae40-ff97118cf509)
+权限的数字序号：权限可以用3位数字代表 分别表示用户权限、用户组权限、其他用户权限
+
+r记为4 w记为2 x记为1
+
+0：无任何权限 即 ---
+
+1：仅有x权限 即 --x
+
+2：仅有w权限 即 -w-
+
+3：有w和x权限 即 -wx
+
+4：仅有r权限 即 r--
+
+5：有r和x权限 即 r-w
+
+6：有r和w权限 即 rw-
+
+7：全部权限 即 rwx
+
+修改权限信息
+```bash
+chmod u=rwx,g=rx,o=x test.txt  //将文件test.txt的权限修改为rwxr-x--x
+chmod 751 test.txt //使用权限的数字序号
+chmod -R 权限 文件夹名   //将文件夹以及文件夹内的全部内容的权限设置
+
+chown [-R] [用户] [:][用户组] 文件或文件夹名   //root用户下 修改文件、文件夹的所属用户、用户组
+```
 ## vim配置
 
 Linux 没有盘符，只有一个根目录/，所有文件都在它下面
@@ -283,82 +355,8 @@ vim 兼容全部的vi功能
 
 光标处 按着r 再按别的键 可以将光标值改为所按下的键的值 按x删除 按s删除并进入输入模式
 
-# *用户权限
-## 切换用户
-su [ 选项 ]  [ 用户名 ]
-```bash
-su  //用户名省略切换到root
-su - // - 表示重新加载新用户的环境变量
-su -c 'ls /root' // c 表示允许在切换用户时指定要执行的命令
-```
-普通用户切换其他用户需要输入密码 root用户切换到其他用户 无需密码
-## 配置sudo认证
-切换到root用户 执行
-```bash
-visudo  //会自动通过vi编辑器打开/etc/sudoers
-```
-在文件的最后添加 并wq保存
-```
-yjr ALL=(ALL:ALL)         NOPASSWD:ALL
-```
-## 用户和用户组
-参看系统中的用户和用户组
-```bash
-getent passwd  //查看当前系统中有哪些用户
-//输出：  用户名：密码(x)：用户ID：组ID：描述信息：HOME目录：执行终端(默认bash)
-getent group  //查看当前系统中有哪些用户组
-//输出：  组名称：组认证(x)：组ID
-```
-增、删、改、查 用户和用户组(root用户下)
-```bash
-useradd [-g -d] 用户名  //创建用户
-//-g指定用户的组(已经存在的组) 不指定会创建同名组并自动加入 如已存在同名组 必须使用-g
-//-d指定用户HOME路径 不指定HOME目录默认在: /home/用户名
-groupadd 用户组名       //创建用户组
-
-userdel [-r] 用户名    //删除用户 -r删除用户的HOME目录
-groupdel 用户组名      //删除用户组
-
-usermod -aG 用户组 用户名 //将指定用户加入指定用户组
-
-id [用户名]         //查看用户所属组 不提供用户名则查看自身
-```
-## 权限控制信息
-```
-ll  //参看详细的权限控制信息
--表示文件 d表示文件夹 l表示软链接 r表示读/查看权限 w表示写/修改权限 x表示执行/CD进入权限
-```
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/7e44ca43-cc66-4dfc-ae40-ff97118cf509)
-权限的数字序号：权限可以用3位数字代表 分别表示用户权限、用户组权限、其他用户权限
-
-r记为4 w记为2 x记为1
-
-0：无任何权限 即 ---
-
-1：仅有x权限 即 --x
-
-2：仅有w权限 即 -w-
-
-3：有w和x权限 即 -wx
-
-4：仅有r权限 即 r--
-
-5：有r和x权限 即 r-w
-
-6：有r和w权限 即 rw-
-
-7：全部权限 即 rwx
-
-修改权限信息
-```bash
-chmod u=rwx,g=rx,o=x test.txt  //将文件test.txt的权限修改为rwxr-x--x
-chmod 751 test.txt //使用权限的数字序号
-chmod -R 权限 文件夹名   //将文件夹以及文件夹内的全部内容的权限设置
-
-chown [-R] [用户] [:][用户组] 文件或文件夹名   //root用户下 修改文件、文件夹的所属用户、用户组
-```
-
-## 软件下载压缩
+# *软件、压缩、服务
+## 软件下载安装
 CentOS:yum 和Ubuntu:apt 完全一致 需要root权限或者sudo 需要联网
 ```bash
 yum [-y] [install | remove | search] 软件名称
@@ -372,6 +370,7 @@ yum info package-name  //查看软件包信息
 sudo yum clean all  //清理缓存
 yum deplist package-name  //查找依赖关系
 ```
+## 压缩与解压缩
 针对.tar/.gz/.bz2的压缩包
 ```bash
 tar[-c|-x -z|-j -v -f -C] 参数1 参数2…
@@ -391,4 +390,11 @@ zip test.zip newfile    //将newfile加入到test.zip中
 zip -d test.zip file1 file2 ...  //将test.zip中的file1 file2 ...删除
 
 unzip [-d] 压缩包名 //解压 -d(不同于zip)选择解压的目的地
+```
+## 服务
+Linux系统很多软件能够被systemctl管理
+```bash
+systemctl start | stop | restart | status | enable | disable 服务名  //启动|停止|重启|查看状态|开机自启|开机不自启 一个服务
+systemctl list-units --type=service  //列出所有正在运行的服务
+systemctl is-enabled mysql  //查看服务mysql是否开机启动
 ```
