@@ -377,7 +377,7 @@ find /path/to/search -name "*.txt" -type f -size +1M
 //\; 是告诉 find 命令 在每个 -exec 命令的结尾使用分号来表示命令的结束
 find /path/to/search -name "*.log" -exec rm {} \; 
 ```
-##快捷键
+## 快捷键
 ```bash
 Ctrl + C 强制停止
 Ctrl + D 退出账号的登录 退出某些特点程序的专属页面 不能用于退出vi/vim
