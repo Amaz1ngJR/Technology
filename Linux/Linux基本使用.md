@@ -302,3 +302,31 @@ visudo  //会自动通过vi编辑器打开/etc/sudoers
 yjr ALL=(ALL:ALL)         NOPASSWD:ALL
 ```
 ## 用户和用户组
+参看系统中的用户和用户组
+```bash
+getent passwd  //查看当前系统中有哪些用户
+//输出：  用户名：密码(x)：用户ID：组ID：描述信息：HOME目录：执行终端(默认bash)
+getent group  //查看当前系统中有哪些用户组
+//输出：  组名称：组认证(x)：组ID
+```
+增、删、改、查 用户和用户组(root用户下)
+```bash
+useradd [-g -d] 用户名  //创建用户
+//-g指定用户的组(已经存在的组) 不指定会创建同名组并自动加入 如已存在同名组 必须使用-g
+//-d指定用户HOME路径 不指定HOME目录默认在: /home/用户名
+groupadd 用户组名       //创建用户组
+
+userdel [-r] 用户名    //删除用户 -r删除用户的HOME目录
+groupdel 用户组名      //删除用户组
+
+usermod -aG 用户组 用户名 //将指定用户加入指定用户组
+
+id [用户名]         //查看用户所属组 不提供用户名则查看自身
+```
+## 权限控制信息
+```
+-表示文件 d表示文件夹 l表示软链接 r表示读/查看权限 w表示写/修改权限 x表示执行/CD进入权限
+```
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/7e44ca43-cc66-4dfc-ae40-ff97118cf509)
+权限的数字序号：权限可以用3位数字代表 分别表示用户权限、用户组权限、其他用户权限
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bfe822bb-3c0b-4916-86ac-9dcd5113c6fa)
