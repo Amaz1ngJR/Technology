@@ -73,7 +73,42 @@ run argv[1] argv[2]       //调试时命令行传参
 动态库：使用时全部调入到内存中 多个程序共享一份
 ### 创建静态库 lib_.a
 
+将库中声明写到头文件下（一般库在lib下，头文件在inc下，头文件里是库中函数的声明和其他的include）
+
+要创建一个静态库或将目标代码加入到已经存在的静态库中 使用下面命令
+```bash
+ar rcs libmylib.a file1.o file2.o
+//r 将目标代码加入静态库中
+//c 若libmylib.a不存在 会自动创建
+//s 更新.a文件的索引 使之包含加入的.o文件
+```
+静态库制作以及使用步骤
+```bash
+1. 将.c生成.o
+    g++ -c func.c -o func.o
+2.使用ar工具制作静态库  
+    ar rcs lib库名.a func1.o func2.o
+3.编译静态库到可执行文件中
+    g++ code.c lib库名.a -o code 
+```
 ### 创建动态库 lib_.so
+```bash
+1.将.c生成.o文件（生成与位置无关的代码 参数 -fPIC）所有地址后面带有@plt（延迟绑定）
+    gcc -c add.c -o add.o -fPIC
+2.使用gcc -shared 制作动态库
+	gcc -shared lib库名.so add.o
+3.编译可执行程序时，指定所使用的动态库 所有的库名都以lib开头 链接的时候参数省略开头的lib
+    gcc main.c -o main -lmylib -L./lib    //-l/L后直接带参数 没有空格
+4.执行./main会出错
+出错原因：
+链接器：     工作于链接阶段 工作时需要-l和-L
+动态链接器： 工作于程序运行阶段 工作时需要提供动态库所在目录位置
+解决：需要将动态库加到环境变量LD_LIBRARY_PATH中并导出(参考环境变量部分)：
+1.export LD_LIBRARY_PATH=./lib(临时设置)  
+2.vi ~/.bashrc ->添加export LD_LIBRARY_PATH=./lib ->重启终端或者..bashrc或者source .bashrc(永久设置)
+3.添加绝对路径到sudo vi /etc/ld.so.conf,并执行sudo ldconfig(永久设置)
+4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
+```
 
 ## 文件IO
 
