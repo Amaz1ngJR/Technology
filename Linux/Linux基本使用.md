@@ -329,4 +329,20 @@ id [用户名]         //查看用户所属组 不提供用户名则查看自身
 ```
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/7e44ca43-cc66-4dfc-ae40-ff97118cf509)
 权限的数字序号：权限可以用3位数字代表 分别表示用户权限、用户组权限、其他用户权限
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/bfe822bb-3c0b-4916-86ac-9dcd5113c6fa)
+
+r记为4 w记为2 x记为1
+0：无任何权限 即 ---
+
+1：仅有x权限 即 --x
+
+2:仅有w权限 即 -w-
+
+3:有w和x权限 即 -wx
+
+4：仅有r权限 即 r--
+
+5：有r和x权限 即 r-w
+
+6:有r和w权限 即 rw-
+
+7:全部权限 即 rwx
