@@ -118,3 +118,11 @@ od-tcx filename  //查看文件的16进制表示形式
 od-tcd filename  //查看文件的10进制表示形式
 ```
 
+inode
+其本质为结构体 存储文件的属性信息 如:权限、类型、大小、时间、用户、盘块位置·.····也叫作文件属性管理结构 
+大多数的 inode 都存储在磁盘上 少量常用、近期使用的 inode会被缓存到内存中
+
+目录项dentry
+其本质是结构体 重要成员变量有两个(文件名，inode，...) 而文件内容(data)保存在磁盘盘块中
+
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/488d5a66-77c6-4dfb-9c68-394325165bb7)
