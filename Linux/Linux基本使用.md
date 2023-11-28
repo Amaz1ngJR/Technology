@@ -417,6 +417,16 @@ wc -L filename          //显示文件中最长行的长度
 echo hello     //输出hello
 echo "hello "  //输出hello 尽量带"" 否则空格隔开容易视为第二个命令
 ```
+## 环境变量
+```bash
+export 变量名=变量值 //临时设置
+export a=6
+echo $a  //$符号被用于取“变量”的值 配合echo可以通过echo $变量输出值
+
+配置~/bashrc文件    //针对当前用户永久生效
+配置/etc/profile文件//针对所有用户永久生效
+通过 source 配置文件  进行立刻生效
+```
 ## 反引号`
 ```bash
 echo pwd    //输出pwd
