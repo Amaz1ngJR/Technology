@@ -283,7 +283,7 @@ vim 兼容全部的vi功能
 
 光标处 按着r 再按别的键 可以将光标值改为所按下的键的值 按x删除 按s删除并进入输入模式
 
-# 用户权限
+# *用户权限
 ## 切换用户
 su [ 选项 ]  [ 用户名 ]
 ```bash
@@ -325,6 +325,7 @@ id [用户名]         //查看用户所属组 不提供用户名则查看自身
 ```
 ## 权限控制信息
 ```
+ll  //参看详细的权限控制信息
 -表示文件 d表示文件夹 l表示软链接 r表示读/查看权限 w表示写/修改权限 x表示执行/CD进入权限
 ```
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/7e44ca43-cc66-4dfc-ae40-ff97118cf509)
@@ -347,3 +348,47 @@ r记为4 w记为2 x记为1
 6：有r和w权限 即 rw-
 
 7：全部权限 即 rwx
+
+修改权限信息
+```bash
+chmod u=rwx,g=rx,o=x test.txt  //将文件test.txt的权限修改为rwxr-x--x
+chmod 751 test.txt //使用权限的数字序号
+chmod -R 权限 文件夹名   //将文件夹以及文件夹内的全部内容的权限设置
+
+chown [-R] [用户] [:][用户组] 文件或文件夹名   //root用户下 修改文件、文件夹的所属用户、用户组
+```
+
+## 软件下载压缩
+CentOS:yum 和Ubuntu:apt 完全一致 需要root权限或者sudo 需要联网
+```bash
+yum [-y] [install | remove | search] 软件名称
+-y 自动确认 install 安装 remove 卸载 search 搜索
+```
+```bash
+sudo yum update  //更新所有已安装的软件包
+sudo yum update package-name  //更新特定软件包
+yum list installed  //列出已安装的软件包
+yum info package-name  //查看软件包信息
+sudo yum clean all  //清理缓存
+yum deplist package-name  //查找依赖关系
+```
+针对.tar/.gz/.bz2的压缩包
+```bash
+tar[-c|-x -z|-j -v -f -C] 参数1 参数2…
+-c 创建压缩文件 用于压缩模式 -x 解压模式 -v查看压缩、解压进度
+(-z表示gzip -j表示bzip2不使用默认tarball格式)
+-f 要创建的文件 或要解压的文件 必须在所有选项的最后一个
+-C 选择解压的目的地(单独使用) 不加表示解压到当前目录
+
+tar -xvf test.tar -C /home/yjr    //将test.tar解压至/home/yjr
+tar --delete -f test.tar file1   //将test.tar中的file1删除
+tar -rvf test.tar newfile     //将newfile加入到test.tar中
+```
+针对.zip的压缩包
+```bash
+zip [-r] 参数1，参数2，…  //压缩 -r:被压缩的包含文件夹
+zip test.zip newfile    //将newfile加入到test.zip中
+zip -d test.zip file1 file2 ...  //将test.zip中的file1 file2 ...删除
+
+unzip [-d] 压缩包名 //解压 -d(不同于zip)选择解压的目的地
+```
