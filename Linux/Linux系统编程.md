@@ -110,29 +110,42 @@ ar rcs libmylib.a file1.o file2.o
 4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
 ```
 
-## 文件相关 系统函数/调用
+## 操作系统名词解释
 
-### 文件前置
+### 文件进制
 ```bash
 od-tcx filename  //查看文件的16进制表示形式
 od-tcd filename  //查看文件的10进制表示形式
 ```
 
-索引节点inode
+### 索引节点inode
 其本质为结构体 存储文件的属性信息 如:权限、类型、大小、时间、用户、盘块位置·.····也叫作文件属性管理结构 
 大多数的 inode 都存储在磁盘上 少量常用、近期使用的 inode会被缓存到内存中
 
-目录项dentry
+### 目录项dentry
 其本质是结构体 重要成员变量有两个(文件名，inode，...) 而文件内容(data)保存在磁盘盘块中
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/488d5a66-77c6-4dfb-9c68-394325165bb7)
 
-文件描述符
+### 文件描述符
 是一个非负整数 它在进程中唯一标识打开的文件、套接字（socket）或其他I/O资源
+
 文件描述符的三个标准值：
 0：标准输入（stdin）
 1：标准输出（stdout）
 2：标准错误（stderr）
+
+![v2-d3e534157323ffd5881150d9d8d9c734_r](https://github.com/Amaz1ngJR/Technology/assets/83129567/ffb90d35-118a-4484-b1a5-1f7b498c77e8)
+
+
+### 进程控制块PCB
+PCB(本质是结构体)中有一个指针* 指向文件描述符表 
+
+文件描述符表中存放文件描述符(指针(实际是key)但是操作系统封装了 像个数组 只暴露出下标 所以一般用int整数)
+
+关闭一个文件后 再打开一个文件 还是会按表中下标最小的位置存放
+
+## 文件相关 系统函数/调用
 
 ### open/close函数
 
