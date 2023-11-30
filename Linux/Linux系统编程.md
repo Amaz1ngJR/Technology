@@ -112,6 +112,9 @@ ar rcs libmylib.a file1.o file2.o
 
 ## 操作系统名词解释
 
+### 终端
+终端(一系列输入输出设备的统称)文件 /dev/tty
+
 ### 文件进制
 ```bash
 od-tcx filename  //查看文件的16进制表示形式
@@ -144,6 +147,11 @@ PCB(本质是结构体)中有一个指针* 指向文件描述符表
 文件描述符表中存放文件描述符(指针(实际是key)但是操作系统封装了 像个数组 只暴露出下标 所以一般用int整数)
 
 关闭一个文件后 再打开一个文件 还是会按表中下标最小的位置存放
+
+### 阻塞和非阻塞
+阻塞和非阻塞是设备文件、网络文件的属性(常规文件无阻塞概念)
+
+产生场景：读设备文件、网络文件
 
 ## 文件相关 系统函数/调用
 
@@ -188,18 +196,18 @@ int close(int fd); //#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 
-void demo(){
-	int fd = open("/home/yjr/mytest/test.txt",O_RDONLY);
-	std::cout<<"fd = "<< fd << std::endl;
-	int c = close (fd);
-	std::cout<<"c = "<< c << std::endl;
-	
-	int fd2 =open("/home/yjr/NULL",O_RDONLY);
-	std::cout<<"fd2 = "<< fd2 << std::endl;
-	std::cout<<"errno = "<< strerror(errno) << std::endl;
-	int c2= close (fd2);
-	std::cout<<"c2 = "<< c2 << std::endl;
-	std::cout<<"errno = "<< strerror(errno) << std::endl;
+void demo() {
+	int fd = open("/home/yjr/mytest/test.txt", O_RDONLY);
+	std::cout << "fd = " << fd << std::endl;
+	int c = close(fd);
+	std::cout << "c = " << c << std::endl;
+
+	int fd2 = open("/home/yjr/NULL", O_RDONLY);
+	std::cout << "fd2 = " << fd2 << std::endl;
+	std::cout << "errno = " << strerror(errno) << std::endl;
+	int c2 = close(fd2);
+	std::cout << "c2 = " << c2 << std::endl;
+	std::cout << "errno = " << strerror(errno) << std::endl;
 }
 
 int main(){
@@ -209,7 +217,17 @@ int main(){
 ```
 
 ### read/write函数
+```c++
+ssize_t read(int fd, void *buf, size_t count);  //#include <unistd.h>
+ssize_t write(int fd, const void *buf, size_t count);  //#include <unistd.h>
+//参数：fd 文件描述符 *buf:存/写 数据的缓冲区 count：缓冲区/写入 大小
+//返回值：成功：读到的字节数 失败：-1 设置errno 如果errno=EAGIN或EWOULDBLOCK 说明不是read失败
+//而是read以非阻塞的方式读一个设备文件、网络文件 并且文件无数据
+```
+通过read和write实现cp命令
+```c++
 
+```
 ### fcntl函数
 
 ### lseek函数
@@ -219,19 +237,19 @@ int main(){
 ```
 1.	指针作为函数参数
 2.	通常有const关键字修饰
-3.	指针指向有效区域，在函数内部做读操作
+3.	指针指向有效区域 在函数内部做读操作
 ```
 传出参数：
 ```
 1.	指针作为函数参数
-2.	在函数调用之前，指针指向的空间可以无意义，但必须有效
-3.	在函数内部，做写操作
-4.	函数调用结束后，充当函数返回值
+2.	在函数调用之前 指针指向的空间可以无意义 但必须有效
+3.	在函数内部 做写操作
+4.	函数调用结束后 充当函数返回值
 ```
 传入传出参数：
 ```
 1.	指针作为函数参数
-2.	在函数调用之前，指针指向的空间有实际意义
-3.	在函数内部，先做读操作，后写操作
-4.	函数调用结束后，充当函数返回值
+2.	在函数调用之前 指针指向的空间有实际意义
+3.	在函数内部 先做读操作 后写操作
+4.	函数调用结束后 充当函数返回值
 ```
