@@ -267,6 +267,7 @@ int fcntl(int fd, int cmd, ... /* arg */ ); //#include <unistd.h> #include <fcnt
 //	获取文件锁信息：F_GETLK
 //	设置文件锁：F_SETLK
 //	阻塞设置文件锁：F_SETLKW
+//参数3 如果是一个被占用的文件描述符 则返回最小的可以的 否则返回=参数3的文件描述符
 ```
 ```c++
 int main() {
@@ -415,3 +416,59 @@ int unlink(const char *pathname);
 link(argv[1],argv[2]);
 unlink(argv[1]);
 ```
+使用readlink函数或命令可以 读取符号链接文件本身的内容 得到链接所指向的文件名
+
+### opendir/closedir/readdir 库函数
+```c++
+#include <dirent.h>
+DIR *opendir(const char *name);
+DIR *fdopendir(int fd);
+int closedir(DIR *dirp);
+struct dirent *readdir(DIR *dirp);
+//	struct dirent {  //目录项
+//               ino_t          d_ino;       /* Inode number */
+//               off_t          d_off;       /* Not an offset; see below */
+//               unsigned short d_reclen;    /* Length of this record */
+//               unsigned char  d_type;      /* Type of file; not supported
+//                                              by all filesystem types */
+//               char           d_name[256]; /* 去掉"/0"文件名最大255字节 */
+//	};
+```
+```c++
+string path = "/home/yjr/test";
+DIR* dir;
+struct dirent* entry;
+if ((dir = opendir(sourceFolderPath.c_str())) != nullptr){
+	while ((entry = readdir(dir)) != nullptr) {
+		string subfolderName = entry->d_name;
+		if (subfolderName != "." && subfolderName != ".."){
+			string sourceFilePath = sourceFolderPath + "/" + subfolderName + "/raw_model.obj";
+			struct stat fileInfo;
+			if (stat(sourceFilePath.c_str(), &fileInfo) == 0 && S_ISREG(fileInfo.st_mode)) {
+			//todo...
+			}
+		}
+	}
+	closedir(dir);
+}
+```
+
+### dup/dup2重定向函数
+```c++
+#include <unistd.h>
+
+int dup(int oldfd);//输入已有的文件描述符 返回新的文件描述符(拷贝一份oldfd)
+int dup2(int oldfd, int newfd); //返回newfd (将oldfd拷贝到newfd 让newfd指向oldfd)
+```
+将终端输出的东西拷贝到文件里 而终端不显示
+```c++
+int main(int argc, char *argv[]){
+	int fd = open(argv[1],O_RDWR);
+	int fdret =dup2(fd,STDOUT_FILENO);
+	std::cout<<"fdret = "<<fdret<<std::endl;
+	std::cout<<"---------------"<<std::endl;
+	return 0;
+}
+```
+
+## 进程相关 系统函数/调用
