@@ -94,11 +94,11 @@ ar rcs libmylib.a file1.o file2.o
 ### 创建动态库 lib_.so
 ```bash
 1.将.c生成.o文件（生成与位置无关的代码 参数 -fPIC）所有地址后面带有@plt（延迟绑定）
-    gcc -c add.c -o add.o -fPIC
+	gcc -c add.c -o add.o -fPIC
 2.使用gcc -shared 制作动态库
 	gcc -shared lib库名.so add.o
 3.编译可执行程序时，指定所使用的动态库 所有的库名都以lib开头 链接的时候参数省略开头的lib
-    gcc main.c -o main -lmylib -L./lib    //-l/L后直接带参数 没有空格
+	gcc main.c -o main -lmylib -L./lib    //-l/L后直接带参数 没有空格
 4.执行./main会出错
 出错原因：
 链接器：     工作于链接阶段 工作时需要-l和-L
