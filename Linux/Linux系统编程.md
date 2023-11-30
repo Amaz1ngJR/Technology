@@ -226,12 +226,115 @@ ssize_t write(int fd, const void *buf, size_t count);  //#include <unistd.h>
 ```
 通过read和write实现cp命令
 ```c++
-
+//argc 表示命令行参数的数量 至少为1 因为程序的名称被算作一个参数
+//argv 指向字符串数组的指针 每个字符串表示一个命令行参数
+// ./demo test.txt newtest.txt argc=3 argv[] ={"./demo" ,"test.txt","newtest.txt"}
+int main(int argc, char* argv[]) {
+	int fd1, fd2, n = 0;
+	char buf[1024];  //设置缓冲区的大小为1024
+	fd1 = open(argv[1], O_RDONLY);
+	if (fd1 == -1) {
+		perror("open argv1 error");
+		exit(1); //#include <stdlib.h> exit(0)表示正常终止 其他表示异常终止
+	}
+	fd2 = open(argv[2], O_RDWR | O_CREAT | O_TRUNC, 0664);
+	while ((n = read(fd1, buf, 1024)) != 0) {
+		write(fd2, buf, n);
+	}
+	close(fd1); close(fd2);
+	return 0;
+}
 ```
+系统函数read/write与库函数fputc的区别
+
+fputc内置一个4096的缓冲区(预读入缓输出) 满了以后调用write系统函数
+
+read/write称为unbuffered I/O（无用户级缓冲区）
+
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/dd027f7e-ca5f-4d50-a1fb-837b634b9686)
+同样将buf设为1 由于库函数有内置的缓冲区 比write要快
+
 ### fcntl函数
+函数原型
+```c++
+//改变一个 已经打开 的文件的 访问控制属性
+int fcntl(int fd, int cmd, ... /* arg */ ); //#include <unistd.h> #include <fcntl.h>
+//fd 是文件描述符
+//cmd 是控制命令
+//	获取文件状态： F_GETFL
+//	设置文件状态： F_SETFL
+//	复制文件描述符：F_DUPFD
+//	获取文件锁信息：F_GETLK
+//	设置文件锁：F_SETLK
+//	阻塞设置文件锁：F_SETLKW
+```
+```c++
+int main() {
+	int fd = open("/home/yjr/mytest/test.txt", O_RDWR);
+	int flags = 0;
+	flags = fcntl(fd, F_GETFL); //获取stdin属性信息
+	if (flags == -1) {
+		perror("fcnt; error");
+		exit(1);
+	}
+	flags |= O_NONBLOCK; //添加非阻塞标志
+	int ret = fcntl(fd, F_SETFL, flags);
+	if (ret == -1) {
+		perror("fcnt; error");
+		exit(1);
+	}
+	return 0;
+}
+```
 
 ### lseek函数
+函数原型
+```c++
+off_t lseek(int fd, off_t offset, int whence); //#include <sys/types.h> #include <unistd.h>
+// fd：文件描述符 iffset：偏移字节数 whence：偏移起始位置(SEEK_SET/SEEK_CUR/SEEK_END)
+//返回值是以文件的开头作为偏移起始位置的偏移量
+```
+在文件里写入一段字符再读出 注意文件的读和写使用同一偏移位置
+```c++
+int main(){
+	int fd = open("test.txt", O_RDWR | O_CREAT, 0644);
+	if (fd < 0) {
+		perror("open error");
+		exit(1);
+	}
 
+	char buf[] = "test for lseek";
+	write(fd, buf, sizeof(buf)); //写到文件末尾
+	lseek(fd, 0, SEEK_SET);      //将偏移量改到开头，归位
+
+	char ch; int n;
+	while (n = read(fd, &ch, 1)) {   //读和写使用同一个偏移位置
+		if (n < 0) {
+			perror("open error");
+			exit(1);
+		}
+		write(STDOUT_FILENO, &ch, n);//写入到标准输出(终端)
+	}
+	close(fd);
+	return 0;
+}
+```
+使用lseek获取文件大小
+```c++
+int main() {
+	int fd = open("test.txt", O_RDWR | O_CREAT, 0644);
+	int len = lseek(fd, 0, SEEK_END);
+	cout<<"len = "<<len<<endl;
+	close(fd);
+	return 0;
+}
+```
+使用lseek拓展文件大小
+```c++
+lseek(fd,要拓展的大小-1,SEEK_END);
+write(fd,”/0”,1);//要想使文件大小真正拓展，必须引起IO操作
+int ret=truncate(filepath,要拓展大小);//使用truncate也可以拓展文件大小
+```
 ### 传入传出参数(都是指针)
 传入参数：
 ```
@@ -253,3 +356,5 @@ ssize_t write(int fd, const void *buf, size_t count);  //#include <unistd.h>
 3.	在函数内部 先做读操作 后写操作
 4.	函数调用结束后 充当函数返回值
 ```
+
+### stat/lstat函数
