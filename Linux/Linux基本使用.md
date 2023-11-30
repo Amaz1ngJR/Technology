@@ -347,7 +347,7 @@ cd ../[ 相对路径 ]     //进入相对于当前的工作目录的路径
 cd /path/to/directory  //进入绝对路径
 pwd                    //显示当前工作目录
 ```
-## touch/mkdir 创建文件/文件夹
+## touch/mkdir/mkfifo 创建文件/文件夹/管道
 ```bash
 touch/mkdir filename          //创建文件/文件夹
 touch/mkdir file1 file2 file3 //创建多个文件/文件夹
