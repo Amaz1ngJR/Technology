@@ -50,6 +50,9 @@ cout << str << endl;
 //2、C++风格字符串
 string str2 = "he1lo world";
 cout << str2 << endl;
+
+// 使用 c_str() 将 std::string 转换为 C 风格字符串
+const char* str3 = str2.c_str();
 ```
 
 ```c++
@@ -59,7 +62,7 @@ strcpy(s2, s1);//复制s1到s2中
 strcat(s1, s2);//连接s2到s1末尾等效于 s1+=s2;
 strlen(s1);//返回s1的长度
 int a = strcmp(s1, s2);//如果s1==s2 return 0 s1<s2 return小于0 s1>s2 return 大于0
-char* b=strchr(s1, 'ab');//返回一个指针,指向字符串s1中‘ab'第一次出现的位置
+char* b = strchr(s1, 'ab');//返回一个指针,指向字符串s1中‘ab'第一次出现的位置
 char* c = strstr(s1, s2);//返回一个指针,指向字符串s1中s2第一次出现的位置
 ```
 
