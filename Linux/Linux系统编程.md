@@ -358,3 +358,33 @@ int ret=truncate(filepath,要拓展大小);//使用truncate也可以拓展文件
 ```
 
 ### stat/lstat函数
+```c++
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int stat(const char *pathname, struct stat *statbuf);
+int lstat(const char *pathname, struct stat *statbuf);
+//成功返回0 失败-1
+```
+```c++
+//struct stat中有个成员st_mode可以用来判断文件类型
+int main(int argc, char *argv[]){
+	struct stat sb;
+	int ret =stat(argv[1],&sb);
+	if(ret==-1){
+		perror("stat error");
+		exit(1);
+	}
+	if(S_ISREG(sb.st_mode))
+		std::cout<<"普通文件"<<std::endl;
+	else if(S_ISDIR(sb.st_mode))
+		std::cout<<"目录文件"<<std::endl;
+	else if(S_ISFIFO(sb.st_mode))
+		std::cout<<"管道"<<std::endl;
+	else if(S_ISLNK(sb.st_mode))
+		std::cout<<"软链接"<<std::endl;
+
+	return 0;
+}
+```
