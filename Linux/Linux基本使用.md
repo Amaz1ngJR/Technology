@@ -333,6 +333,10 @@ ls -S           //按文件大小排序 最大的文件显示在前面
 ls -d           //仅显示目录本身，而不显示其内容。
 ls --color      //以不同的颜色显示不同类型的文件。这需要终端支持颜色。
 ```
+## stat 查看文件、目录的详细信息
+```bash
+stat [-c|-t|-l] name
+```
 ## cd/pwd 切换/查看当前目录
 ```bash
 cd                    //返回用户的home目录
@@ -397,6 +401,7 @@ mv source /path/to/target/     //将source文件移动到target下
 mv source /path/to/target/new_name //将source文件移动到target下并改名
 mv -f source target/           //-f强制覆盖 不询问 如果要移动的地方已存在文件 会询问是否覆盖
 ```
+
 ## 重定向符 >和>>
 ```bash
 命令1 >file  //将左侧命令1的结果覆盖写入右侧文件中
