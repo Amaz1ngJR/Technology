@@ -349,6 +349,16 @@ int ret=truncate(filepath,要拓展大小);//使用truncate也可以拓展文件
 3.	在函数内部 做写操作
 4.	函数调用结束后 充当函数返回值
 ```
+```c++
+int func(int* a, struct student* b, double* c) {...} 
+void demo() {
+	int* a;
+	struct student* b;
+	double* c;
+	int d = 0;
+	d = func(a, b, c);//d为函数返回值 a b c都是传出参数
+}
+```
 传入传出参数：
 ```
 1.	指针作为函数参数
@@ -363,8 +373,8 @@ int ret=truncate(filepath,要拓展大小);//使用truncate也可以拓展文件
 #include <sys/stat.h>
 #include <unistd.h>
 
-int stat(const char *pathname, struct stat *statbuf);
-int lstat(const char *pathname, struct stat *statbuf);
+int stat(const char *pathname, struct stat *statbuf);  //能够穿透符号链接
+int lstat(const char *pathname, struct stat *statbuf); //不能穿透符号链接
 //成功返回0 失败-1
 ```
 ```c++
@@ -387,4 +397,21 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+```
+### link/unlink函数
+```c++
+#include <unistd.h>
+
+int link(const char *oldpath, const char *newpath);
+int unlink(const char *pathname);
+//成功返回0 失败-1
+
+//Linux下删除文件的机制：不断将st_nlink -1 直至为0
+//使用unlink将文件的硬链接数降至0后 没有dentry与之对应
+//该文件不会马上被释放 要等到所有打开该文件的进程关闭了该文件 系统才会择机释放(隐式回收系统资源)
+```
+使用link/unlink实现mv改名
+```c++
+link(argv[1],argv[2]);
+unlink(argv[1]);
 ```
