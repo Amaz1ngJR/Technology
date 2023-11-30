@@ -149,6 +149,65 @@ PCB(本质是结构体)中有一个指针* 指向文件描述符表
 
 ### open/close函数
 
+函数原型
+```c++
+int open(const char *pathname, int flags); //#include <fcntl.h>
+int open(const char *pathname, int flags, mode_t mode); //#include <fcntl.h>、<sys/types.h>、<sys/stat.h>
+//flags：
+//	O_RDONLY: 只读方式打开文件
+//	O_WRONLY: 只写方式打开文件
+//	O_RDWR: 读写方式打开文件
+//	O_CREAT: 如果文件不存在 就创建一个新文件 需要与mode参数一起使用 指定新文件的权限
+//	O_EXCL: 与O_CREAT一起使用 用于确保创建新文件而不覆盖已存在的文件
+//	O_TRUNC: 如果文件存在 并且以写方式打开 则清空文件内容
+//	O_APPEND: 打开文件并定位到文件末尾 用于在文件末尾追加数据
+//	O_NONBLOCK: 非阻塞模式打开文件 用于在读取或写入时不阻塞进程
+//mode：mode是八进制的整型 表示文件的权限掩码
+//	S_IRUSR (0400): 用户读权限
+//	S_IWUSR (0200): 用户写权限
+//	S_IXUSR (0100): 用户执行权限
+//	S_IRGRP (0040): 组读权限
+//	S_IWGRP (0020): 组写权限
+//	S_IXGRP (0010): 组执行权限
+//		S_IRUSR | S_IWUSR：表示用户具有读写权限
+// 			文件权限 = mode & ~umask
+//函数返回 int文件描述符
+
+int close(int fd); //#include <unistd.h>
+//fd 要关闭的文件描述符
+//关闭成功返回0 关闭失败返回-1 并设置errno来指示错误的类型
+```
+
+```c++
+#include <iostream>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+//查看errno错误
+#include <errno.h>
+#include <string.h>
+
+void demo(){
+	int fd = open("/home/yjr/mytest/test.txt",O_RDONLY);
+	std::cout<<"fd = "<< fd << std::endl;
+	int c = close (fd);
+	std::cout<<"c = "<< c << std::endl;
+	
+	int fd2 =open("/home/yjr/NULL",O_RDONLY);
+	std::cout<<"fd2 = "<< fd2 << std::endl;
+	std::cout<<"errno = "<< strerror(errno) << std::endl;
+	int c2= close (fd2);
+	std::cout<<"c2 = "<< c2 << std::endl;
+	std::cout<<"errno = "<< strerror(errno) << std::endl;
+}
+
+int main(){
+	demo();
+	return 0;
+}
+```
+
 ### read/write函数
 
 ### fcntl函数
