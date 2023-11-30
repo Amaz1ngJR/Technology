@@ -444,8 +444,9 @@ void demo() {
 	v1.resize(20);//重新指定容器长度为20 若容器变长 以默认值填充新位置 变短则删除超出部分
 	v1.resize(20, 100);//将填充的默认值修改成100
 }
-void demo() {//区分vector<int>v(size)和v.reserve(size)
-	vector<int>v1(10), v2(10);
+void demo() {//区分vector<int>v(size) v.resize(size)和v.reserve(size)
+	vector<int>v1(10), v2;
+	v2.resize(10);//分配内存 并用默认值初始化
 	cout << "v1的大小为 " << v1.size() <<
 		" v2的大小为 " << v2.size() << endl;
 	//v1的大小为 10 v2的大小为 10 
@@ -461,7 +462,7 @@ void demo() {//区分vector<int>v(size)和v.reserve(size)
 	}
 
 	vector<int>v3;
-	v3.reserve(10);
+	v3.reserve(10);//只分配内存
 	for (int i = 0; i < 10; i++) {
 		v3.emplace_back(i);
 	}
