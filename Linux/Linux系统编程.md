@@ -209,6 +209,7 @@ int main(){
 ```
 
 ### read/write函数
+函数原型
 ```c++
 ssize_t read(int fd, void *buf, size_t count);  //#include <unistd.h>
 ssize_t write(int fd, const void *buf, size_t count);  //#include <unistd.h>
@@ -361,6 +362,7 @@ void demo() {
 ```
 
 ### stat/lstat函数
+函数原型
 ```c++
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -392,6 +394,7 @@ int main(int argc, char *argv[]){
 }
 ```
 ### link/unlink函数
+函数原型
 ```c++
 #include <unistd.h>
 
@@ -411,6 +414,7 @@ unlink(argv[1]);
 使用readlink函数或命令可以 读取符号链接文件本身的内容 得到链接所指向的文件名
 
 ### opendir/closedir/readdir 库函数
+函数原型
 ```c++
 #include <dirent.h>
 DIR *opendir(const char *name);
@@ -468,8 +472,47 @@ int main(int argc, char *argv[]){
 ### 操作系统相关名词解释
 
 #### 进程控制块PCB
-PCB(本质是结构体)中有一个指针* 指向文件描述符表 
+PCB本质是结构体 里面含进程id 进程的状态 进程切换时保存的CPU寄存器 虚拟内存信息 当前的工作目录  文件描述符 会话和进程组等
 
 文件描述符表中存放文件描述符(指针(实际是key)但是操作系统封装了 像个数组 只暴露出下标 所以一般用int整数)
 
 关闭一个文件后 再打开一个文件 还是会按表中下标最小的位置存放
+
+进程的状态有5种：初始态、就绪态、运行态、挂起态与终止态(初始态为进程准备阶段 常与就绪态结合)
+![bf436d541a109a5b17bc6ffbfceec4c3](https://github.com/Amaz1ngJR/Technology/assets/83129567/1e86794c-5148-419c-bc7b-c8d3f76901a8)
+
+#### 虚拟地址到物理地址的映射
+在32位操作系统中 一个进程通常具有4GB(可用)的虚拟地址空间 如下图所示 有1G的内核空间和3G的用户空间 内核区映射回物理地址是同一片区域(也是进程通信能够实现的原因)
+
+![665567ea583a121297b7ba8262c59ec8](https://github.com/Amaz1ngJR/Technology/assets/83129567/dbc3b923-0457-495c-a655-f05f4307fcd7)
+
+### fork函数
+函数原型
+```c++
+#include <sys/types.h>
+#include <unistd.h>
+pid_t fork(void);  //创建一个子进程 无参数 
+//内部是当程序Base执行到fork() 会在内存复制一份作为子进程Son
+//子进程的fork返回给父进程一个0表示子进程创建成功 失败为-1
+//父进程的fork返回子进程的pid (只调用了父进程的fork 但是父子进程的fork都有返回)
+//父子进程继续执行fork后的指令
+```
+```c++
+int main(int argc, char *argv[]){
+	std::cout << "创建子进程之前的指令" << std::endl;
+	pid_t pid = fork();
+	if (pid == -1) {
+		perror("fork error");
+		exit(1);
+	}
+	else if (pid == 0) {
+		std::cout << "子进程成功被创建" << std::endl;
+	}
+	else if (pid > 0) {
+		std::cout << "创建了子进程" << pid << std::endl;
+	}
+	std::cout << "---end---" << std::endl;
+	return 0;
+}
+```
+### getpid函数
