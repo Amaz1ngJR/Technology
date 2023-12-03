@@ -614,8 +614,7 @@ int execvpe(const char *file, char *const argv[],
 exec l(list)命令行参数列表 p(path)搜索file时使用path变量 v(vector)使用命令行参数数组 e(environment)使用环境变量数组
 execve 是真正的系统调用 
 ```
-#### execlp函数
-加载一个进程 借助path环境
+execlp函数 加载一个进程 借助path环境
 ```c++
 int main(int argc, char* argv[]) {
 	pid_t pid = fork();
@@ -628,8 +627,7 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
-#### execl函数
-同一个目录下有一个test可执行程序
+execl函数 同一个目录下有一个test可执行程序
 ```c++
 int main(int argc, char* argv[]) {
 	pid_t pid = fork();
