@@ -486,7 +486,12 @@ PCB本质是结构体 里面含进程id 进程的状态 进程切换时保存的
 
 ![665567ea583a121297b7ba8262c59ec8](https://github.com/Amaz1ngJR/Technology/assets/83129567/dbc3b923-0457-495c-a655-f05f4307fcd7)
 
-### fork函数
+#### 进程共享
+fork之后  子进程似乎复制了父进程的用户空间的内容以及PCB(pid不同) 
+
+但子进程并不是将父进程的用户空间 完全拷贝一份
+父子进程间遵循 *读时共享* *写时复制* 的原则
+### fork函数创建进程
 函数原型
 ```c++
 #include <sys/types.h>
@@ -496,6 +501,9 @@ pid_t fork(void);  //创建一个子进程 无参数
 //子进程的fork返回给父进程一个0表示子进程创建成功 失败为-1
 //父进程的fork返回子进程的pid (只调用了父进程的fork 但是父子进程的fork都有返回)
 //父子进程继续执行fork后的指令
+pid_t getpid(void);//获取当前进程的PID  getuid：当前用户id getgid：当前用户组id
+pid_t getppid(void);//获取父进程的PID
+
 ```
 ```c++
 int main(int argc, char *argv[]){
@@ -505,14 +513,39 @@ int main(int argc, char *argv[]){
 		perror("fork error");
 		exit(1);
 	}
-	else if (pid == 0) {
+	else if (pid == 0) {//子进程返回给父进程0 当前进程为子进程
 		std::cout << "子进程成功被创建" << std::endl;
+		std::cout << "进程" << getpid() << "被" <<getppid() << "创建" <<std::endl; 
 	}
-	else if (pid > 0) {
-		std::cout << "创建了子进程" << pid << std::endl;
+	else if (pid > 0) {//父进程返回子进程的pid 当前进程为父进程
+		//#include <sys/wait.h> 等待子进程结束
+		//wait(NULL); //否则子进程的getppid()可能为1(父进程先结束 然后被1号(init)进程接管)
+		sleep(1);//睡眠1秒
+		std::cout << "进程" << getpid() << "创建了子进程" << pid << std::endl;
 	}
 	std::cout << "---end---" << std::endl;
 	return 0;
 }
 ```
-### getpid函数
+循环创建N个子进程
+```c++
+int main(int argc, char* argv[]) {
+	//循环创建5个子进程
+	int i;
+	for (i = 0; i < 5; i++) {
+		if (fork() == 0) {//当前进程为子进程
+			break;
+		}
+	}
+	if (i == 5) {
+		sleep(1);
+		std::cout << "父进程" << getpid() << std::endl;
+	}
+	else {
+		sleep(i);
+		std::cout << "第" << i + 1 << "个子进程" << std::endl;
+	}
+
+	return 0;
+}
+```
