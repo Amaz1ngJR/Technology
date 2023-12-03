@@ -590,6 +590,50 @@ fork创建子进程后 子进程执行的是和父进程相同的程序(可以�
 子进程往往调用exec函数来执行另一个程序 当进程调用exec函数时 该进程的用户空间代码和数据被新的程序替换
 
 调用exec并不创建新进程 所以调用exec前后 该进程的id并不改变
-```c++
 
+在bash中执行的程序都是bash的子程序 用exec执行
+函数原型
+```c++
+#include <unistd.h>
+extern char **environ;
+
+int execl(const char *pathname, const char *arg, ...
+	       /* (char  *) NULL */);
+int execlp(const char *file, const char *arg, ...  //file为文件名 则在$path中寻找对应命令 为目录 则在传入目录中找命令
+	       /* (char  *) NULL */);  //仅在出错的时候返回-1
+int execle(const char *pathname, const char *arg, ...
+	       /*, (char *) NULL, char *const envp[] */);
+int execv(const char *pathname, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+int execvpe(const char *file, char *const argv[],
+	       char *const envp[]);
+
+```
+### execlp函数
+加载一个进程 借助path环境
+```c++
+int main(int argc, char* argv[]) {
+	pid_t pid = fork();
+	if (pid == 0) { //子进程
+		//execlp("ls", "-l", "-h", NULL);//错误写法 第二个参数是从argv[0]开始计算
+		execlp("ls", "ls", "-l", "-h", NULL);//成功无返回值
+		perror("exec error");
+		exit(1);
+	}
+	return 0;
+}
+```
+### execl函数
+同一个目录下有一个test可执行程序
+```c++
+int main(int argc, char* argv[]) {
+	pid_t pid = fork();
+	if (pid == 0) { //子进程
+		//execlp("/bin/ls", "ls", NULL);//成功无返回值
+		execlp("./test", "./test", NULL);//成功无返回值
+		perror("exec error");
+		exit(1);
+	}
+	return 0;
+}
 ```
