@@ -525,6 +525,10 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
+#### 孤儿进程和僵尸进程
+父进程先于子进程结束 则子进程成为孤儿进程 子进程的父进程成为init进程 称init进程领养孤儿进程
+
+进程终止 父进程尚未回收 子进程残留资源(PCB)存放在内核中 变成僵尸进程 僵尸进程无法使用kill命令清除(因为进程已经终止了)
 
 ### fork函数
 函数原型
@@ -554,8 +558,8 @@ int main(int argc, char *argv[]){
 	}
 	else if (pid > 0) {//父进程返回子进程的pid 当前进程为父进程
 		//#include <sys/wait.h> 等待子进程结束
-		//wait(NULL); //否则子进程的getppid()可能为1(父进程先结束 然后被1号(init)进程接管)
-		sleep(1);//睡眠1秒
+		//wait(NULL); //防止进程成为孤儿进程
+		sleep(1);//睡眠1秒 防止进程成为孤儿进程
 		std::cout << "进程" << getpid() << "创建了子进程" << pid << std::endl;
 	}
 	std::cout << "---end---" << std::endl;
@@ -604,10 +608,11 @@ int execlp(const char *file, const char *arg, ...  //file为文件名 则在$pat
 int execle(const char *pathname, const char *arg, ...
 	       /*, (char *) NULL, char *const envp[] */);
 int execv(const char *pathname, char *const argv[]);
-int execvp(const char *file, char *const argv[]);
+int execvp(const char *file, char *const argv[]); //加载一个进程 使用自定义环境变量env
 int execvpe(const char *file, char *const argv[],
 	       char *const envp[]);
-
+exec l(list)命令行参数列表 p(path)搜索file时使用path变量 v(vector)使用命令行参数数组 e(environment)使用环境变量数组
+execve 是真正的系统调用 
 ```
 ### execlp函数
 加载一个进程 借助path环境
@@ -637,3 +642,4 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
+
