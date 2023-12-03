@@ -29,11 +29,12 @@ G++是GCC的C++编译器前端
 1·标准库：g++会自动链接C++标准库 以支持C++语言的功能 如STL（标准模板库）等
 
 2.编译选项：g++会自动启用C++语言的特性和默认编译选项
+
 ## *gdb调试 (检查逻辑错误)
 对gcc -g .c文件 生成的文件如hello进行调试
 ```bash
 gdb hello
-(gdb)list                 //显示代码
+(gdb)l/list                 //显示代码
 (gdb)b/break 3            //在行号为3处设置断点 也可根据函数名
 (gdb)c/continue           //继续执行断点后续指令
 (gdb)r/run                //运行程序 如果出现段错误 会报出
@@ -67,6 +68,15 @@ run argv[1] argv[2]       //调试时命令行传参
 (gdb)watch              //被设置观察点的变量发生修改时 打印显示
 (gdb)i watch            //显示观察点
 (gdb)q/quit             //退出gdb
+```
+### 对父子进程的gdb调试
+使用gdb调试的时候 gdb只能跟踪一个进程 可以在fork函数调用之前 通过指令设置gdb调试工具跟踪父进程(默认)或子进程
+```bash
+(gdb)set follow-fork-mode child #在fork之后跟踪子进程
+(gdb)set follow-fork-mode parent #在fork之后跟踪父进程
+(gdb)info inferiors #查看当前有哪些进程 以及你当前正在调试
+(gdb)inferior 1   # 切换到父进程
+(gdb)inferior 2   # 切换到子进程
 ```
 ## *静态库与动态库
 静态库：对空间要求低 时间要求高的核心程序中 使用的时候直接复制到程序中
@@ -487,11 +497,36 @@ PCB本质是结构体 里面含进程id 进程的状态 进程切换时保存的
 ![665567ea583a121297b7ba8262c59ec8](https://github.com/Amaz1ngJR/Technology/assets/83129567/dbc3b923-0457-495c-a655-f05f4307fcd7)
 
 #### 进程共享
-fork之后  子进程似乎复制了父进程的用户空间的内容以及PCB(pid不同) 
+fork之后 父子进程的不同之处：进程ID、fork返回值、父进程ID、进程运行时间、闹钟(定时器)、未决信号集  
 
-但子进程并不是将父进程的用户空间 完全拷贝一份
-父子进程间遵循 *读时共享* *写时复制* 的原则
-### fork函数创建进程
+子进程似乎复制了父进程的用户空间的内容以及PCB(pid不同) 但子进程并不是将父进程的用户空间 完全拷贝一份
+
+父子进程之间真正共享的是**文件描述符(打开文件的结构体)**
+父子进程间遵循 **读时共享** **写时复制** 的原则 
+```c++
+int global_val = 100;
+int main(int argc, char* argv[]) {
+	pid_t pid = fork();
+	if (pid == -1) {
+		perror("fork error");
+		exit(1);
+	}
+	else if (pid > 0) {
+		global_val = 200; 
+		std::cout << "父进程" << getpid() << "的global_val为" << global_val << std::endl;
+		sleep(1);
+	}
+	else if (pid == 0) {
+		//global_val = 50;  //此行验证写时复制
+		std::cout << "由进程" << getppid() << "创建的子进程"
+			<< getpid() << "的global_val为" << global_val << std::endl;
+	}
+	std::cout << "---done---" << std::endl;
+	return 0;
+}
+```
+
+### fork函数
 函数原型
 ```c++
 #include <sys/types.h>
@@ -548,4 +583,13 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
+```
+### exec库函数族 
+fork创建子进程后 子进程执行的是和父进程相同的程序(可以通过if(pid==0?)来执行不同的代码分支) 
+
+子进程往往调用exec函数来执行另一个程序 当进程调用exec函数时 该进程的用户空间代码和数据被新的程序替换
+
+调用exec并不创建新进程 所以调用exec前后 该进程的id并不改变
+```c++
+
 ```
