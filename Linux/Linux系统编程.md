@@ -588,6 +588,21 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
+c语言中printf和c++cout在fork上的区别
+```c++
+int demo(){
+	//c++ 输出 a
+	std::cout<<"a"<<std::endl;
+	pid_t pid = fork();
+	return 0;
+	//c语言 输出aa
+	printf("a");
+	pid_t pid = fork();
+	return 0;
+	//printf 只把数据输出到缓存区 return 0 程序终止退出后才将缓存区的内容输出到显示器
+	//子进程可以继承父进程的缓存区 而父进程没有刷新缓存 所以会输出两个a
+}
+```
 ### exec库函数族 
 fork创建子进程后 子进程执行的是和父进程相同的程序(可以通过if(pid==0?)来执行不同的代码分支) 
 
