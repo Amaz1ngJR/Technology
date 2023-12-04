@@ -528,7 +528,9 @@ int main(int argc, char* argv[]) {
 #### 孤儿进程和僵尸进程
 父进程先于子进程结束 则子进程成为孤儿进程 子进程的父进程成为init进程 称init进程领养孤儿进程
 
-进程终止 父进程尚未回收 子进程残留资源(PCB)存放在内核中 变成僵尸进程 僵尸进程无法使用kill命令清除(因为进程已经终止了)
+子进程终止 父进程(比如是死循环)尚未回收 子进程残留资源(PCB)存放在内核中 变成僵尸进程 僵尸进程无法使用kill命令清除(因为进程已经终止了)
+
+清理僵尸进程的方法：kill父进程
 
 ### fork函数
 函数原型
@@ -655,4 +657,46 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
+### wait/waitpid函数
+函数原型
+```c++
+#include <sys/types.h>
+#include <sys/wait.h>
 
+pid_t wait(int *wstatus);
+//功能：1、阻塞等待子进程退出 2、回收子进程残留资源 3、获取子进程结束状态(退出原因)
+//参数：传出参数 借助宏可以查看子进程结束状态 返回值： 成功返回子进程pid 失败返回-1 
+pid_t waitpid(pid_t pid, int *wstatus, int options);
+//参数1 指定回收某个进程 参数3 设置非阻塞 返回值 比wait多一个 0:函数调用时 参数3指定了WNOHANG(不阻塞)并且没有子进程结束
+
+//一次wait、waitpid函数调用 只能回收一个子进程 对于wait 由于没有指定哪个子进程 当存在多个子进程的时候 回收第一个结束的子进程
+```
+使用宏 查看子进程退出值和异常终止信号
+```c++
+int main(int argc, char* argv[]) {
+	pid_t pid, wpid;
+	int status;
+	pid = fork();
+	if (pid == 0) {
+		std::cout << "子进程" << getpid() << "going to sleep 5s" << std::endl;
+		sleep(5);
+		std::cout << "子进程死亡" << std::endl;
+		return 2;//返回一个正常终止的值
+	}
+	else {
+		wpid = wait(&status);  //可以传NULL表示不关心子进程结束原因
+		if (WIFEXITED(status)) {//若为真 说明进程正常终止
+			std::cout << "子进程正常退出返回" << WEXITSTATUS(status) << std::endl;//返回2
+		}
+		if (WIFSIGNALED(status)) {//若为真 说明进程异常终止
+			std::cout << WTERMSIG(status) << "信号导致子进程异常退出" << std::endl;
+		}
+		if (WIFSTOPPED(status)) {//若为真 说明进程处于暂停状态
+			std::cout << WSTOPSIG(status) << "信号导致子进程暂停" << std::endl;
+			if (WIFCONTINUED(status)) std::cout << "子进程暂停后已继续运行" << std::endl;
+		}
+		std::cout << "父进程等待子进程" << wpid << "结束" << std::endl;
+	}
+	return 0;
+}
+```
