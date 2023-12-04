@@ -1333,6 +1333,10 @@ int deal_files() {
 	// 读取文件夹下的所有文件
 	dirent* entry;
 	while ((entry = readdir(dir)) != NULL) {
+		// 排除特殊条目 "." 和 ".."
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
 		// 拼接文件的完整路径
 		string file_path = folder_path + "/" + entry->d_name;
 		std::string filename = entry->d_name;
