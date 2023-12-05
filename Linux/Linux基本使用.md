@@ -426,6 +426,8 @@ mv old_name new_name           //改名
 mv source /path/to/target/     //将source文件移动到target下   
 mv source /path/to/target/new_name //将source文件移动到target下并改名
 mv -f source target/           //-f强制覆盖 不询问 如果要移动的地方已存在文件 会询问是否覆盖
+
+mv dir1/* dir2/   //将dir1下所有文件移动到dir2下
 ```
 
 ## 重定向符 >和>>
