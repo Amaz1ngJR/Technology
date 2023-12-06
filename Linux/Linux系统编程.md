@@ -759,3 +759,23 @@ int main() {
 	return 0;
 }
 ```
+父子进程实现管道符操作ls | wc -l
+```c++
+int main() {
+	int fd[2];
+
+	pipe(fd);//创建一个管道
+	pid_t pid = fork();
+	if (pid == 0) {
+		close(fd[0]);  //关闭读端  
+		dup2(fd[1], STDOUT_FILENO);//将标准输出 改到写端
+		execlp("ls", "ls", NULL);
+	}
+	else if (pid > 0) {
+		close(fd[1]);  //关闭写端
+		dup2(fd[0], STDIN_FILENO);  //将标准输入 改到读端
+		execlp("wc", "wc", "-l", NULL);
+	}
+	return 0;
+}
+```
