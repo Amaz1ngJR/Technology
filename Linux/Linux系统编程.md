@@ -759,7 +759,7 @@ int main() {
 	return 0;
 }
 ```
-父子进程实现管道符操作ls | wc -l
+父子进程实现管道符操作 ls | wc -l
 ```c++
 int main() {
 	int fd[2];
@@ -776,6 +776,35 @@ int main() {
 		dup2(fd[0], STDIN_FILENO);  //将标准输入 改到读端
 		execlp("wc", "wc", "-l", NULL);
 	}
+	return 0;
+}
+```
+兄弟进程实现管道符操作 ls | wc -l
+```c++
+int main() {
+	int fd[2], i;
+	pipe(fd);//创建一个管道
+	//循环创建两个子进程
+	for (i = 0; i < 2; i++) {
+		if (fork() == 0)break;
+	}
+	if (i == 2) {//父进程 关闭读端写端 等待回收两个子进程
+		close(fd[0]);
+		close(fd[1]);
+		wait(NULL);
+		wait(NULL);
+	}
+	else if (i == 0) {//兄进程
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		execlp("ls", "ls", NULL);
+	}
+	else if (i == 1) {//弟进程
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		execlp("wc", "wc", "-l", NULL);
+	}
+
 	return 0;
 }
 ```
