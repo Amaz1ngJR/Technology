@@ -191,7 +191,6 @@ int close(int fd); //#include <unistd.h>
 ```c++
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 //查看errno错误
 #include <errno.h>
@@ -217,8 +216,10 @@ int main() {
 ### read/write函数
 函数原型
 ```c++
-ssize_t read(int fd, void *buf, size_t count);  //#include <unistd.h>
-ssize_t write(int fd, const void *buf, size_t count);  //#include <unistd.h>
+#include <unistd.h>
+
+ssize_t read(int fd, void *buf, size_t count);  
+ssize_t write(int fd, const void *buf, size_t count);  
 //参数：fd 文件描述符 *buf:存/写 数据的缓冲区 count：缓冲区/写入 大小
 //返回值：成功：读到的字节数 失败：-1 设置errno 如果errno=EAGIN或EWOULDBLOCK 说明不是read失败
 //而是read以非阻塞的方式读一个设备文件、网络文件 并且文件无数据
@@ -370,9 +371,8 @@ void demo() {
 ### stat/lstat函数
 函数原型
 ```c++
-#include <sys/types.h>
+#include <sys/types.h> 包含在#include <unistd.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 int stat(const char *pathname, struct stat *statbuf);  //能够穿透符号链接
 int lstat(const char *pathname, struct stat *statbuf); //不能穿透符号链接
@@ -531,8 +531,8 @@ int main(int argc, char* argv[]) {
 ### fork函数
 函数原型
 ```c++
-#include <sys/types.h>
-#include <unistd.h>
+#include <sys/types.h> 包含在#include <unistd.h>
+
 pid_t fork(void);  //创建一个子进程 无参数 
 //内部是当程序Base执行到fork() 会在内存复制一份作为子进程Son
 //子进程的fork返回给父进程一个0表示子进程创建成功 失败为-1
@@ -656,7 +656,7 @@ int main(int argc, char* argv[]) {
 ### wait/waitpid函数
 函数原型
 ```c++
-#include <sys/types.h>
+#include <sys/types.h> 包含在#include <unistd.h>
 #include <sys/wait.h>
 
 pid_t wait(int *wstatus);
@@ -703,8 +703,8 @@ int main(int argc, char* argv[]) {
 ### 进程间通信(IPC)方式
 进程之间不能相互访问 要交换数据必须通过内核 进程A在内核开辟一块缓冲区(默认4096B)后 将数据从用户空间拷贝过去 进程B再从缓冲区中读走数据 这种机制称为进程间通信(IPC)
 
-常用的IPC方法有：1、管道(使用最简单 要有血缘关系)2、信号(开销最小)3、共享映射区(无血缘关系)4、本地套接字(最稳定) 此外还有 文件、共享内存、消息队列
-### 管道
+常用的IPC方法有：1、管道(使用最简单 要有血缘关系 父子或兄弟)2、信号(开销最小)3、共享映射区(无血缘关系)4、本地套接字(最稳定) 此外还有 文件、共享内存、消息队列
+### 管道pipe(伪文件)
 管道的原理:管道实为内核使用环形队列(fifo)机制 借助内核缓冲区(4k)实现
 
 管道的特质:
@@ -723,6 +723,7 @@ int main(int argc, char* argv[]) {
 
 3.采用半双工通信方式 数据只能在单方向上流动
 
+可以有一个写端 多个读端 或多个写端 一个读端
 #### pipe函数
 函数原型
 ```c++
@@ -784,9 +785,9 @@ int main() {
 	for (i = 0; i < 2; i++) {
 		if (fork() == 0)break;
 	}
-	if (i == 2) {//父进程 关闭读端写端 等待回收两个子进程
-		close(fd[0]);
-		close(fd[1]);
+	if (i == 2) {//父进程
+		close(fd[0]);//关闭读端
+		close(fd[1]);//关闭写端
 		for (i = 0; i < 2; i++)wait(NULL);
 	}
 	else if (i == 0) {//兄进程
@@ -799,7 +800,64 @@ int main() {
 		dup2(fd[0], STDIN_FILENO);
 		execlp("wc", "wc", "-l", NULL);
 	}
-
 	return 0;
 }
 ```
+#### 命名管道FIFO(文件)
+解决没有血缘关系的进程间通信 是文件且能阻塞
+
+mkfifo命令创建命名管道
+```bash
+mkfifo 管道名
+```
+使用库函数mkfifo
+```c++
+#include <sys/types.h> 包含在#include <unistd.h>
+#include <sys/stat.h>
+
+int mkfifo(const char *pathname, mode_t mode);
+//成功返回0 失败返回-1 参数：管道名 权限
+//本质还是创建一个文件(FIFO) 一个以open(fd,O_WRONLY)->write 另一个open(fd,O_RDONLY)->read
+```
+
+#### 普通文件实现进程间通信
+使用普通文件test.txt文件实现两个进程间的通信
+```c++
+//进程1
+int main(int argc, char* argv[]) {
+	char buf[1024];
+	char* s = "---------1write------";  //要写入的信息
+	int fd = open("test.txt", O_RDWR | O_TRUNC | O_CREAT, 0644);
+	write(fd, s, strlen(s));  //将信息写入到test.txt文件中
+	std::cout << "1写入完毕" << std::endl;
+	sleep(5);  //睡眠5秒 让进程2去读取信息并再写入信息
+
+	lseek(fd, 0, SEEK_SET);  //将偏移量移动到文件开头 再去读test.txt里的内容
+	int ret = read(fd, buf, sizeof(buf));
+	ret = write(STDOUT_FILENO, buf, ret);
+	close(fd);
+	return 0;
+}
+```
+```c++
+//进程2
+int main(int argc, char* argv[]) {
+	char buf[1024];
+	char* s = "---------2write------"; //要写入的信息
+	sleep(2);//先睡眠2秒 让进程1写完信息
+
+	int fd = open("test.txt", O_RDWR);
+	int ret = read(fd, buf, sizeof(buf));
+	write(STDOUT_FILENO, buf, ret);//将读到的信息打印的终端
+	write(fd, s, strlen(s));//接着往文件里面写入信息s
+	std::cout << "2读完并写完了" << std::endl;
+	close(fd);
+	return 0;
+}
+```
+### 存储映射I/O
+存储映射I/O(Mempry-mapped I/O) 使一个磁盘文件与内存空间中的一个缓冲区相映射 于是当从缓冲区中取数据 
+就相当于读文件中的相应字节 于此类似 将数据存入缓冲区 则相应的字节就自动写入文件 
+这样就可在不使用 read 和 write 函数的情况下 使用地址《指针)完成I/O操作
+
+#### mmap函数
