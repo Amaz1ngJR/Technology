@@ -189,16 +189,15 @@ int close(int fd); //#include <unistd.h>
 ```
 
 ```c++
-#include <iostream>
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 //查看errno错误
 #include <errno.h>
 #include <string.h>
 
-void demo() {
+int main() {
 	int fd = open("/home/yjr/mytest/test.txt", O_RDONLY);
 	std::cout << "fd = " << fd << std::endl;
 	int c = close(fd);
@@ -210,10 +209,7 @@ void demo() {
 	int c2 = close(fd2);
 	std::cout << "c2 = " << c2 << std::endl;
 	std::cout << "errno = " << strerror(errno) << std::endl;
-}
 
-int main(){
-	demo();
 	return 0;
 }
 ```
