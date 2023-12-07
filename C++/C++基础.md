@@ -181,19 +181,6 @@ void demo() {
 | long double        | 16 个字节     | 长双精度型 16 个字节（128位）内存空间，可提供18-19位有效数字。 |
 | wchar_t            | 2 或 4 个字节 | 1 个宽字符                                                   |
 
-使用typedef给类型改名
-
-```c++
-typedef int myint//将int改名为myint
-myint distance;
-```
-
-const和constexpr
-```c++
-const修饰只读变量
-constexpr修饰常量
-```
-
 enum
 
 类似bool都表示一组有限的离散值的数据类型
@@ -225,7 +212,29 @@ enum Color {
     BLUE
 };//RED=0 GREEN=2 BLUE=3
 ```
-#### 用constexpr或enum替换#define常量
+
+使用typedef给类型改名
+
+```c++
+typedef int myint//将int改名为myint
+myint distance;
+```
+
+**auto** 关键字用于两种情况：声明变量时根据初始化表达式自动推断该变量的类型、声明函数时函数返回值的占位符
+
+```c++
+auto f=3.14;      //double
+auto s("hello");  //const char*
+auto z = new auto(9); // int*
+auto x1 = 5, x2 = 5.0, x3='r';//错误，必须是初始化为同一类型
+```
+### 关键字
+#### const和constexpr
+```c++
+const修饰只读变量
+constexpr修饰常量
+```
+用constexpr或enum替换#define常量
 ```c++
 #define NUMBER 1234 //如果发生错误 编译器给出的信息是1234 而不是NUMBER 如果这部分不是自己写的 来自某个头文件 会很难发现错误
 //使用constexpr来定义常量替换#define
@@ -255,18 +264,6 @@ private:
 	enum { Number = 8 };//"the enum hack" 令Number成为5的一个记号
 	int a[Number];
 };
-```
-### **存储类
-
-#### auto
-
-**auto** 关键字用于两种情况：声明变量时根据初始化表达式自动推断该变量的类型、声明函数时函数返回值的占位符
-
-```c++
-auto f=3.14;      //double
-auto s("hello");  //const char*
-auto z = new auto(9); // int*
-auto x1 = 5, x2 = 5.0, x3='r';//错误，必须是初始化为同一类型
 ```
 
 #### static
