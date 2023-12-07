@@ -290,9 +290,8 @@ void demo() {
 //输出：变量 i 为 9 变量 i 为 10 变量 i 为 11
 ```
 c++对多个编译单元内的 non-local static 对象 的初始化次序无明确定义
-
-考虑在文件A下有一个类A
 ```c++
+//文件A下的类A
 class A {
 public:
 	// ...
@@ -300,8 +299,8 @@ public:
 };
 extern A a;//预备好的对象
 ```
-文件B下有一个类B
 ```c++
+//文件B下的类B
 class B {
 public:
 	B() {
