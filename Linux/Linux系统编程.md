@@ -195,6 +195,8 @@ int close(int fd); //#include <unistd.h>
 //查看errno错误
 #include <errno.h>
 #include <string.h>
+#include <cstdlib> // C++ For exit
+#include <cstring> // C++ For perror
 
 int main() {
 	int fd = open("/home/yjr/mytest/test.txt", O_RDONLY);
@@ -291,7 +293,7 @@ int main() {
 ### lseek函数
 函数原型
 ```c++
-off_t lseek(int fd, off_t offset, int whence); //#include <sys/types.h> #include <unistd.h>
+off_t lseek(int fd, off_t offset, int whence); //#include <unistd.h>
 // fd：文件描述符 iffset：偏移字节数 whence：偏移起始位置(SEEK_SET/SEEK_CUR/SEEK_END)
 //返回值是以文件的开头作为偏移起始位置的偏移量
 ```
@@ -333,9 +335,12 @@ int main() {
 使用lseek拓展文件大小
 ```c++
 lseek(fd,要拓展的大小-1,SEEK_END);
-write(fd,”/0”,1);//要想使文件大小真正拓展，必须引起IO操作
+write(fd,”/0”,1);//要想使文件大小真正拓展 必须引起IO操作
+
 int ret=truncate(filepath,要拓展大小);//使用truncate也可以拓展文件大小
+
 ```
+
 ### 传入传出参数(都是指针)
 传入参数：
 ```
@@ -874,5 +879,36 @@ void *mmap(void *addr, size_t length,
 //fd：用于创建共享内存映射区的那个文件的 文件描述符
 //offset：偏移位置 必须是page大小(4K)的整数倍 默认是0 表示映射文件的全部
 //返回值void*(通用的指针类型) 成功返回映射区的首地址 失败返回MAP_FAILED
-```
 
+//释放映射区
+int munmap(void *addr, size_t length);
+//addr：mmap的返回值 length：映射区的大小 返回值 成功0失败-1
+```
+使用mmap在不使用 read 和 write 函数的情况下 使用地址(指针)完成I/O操作
+```c++
+void sys_err(const std::string& s) {
+	perror(s.c_str());
+	exit(1);
+}
+int main(int argc, char* argv[]) {
+	int fd = open("test.txt", O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)perror("open error");
+
+	/*lseek(fd, 9, SEEK_END);
+	write(fd, "a", 1);*/
+	ftruncate(fd, 10);
+	int len = lseek(fd, 0, SEEK_END);
+
+	char* p = static_cast<char*>(mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
+	if (p == MAP_FAILED)sys_err("mmap error");
+
+	//使用p对文件进行读写操作
+	strcpy(p, "hello-----------");
+	std::cout << "--" << p << std::endl;
+
+	int ret = munmap(p, len);
+	if (ret == -1)sys_err("munmap error");
+
+	return 0;
+}
+```
