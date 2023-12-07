@@ -858,6 +858,21 @@ int main(int argc, char* argv[]) {
 ### 存储映射I/O
 存储映射I/O(Mempry-mapped I/O) 使一个磁盘文件与内存空间中的一个缓冲区相映射 于是当从缓冲区中取数据 
 就相当于读文件中的相应字节 于此类似 将数据存入缓冲区 则相应的字节就自动写入文件 
-这样就可在不使用 read 和 write 函数的情况下 使用地址《指针)完成I/O操作
+这样就可在不使用 read 和 write 函数的情况下 使用地址(指针)完成I/O操作
 
 #### mmap函数
+函数原型
+```c++
+#include <sys/mman.h>
+//使用文件描述符 创建共享内存映射
+void *mmap(void *addr, size_t length,
+	int prot, int flags,int fd, off_t offset);
+//参数 addr：指定映射区的首地址 通常传NULL 表示让系统自动分配
+//1ength：共享内存映射区的大小 (<=文件的实际大小)
+//prot：共享内存映射区的读写属性 PROT_READ、PROT_WRITE、PROTREAD|PROT_WRITE
+//flags：标注共享内存的共享属性 MAP_SHARED、MAP_PRIVATE(对内存的修改不会映射到磁盘)
+//fd：用于创建共享内存映射区的那个文件的 文件描述符
+//offset：偏移位置 必须是page大小(4K)的整数倍 默认是0 表示映射文件的全部
+//返回值void*(通用的指针类型) 成功返回映射区的首地址 失败返回MAP_FAILED
+```
+
