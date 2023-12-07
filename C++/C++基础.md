@@ -268,11 +268,11 @@ private:
 
 #### static
 
-**static** 存储类指示编译器在程序的生命周期内保持局部变量的存在，而不需要在每次它进入和离开作用域时进行创建和销毁。因此，使用 static 修饰局部变量可以在函数调用之间保持局部变量的值。
+**static** 存储类指示编译器在程序的生命周期内保持局部变量的存在 而不需要在每次它进入和离开作用域时进行创建和销毁 因此 使用 static 修饰局部变量可以在函数调用之间保持局部变量的值
 
-static 修饰符也可以应用于全局变量。当 static 修饰全局变量时，会使变量的作用域限制在声明它的文件内。
+static 对象的寿命从构造出来直到程序结束为止 函数内的static对象称为local static对象
 
-在 C++ 中，当 static 用在类数据成员上时，会导致仅有一个该成员的副本被类的所有对象共享。
+当 static 用在类数据成员上时 会导致仅有一个该成员的副本被类的所有对象共享
 
 ```c++
 void func()
@@ -282,20 +282,60 @@ void func()
 	std::cout << "变量 i 为 " << i << endl;
 }
 void demo() {
-	int num = 5;
-	while (num--)
-	{
+	int num = 3;
+	while (num--){
 		func();
 	}
 }
-//输出：
-变量 i 为 9
-变量 i 为 10
-变量 i 为 11
-变量 i 为 12
-变量 i 为 13
+//输出：变量 i 为 9 变量 i 为 10 变量 i 为 11
 ```
+c++对多个编译单元内的 non-local static 对象 的初始化次序无明确定义
 
+考虑在文件A下有一个类A
+```c++
+class A {
+public:
+	// ...
+	int get_num()const;//成员函数
+};
+extern A a;//预备好的对象
+```
+文件B下有一个类B
+```c++
+class B {
+public:
+	B() {
+		//...
+		int num = a.get_num();//调用A的成员函数来初始化B的对象
+	}
+};
+B b;
+```
+除非a在b之前先初始化 否则b的初始化将使用未初始化的a
+
+为免除"跨编译单元的初始化次序"问题 用local static对象替换non-local static 对象
+```c++
+//文件A下的类A
+class A {
+public:
+	static A& get_a() {
+		static A a;
+		return a;//返回一个指向local static 的引用
+	}
+	// ...
+	int get_num()const;
+};
+```
+```c++
+//文件B下的类B
+class B {
+public:
+	B() {
+		//...
+		int num = A::get_a().get_num();  // 调用A的成员函数来初始化B的对象
+	}
+};
+```
 #### extern
 
 **extern** 存储类用于提供一个全局变量的引用，全局变量对所有的程序文件都是可见的。当您使用 'extern' 时，对于无法初始化的变量，会把变量名指向一个之前定义过的存储位置。
