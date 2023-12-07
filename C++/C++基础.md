@@ -228,7 +228,7 @@ auto s("hello");  //const char*
 auto z = new auto(9); // int*
 auto x1 = 5, x2 = 5.0, x3='r';//错误，必须是初始化为同一类型
 ```
-### 关键字
+### *关键字
 #### const和constexpr
 ```c++
 const修饰只读变量
