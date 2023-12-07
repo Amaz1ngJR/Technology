@@ -787,8 +787,7 @@ int main() {
 	if (i == 2) {//父进程 关闭读端写端 等待回收两个子进程
 		close(fd[0]);
 		close(fd[1]);
-		wait(NULL);
-		wait(NULL);
+		for (i = 0; i < 2; i++)wait(NULL);
 	}
 	else if (i == 0) {//兄进程
 		close(fd[0]);
