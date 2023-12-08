@@ -324,23 +324,61 @@ void demo() {
 }
 ```
 
-#### ***拷贝构造
-
-默认情况下，编译器至少给一个类添加4个函数：
-
-
-
-默认构造函数(无参，函数体为空)
-
-默认析构函数(无参，函数体为空)
-
-默认拷贝构造函数(浅拷贝)
-
-默认赋值运算符operator=,对属性进行值拷贝
+默认情况下 编译器至少给一个类添加4个函数：
+```c++
+class Empty {};
+//等效于
+class Empty {
+public:
+	Empty();  //默认构造函数(无参，函数体为空)
+	Empty(const Empty& rhs);  //默认拷贝构造函数(浅拷贝)
+	~Empty();  //默认析构函数(无参，函数体为空)
+	Empty& operator=(const Empty& rhs); //默认赋值运算符operator= 对属性进行值拷贝
+};
+```
 
 当用户定义有参构造函数 编译器不提供默认无参构造函数
 
 当用户定义拷贝构造函数 编译器不提供默认和拷贝构造函数
+
+当不想提供这四个函数的时候 一种方法是将它们放在private中
+```c++
+class Empty {
+public:
+	Empty();
+	~Empty();
+private:  //禁用默认的拷贝构造和拷贝赋值
+	Empty(const Empty& rhs);
+	Empty& operator=(const Empty& rhs);
+};
+```
+但是成员函数、友元函数还是可以调用private下的默认的拷贝构造和拷贝赋值(但是会出现链接错误)
+
+使用一个基类解决这个问题
+```c++
+class Uncopyable{
+protected:
+	Uncopyable();
+	~Uncopyable();
+private:  //禁用默认的拷贝构造和拷贝赋值
+	Uncopyable(const Uncopyable& rhs);
+	Uncopyable& operator=(const Uncopyable& rhs);
+};
+
+class Empty private:Uncopyable{};//不再声明拷贝构造和拷贝赋值
+```
+可以使用delete禁用 
+```c++
+class Empty {
+public:
+	Empty() = delete;
+	~Empty()= delete;
+	Empty(const Empty& rhs) = delete;
+	Empty& operator=(const Empty& rhs) = delete;
+	Empty() = default;//启用默认构造函数
+};
+```
+#### ***拷贝构造
 
 ##### 拷贝构造的调用时机
 
