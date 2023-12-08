@@ -287,7 +287,7 @@ set helplang=cn
 安装byobu
 
 ```bash
-byobu sudo apt-get install byobu 
+sudo apt-get install byobu 
 ```
 
 登录启动
