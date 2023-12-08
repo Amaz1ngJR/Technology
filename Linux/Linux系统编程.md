@@ -901,7 +901,7 @@ int main(int argc, char* argv[]) {
 
 	char* p = static_cast<char*>(mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 	if (p == MAP_FAILED)sys_err("mmap error");
-
+	close(fd);  //创建完映射区 即可关闭文件
 	//使用p对文件进行读写操作
 	strcpy(p, "hello-----------");
 	std::cout << "--" << p << std::endl;
@@ -912,11 +912,54 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
-使用mmap的注意事项：
-
+使用mmap的注意事项(出错率高 一定检查返回值)：
+```
 1.用于创建映射区的文件大小为 0 实际指定非0大小创建映射区 出 总线错误
 2.用于创建映射区的文件大小为 0 实际指定0大小创建映射区 出 无效参数 
 3.用于创建映射区的文件读写属性为只读 映射区属性为读写 出 无效参数
 4.创建映射区需要read权限 mmap的读写权限 <= 文件的open权限 只写不行
 5.文件描述符fd 在mmap创建映射区完成即可关闭 后续访问文件用 地址访问
 6.offset 必须是4096(页大小)的整数倍 (MMU 映射的最小单位为一页)
+7.对申请的映射区内存 不能越界访问
+8.munmap用于释放的地址必须是mmap申请返回的地址 杜绝指针++操作
+```
+保险调用mmap：
+1.open(O_RDWR)
+2.MMAP(NULL,有效文件大小,PROT_READ|PROT_WRITE,MAP_SHARED,fd,0);
+
+mmap父子进程间通信
+```c++
+void sys_err(const std::string& s) {
+	perror(s.c_str());
+	exit(1);
+}
+int var = 100;
+int main(int argc, char* argv[]) {
+	int fd = open("test.txt", O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)perror("open error");
+
+	ftruncate(fd, 4);
+
+	//int* p = (int *)(mmap(nullptr,4 , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
+	int* p = (int *)(mmap(nullptr,4 , PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0));  //改为私有
+	if (p == MAP_FAILED)sys_err("mmap error");
+	close(fd);  //创建完映射区 即可关闭文件
+
+	int pid = fork();
+	if (pid == 0) {//子进程
+		*p = 50;   //写共享内存
+		var = 200;//修改全局变量
+		std::cout << "子进程：*p = " << *p << "var = " << var << std::endl;
+	}
+	if (pid > 0) {
+		sleep(1);
+		std::cout << "父进程：*p = " << *p << "var = " << var << std::endl;
+		wait(NULL);
+
+		int ret = munmap(p, 4);  //释放映射区
+		if (ret == -1)sys_err("munmap error");
+	}
+
+	return 0;
+}
+```
