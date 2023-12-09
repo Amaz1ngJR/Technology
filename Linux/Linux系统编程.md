@@ -876,6 +876,7 @@ void *mmap(void *addr, size_t length,
 //1ength：共享内存映射区的大小 (<=文件的实际大小)
 //prot：共享内存映射区的读写属性 PROT_READ、PROT_WRITE、PROTREAD|PROT_WRITE
 //flags：标注共享内存的共享属性 MAP_SHARED、MAP_PRIVATE(对内存的修改不会映射到磁盘)
+//MAP_ANON、MAP_ANONYMOUS用来创建匿名映射区(无需一个文件)
 //fd：用于创建共享内存映射区的那个文件的 文件描述符
 //offset：偏移位置 必须是page大小(4K)的整数倍 默认是0 表示映射文件的全部
 //返回值void*(通用的指针类型) 成功返回映射区的首地址 失败返回MAP_FAILED
@@ -899,7 +900,7 @@ int main(int argc, char* argv[]) {
 	ftruncate(fd, 10);
 	int len = lseek(fd, 0, SEEK_END);
 
-	char* p = static_cast<char*>(mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
+	char* p = (char*)(mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
 	if (p == MAP_FAILED)sys_err("mmap error");
 	close(fd);  //创建完映射区 即可关闭文件
 	//使用p对文件进行读写操作
@@ -929,15 +930,12 @@ int main(int argc, char* argv[]) {
 
 mmap父子进程间通信
 ```c++
-void sys_err(const std::string& s) {
-	perror(s.c_str());
-	exit(1);
-}
 int var = 100;
 int main(int argc, char* argv[]) {
 	int fd = open("test.txt", O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)perror("open error");
-
+	int ret = unlink("test.txt");
+	if (ret == -1)sys_err("unlink error");
 	ftruncate(fd, 4);
 
 	//int* p = (int *)(mmap(nullptr,4 , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
@@ -960,6 +958,80 @@ int main(int argc, char* argv[]) {
 		if (ret == -1)sys_err("munmap error");
 	}
 
+	return 0;
+}
+```
+改为匿名映射(非血缘关系不能使用)
+```c++
+int main(int argc, char* argv[]) {
+	//改成匿名映射后 无需open文件 文件大小任意设置 文件描述符传-1
+	int* p = (int*)(mmap(nullptr, 10, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0));
+	if (p == MAP_FAILED)sys_err("mmap error");
+
+	int pid = fork();
+	if (pid == 0) {//子进程
+		*p = 50;   //写共享内存
+		var = 200;//修改全局变量
+		std::cout << "子进程：*p = " << *p << "var = " << var << std::endl;
+	}
+	if (pid > 0) {
+		sleep(1);
+		std::cout << "父进程：*p = " << *p << "var = " << var << std::endl;
+		wait(NULL);
+
+		int ret = munmap(p, 4);  //释放映射区
+		if (ret == -1)sys_err("munmap error");
+	}
+
+	return 0;
+}
+Linux下两个特殊文件： /dev/zero 摇钱树 可以读很多空洞 /dev/null 文件黑洞 写不满
+当MAP_ANON无法使用的时候 使用open("/dev/zero", 权限) mmap中文件大小也可以任意设置 (非血缘关系也不能使用)
+```
+mmap非血缘关系进程间通信 
+
+【针对非血缘关系进程间通信 mmap和FIFO的区别】mmap(数据可以重复读取 数据在内存上)FIFO(数据只能一次读取 读完管道就清空了)
+```c++
+struct student {
+	int id;
+	char name[10];//使用固定大小的字符数组 不能是std::string
+ 	//mmap映射的内存区域必须是固定大小的 而string是动态分配的内存
+	int age;
+};
+//进程A
+int main(int argc, char* argv[]) {
+	int fd = open("test.txt", O_RDWR | O_CREAT | O_TRUNC);
+	if (fd == -1)sys_err("open error");
+	student stu = { 1,"n_m",18 };
+	ftruncate(fd, sizeof(stu));
+	struct student* p = (struct student*)mmap(NULL, sizeof(stu), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	close(fd);
+	if (p == MAP_FAILED)sys_err("mmap error");
+	int i = 5;
+	while (i) {
+		memcpy(p, &stu, sizeof(stu));
+		stu.id++;
+		sleep(1);
+		i--;
+	}
+	munmap(p, sizeof(stu));
+	return 0;
+}
+//进程B
+int main(int argc, char* argv[]) {
+	int fd = open("test.txt", O_RDONLY);
+	if (fd == -1)sys_err("open error");
+	student stu;
+	struct student* p = (struct student*)mmap(NULL, sizeof(stu), PROT_READ, MAP_SHARED, fd, 0);
+	close(fd);
+	if (p == MAP_FAILED)sys_err("mmap error");
+	int i = 5;
+	while (i) {
+		std::cout << "id = " << p->id << " name = " << p->name << " age = " << p->age << std::endl;
+		sleep(1);
+		i--;
+	}
+	munmap(p, sizeof(stu));
 	return 0;
 }
 ```
