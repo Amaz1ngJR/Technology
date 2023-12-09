@@ -155,7 +155,7 @@ void thread_func(int a, const string& str) {//线程函数
 			std::thread::id thisThreadId = std::this_thread::get_id();
 			cout << "第" << a << "个线程ID：" << thisThreadId << str << endl;
 		} // 锁定作用域结束后互斥锁自动释放
-		Sleep(1000);// 休眠1秒 Linux: Sleep(1)
+		Sleep(1000);// 休眠1秒 Linux: sleep(1)
 	}
 }
 
