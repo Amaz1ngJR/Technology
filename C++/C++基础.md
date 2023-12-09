@@ -317,13 +317,14 @@ B b;
 //文件A下的类A
 class A {
 public:
-	static A& get_a() {
-		static A a;
-		return a;//返回一个指向local static 的引用
-	}
 	// ...
 	int get_num()const;
 };
+
+A& get_a() { 
+	static A a;
+	return a;//返回一个指向local static 的引用
+}
 ```
 ```c++
 //文件B下的类B
@@ -331,9 +332,14 @@ class B {
 public:
 	B() {
 		//...
-		int num = A::get_a().get_num();  // 调用A的成员函数来初始化B的对象
+		int num = get_a().get_num();  // 调用A的成员函数来初始化B的对象
 	}
 };
+
+B& get_b() {
+	static B b;
+	return b;
+}
 ```
 #### extern
 
