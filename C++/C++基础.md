@@ -332,7 +332,7 @@ class B {
 public:
 	B() {
 		//...
-		int num = get_a().get_num();  // 调用A的成员函数来初始化B的对象
+		int num = get_a().get_num(); 
 	}
 };
 
