@@ -1095,10 +1095,75 @@ int main(int argc, char* argv[]) {
 ```c++
 
 ```
-#### alarm函数
+#### alarm函数(使用自然计时法)
+每个进程有且仅有一个定时器
+
 函数原型
 ```c++
 #include <unistd.h>
+//定时发送信号给当前进程
+unsigned int alarm(unsigned int seconds); //返回0或者剩余的秒数(无失败)
+```
+取消定时器alarm(0);   
+```
+alarm(5); //定时为5秒
+//过了3秒
+alarm(4)；//返回2秒 重置定时器为4秒
+//过了5秒
+alarm(5); //返回0秒 重置定时器为5秒
+alarm(0); //返回5秒
+```
+使用time ./demo 查看下面代码的实际时间=用户时间+系统时间+等待时间
+```c++
+int main(int argc, char* argv[]) {
+	int i;
+	alarm(1);
+	for (i = 0;; i++)std::cout << i << std::endl;
+	return 0;
+}
+```
+#### setitimer/getitimer函数
+函数原型
+```c++
+#include <sys/time.h>
 
-unsigned int alarm(unsigned int seconds);
+int getitimer(int which, struct itimerval *curr_value);
+int setitimer(int which, const struct itimerval *new_value,
+                     struct itimerval *old_value);
+//成功返回0 失败返回-1
+//which:指定定时方式
+//1、【自然计时】ITIMER_REAL(14):计算自然时间 同alarm 发送SIGALRM信号
+//2、【虚拟空间计时(用户空间)】ITIMER_VIRTUAL(26):只计算进程占用cpu的时间 发送SIGVTALRM信号
+//3、【运行时计时(用户+内核)】ITIMER_PROF(27):计算占用cpu及执行系统调用的时间 发送SIGPROF信号
+//new_value：同alarm的seconds old_value同alarm的返回值
+struct itimerval {
+	struct timeval it_interval; /* 用来设定两次定时任务之间的间隔时间 */
+	struct timeval it_value;    /* 定时的时长 */
+};
+
+struct timeval {
+	time_t      tv_sec;         /* seconds */
+	suseconds_t tv_usec;        /* microseconds */
+};
+```
+```c++
+void func(int sig) {
+	std::cout << "hello" << std::endl;
+}
+
+int main(int argc, char* argv[]) {
+	struct itimerval it, oldit;
+	signal(SIGALRM, func);//SIGALRM信号的捕捉函数
+
+	it.it_value.tv_sec = 2;//设置定时时长2秒
+	it.it_value.tv_usec = 0;//0微妙
+
+	it.it_interval.tv_sec = 5;//设定两次定时任务之间的间隔为5秒
+	it.it_interval.tv_usec = 0;
+
+	//一次设置两个闹钟 do while do定时2秒 while定时5秒
+	if (setitimer(ITIMER_REAL, &it, &oldit) == -1)sys_err("setitimer error");
+	while (1);
+	return 0;
+}
 ```
