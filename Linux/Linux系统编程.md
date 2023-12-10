@@ -1057,11 +1057,6 @@ int main(int argc, char* argv[]) {
 
 信号的处理方式：1、执行默认动作2、忽略(丢弃)3、捕捉(调用用户处理函数 类似catch)
 
-阻塞信号集/信号屏蔽字(位图):将某些信号加入集合 对他们设置屏蔽 当屏蔽x信号后 再收到该信号 该信号的处理将推后(解除屏蔽后)
-
-未决信号集(位图):1.信号产生未决信号集中描述该信号的位立刻翻转为1 表信号处于未决状态 当信号被处理 对应位翻转回为0 这一时刻往往非常短暂
-2.信号产生后由于某些原因(主要是阻塞)不能抵达 这类信号的集合称之为未决信号集 在屏蔽解除前 信号一直处于未决状态
-
 使用命令kill -l查看所有信号
 ```bash
 kill -l
@@ -1166,4 +1161,30 @@ int main(int argc, char* argv[]) {
 	while (1);
 	return 0;
 }
+```
+### 信号集
+阻塞信号集/信号屏蔽字(位图):将某些信号加入集合 对他们设置屏蔽 当屏蔽x信号后 再收到该信号 该信号的处理将推后(解除屏蔽后)
+
+未决信号集(位图):1.信号产生未决信号集中描述该信号的位立刻翻转为1 表信号处于未决状态 当信号被处理 对应位翻转回为0 这一时刻往往非常短暂
+2.信号产生后由于某些原因(主要是阻塞)不能抵达 这类信号的集合称之为未决信号集 在屏蔽解除前 信号一直处于未决状态
+
+通过操作阻塞信号集来间接改变未决信号集(不能直接操作)
+#### 信号集操作库函数
+函数原型
+```c++
+#include <signal.h>
+
+int sigemptyset(sigset_t *set);//将集合(二进制)都置为0
+int sigfillset(sigset_t *set);//将集合(二进制)都置为1
+int sigaddset(sigset_t *set, int signum);//将信号signum置为1
+int sigdelset(sigset_t *set, int signum);//将信号signum置为0
+int sigismember(const sigset_t *set, int signum);//查看signum是否在集合中
+```
+#### sigprocmask函数
+函数原型
+```c++
+#include <signal.h>
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+
 ```
