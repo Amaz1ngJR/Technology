@@ -1163,16 +1163,18 @@ int main(int argc, char* argv[]) {
 }
 ```
 ### 信号集
-阻塞信号集/信号屏蔽字(位图):将某些信号加入集合 对他们设置屏蔽 当屏蔽x信号后 再收到该信号 该信号的处理将推后(解除屏蔽后)
+阻塞信号集/信号屏蔽字(位图):将某些信号加入集合 对他们设置屏蔽(屏蔽信号只是将信号处理延后执行 而忽略表示丢弃这个信号) 当屏蔽x信号后 再收到该信号 该信号的处理将推后(解除屏蔽后)
 
 未决信号集(位图):1.信号产生未决信号集中描述该信号的位立刻翻转为1 表信号处于未决状态 当信号被处理 对应位翻转回为0 这一时刻往往非常短暂
 2.信号产生后由于某些原因(主要是阻塞)不能抵达 这类信号的集合称之为未决信号集 在屏蔽解除前 信号一直处于未决状态
 
 通过操作阻塞信号集来间接改变未决信号集(不能直接操作)
-#### 信号集操作 库函数
+#### 信号集操作 库函数 修改自己的set
 函数原型
 ```c++
 #include <signal.h>
+
+sigset_t set;//自定义信号集
 
 int sigemptyset(sigset_t *set);//将集合(二进制)都置为0
 int sigfillset(sigset_t *set);//将集合(二进制)都置为1
@@ -1180,11 +1182,115 @@ int sigaddset(sigset_t *set, int signum);//将信号signum置为1
 int sigdelset(sigset_t *set, int signum);//将信号signum置为0
 int sigismember(const sigset_t *set, int signum);//查看signum是否在集合中
 ```
-#### sigprocmask函数
+#### sigprocmask/sigpending函数 通过自己的set修改阻塞信号集mask/查看未决信号集pending
 函数原型
 ```c++
 #include <signal.h>
-
+//用来屏蔽信号、解除信号 本质是读取或修改进程的信号屏蔽字(PCB中)
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+//参数 how: 1、SIG_BLOCK：阻塞(位或mask=mask|set) 2、SIG_UNBLOCK：解除阻塞(取反再位与mask=mask&~set)  3、SIG_SETMASK：设置屏蔽集(mask=set)
+//*set 传入参数 *oldset传出参数
 
+//读取当前进程的未决信号集pending
+int sigpending(sigset_t *set);//set传出参数 pending
+
+//成功返回0 失败返回-1
+```
+#### signal/sigaction函数
+signal函数原型
+```c++
+#include <signal.h>
+
+typedef void (*sighandler_t)(int); //函数指针 指向返回值为空 参数为int
+//注册一个信号捕捉函数 捕获是操作系统内核做的 而不是这个函数
+sighandler_t signal(int signum, sighandler_t handler);
+//返回一个函数指针 
+```
+```c++
+void sig_catch(int sig) {
+	std::cout << "捕获信号" << sig << std::endl;
+}
+int main(int argc, char* argv[]) {
+	signal(SIGINT, sig_catch);
+	while (1);
+
+	return 0;
+}
+```
+sigaction函数原型
+```c++
+#include <signal.h>
+
+int sigaction(int signum, const struct sigaction *act,
+                     struct sigaction *oldact);
+
+struct sigaction {
+	//......
+	void     (*sa_handler)(int);  //函数指针 类似signal的第二个参数
+	sigset_t   sa_mask; //不同于阻塞信号集mask作用域为整个进程存活时间 它仅作用于当前信号捕捉函数
+	int        sa_flags; //一般传0 表示屏蔽这个信号本身
+};
+```
+信号捕捉特性：
+
+特性1、进程正常运行时 默认PCB中有一个信号屏蔽字 假定为mask 它决定了进程自动屏蔽哪些信号 当注册了某个信号A捕捉函数 捕捉到信号A以后 要调用该函数 而该函数有可能执行很长时间 在这期间所屏蔽的信号是由masksa_mask和mask共同来指定的 调用完信号A处理函数后再恢复为mask
+
+特性2、A信号捕捉函数执行期间 A信号自动被屏蔽
+
+特性3、阻塞的常规信号不支持排队 产生多次只记录一次(后 32 个实时信号支持排队)
+```c++
+void sig_catch(int sig) {
+	std::cout << "捕获信号" << sig << std::endl;
+	sleep(10);//10秒内屏蔽sig信号 特性3
+}
+int main(int argc, char* argv[]) {
+	struct sigaction act, oldact;
+	act.sa_handler = sig_catch;  //设置回调函数
+	sigemptyset(&act.sa_mask);   //清空sa_mask屏蔽字 只在sig_catch工作时有效
+	act.sa_flags = 0;	
+	sigaction(SIGINT, &act, &oldact);
+	while (1);
+	return 0;
+}
+```
+内核实现信号的捕获过程
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/471db1b5-5248-43f3-a14c-0c9d02f5c5c6)
+
+#### SIGCHLD信号
+产生条件(子进程状态改变就会产生)：子进程终止时、子进程接收到SIGSTOP信号停止时、子进程处在停止态接受到SIGCONT后唤醒时
+
+借助SIGCHLD信号回收子进程
+```c++
+void catch_child(int sig) {
+	pid_t pid;
+	while ((pid = wait(NULL)) != -1) {//循环回收 这里不用while的话 会有僵尸进程
+		std::cout << "回收子进程" << pid << std::endl;
+	}
+}
+int main(int argc, char* argv[]) {
+	pid_t pid;
+	//设置阻塞 防止父进程的信号捕捉函数还没有注册完 子进程先死了
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, SIGCHLD);
+	sigprocmask(SIG_BLOCK, &set, nullptr);
+	int i;
+	for (i = 0; i < 5; i++) {
+		if ((pid = fork()) == 0) break;
+	}
+	if (i == 5) {
+		struct sigaction act;
+		act.sa_handler = catch_child;
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = 0;
+		sigaction(SIGCHLD, &act, nullptr);
+		//父进程注册完信号捕捉函数 解除阻塞
+		sigprocmask(SIG_UNBLOCK, &set, nullptr);
+		std::cout << "父进程" << getpid() << std::endl;
+		while (1);
+	}
+	else std::cout << "创建子进程" << getpid() << std::endl;
+
+	return 0;
+}
 ```
