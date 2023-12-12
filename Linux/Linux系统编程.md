@@ -1303,9 +1303,110 @@ int main(int argc, char* argv[]) {
  
 ## *进程组(作业)和会话
 多个进程形成一个进程组 多个进程组形成一个会话
-
+```
 当父进程创建子进程的时候 默认子进程与父进程属于同一进程组 进程组D==第一个进程D(组长进程) 所以 组长进程的标识为 进程组ID==进程ID
-
 可使用kill -SIGKILL -进程组id(负数)来将整个进程内的进程全部杀死
-
 进程组的生存期为 进程组创建到最后一个进程离开 一个进程可以为自己或子进程设置进程组ID
+```
+创建一个会话需要注意以下几点注意事项:
+```
+1.调用进程不能是进程组组长 
+2.该进程变成新会话首进程(session header)、成为一个新进程组的组长进程
+3.需有root 权限 (ubuntu 不需要)
+4.新会话丢弃原有的控制终端 该会话没有控制终端 无法完成交互 
+5.建立新会话时 先调用fork 父进程终止 子进程调用 setsid
+```
+### getsid/setsid函数
+函数原型
+```c++
+#include <unistd.h>
+
+pid_t getsid(pid_t pid); //获取进程所属会话ID pid为0表示查看当前进程sessionID
+pid_t setsid(void);//创建一个会话 并以自己的ID设置进程组ID 同时也是新会话的ID (非进程组组长的话 返回值等于getpid)
+
+//成功返回调用进程的会话id 失败返回-1
+```
+```c++
+int main(int argc, char* argv[]) {
+	pid_t pid;
+	if ((pid = fork()) < 0) sys_err("fork error");
+	else if (pid == 0) {
+		std::cout << "子进程的PID：" << getpid() << std::endl;
+		std::cout << "子进程的组ID：" << getpgid(0) << std::endl;
+		std::cout << "子进程的会话ID：" << getsid(0) << std::endl;
+		sleep(2);
+		setsid();  //子进程非组长进程 将其成为新会话首进程 成为组长进程
+		std::cout << "发生改变" << std::endl;
+		std::cout << "子进程的PID：" << getpid() << std::endl;
+		std::cout << "子进程的组ID：" << getpgid(0) << std::endl;
+		std::cout << "子进程的会话ID：" << getsid(0) << std::endl;
+	}
+
+	return 0;
+}
+```
+### 守护进程
+Daemon(精灵)进程 是Linux 中的后台服务进程 通常独立于控制终端并且周期性地执行某种任务或等待处理某些发生的事件 一般采用以d 结尾的名字
+
+Linux 后台的一些系统服务进程 没有控制终端 不能直接和用户交互 不受用户登录、注销的影响 一直在运行着 他们都是守护进程 如:预读入缓输出机制的实现;ftp 服务器;nfs 服务器等
+
+创建守护进程 最关键的一步是调用 setsid 函数创建一个新的 Session 并成为 Session Leader
+
+创建守护进程模型
+```
+1.创建子进程 父进程退出:所有工作在子进程中进行形式上脱离了控制终端
+2.在子进程中创建新会话:setsid()函数 使子进程完全独立出来 脱离控制
+3.改变当前目录:chdir()函数 防止占用可卸载的文件系统
+4.重设文件权限掩码:umask()函数 防止继承的文件创建屏蔽字拒绝某些权限 增加守护进程灵活性
+5.关闭文件描述符(或将0、1、2重定向到/dev/null):继承的打开文件不会用到 浪费系统资源 无法卸载
+
+6.开始执行守护进程核心工作 守护进程退出处理程序模型
+```
+```c++
+int main(int argc, char* argv[]) {
+	pid_t pid = fork();
+	if (pid > 0)exit(0);//父进程终止
+	pid = setsid(); //创建新会话
+	if (pid == -1)sys_err("setsid error");
+
+	int ret = chdir("/home/yjr/"); //改变工作目录位置
+	if (ret == -1)sys_err("chdir error");
+	umask(0022);  //改变文件访问权限掩码
+
+	close(STDIN_FILENO);//关闭文件描述符0
+	int fd = open("/dev/null", O_RDWR);//fd ---> 0
+	if (fd == -1)sys_err("open error");
+	dup2(fd, STDOUT_FILENO);//重定向文件描述符1
+	dup2(fd, STDERR_FILENO);//重定向文件描述符2
+
+	while (1);//模拟守护进程业务 
+
+	return 0;
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
