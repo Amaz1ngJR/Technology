@@ -367,7 +367,7 @@ private:  //禁用默认的拷贝构造和拷贝赋值
 
 class Empty private:Uncopyable{};//不再声明拷贝构造和拷贝赋值
 ```
-可以使用delete禁用 
+可以使用delete禁用 c++11(delete/default)
 ```c++
 class Empty {
 public:
