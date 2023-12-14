@@ -1395,7 +1395,7 @@ int main(int argc, char* argv[]) {
 区别:在于是否共享地址空间
 Linux下 线程是最小的执行单位 进程是最小分配资源单位 可看成是只有一个线程的进程
 ```
-使用 ps -Lf 进程id 得到线程号(不是线程ID)
+使用 ps -Lf 进程id 得到线程号(不是线程ID) 线程号是给cpu用来分配时间的 线程ID是给进程识别线程的
 
 线程共享：
 ```
@@ -1403,7 +1403,7 @@ Linux下 线程是最小的执行单位 进程是最小分配资源单位 可看
 2.每种信号的处理方式(信号和线程最好不要同时使用)
 3.当工作目录
 4.用户ID 和组ID
-5.内存地址空间 (.text/.data/.bss/heap/共享库)
+5.内存地址空间 (.text/.data/.bss/heap/共享库  线程间共享全局变量(errno除外) 而进程不共享全局变量 只能借助mmap)
 ```
 线程不共享：
 ```
@@ -1414,14 +1414,68 @@ Linux下 线程是最小的执行单位 进程是最小分配资源单位 可看
 5.信号屏蔽字
 6.调度优先级
 ```
+线程ID：可以使用pthread_self(void)查看线程ID同getpid 是进程内部的识别标志(两个进程间的线程ID允许相同)
 
+### pthread_create库函数 
+函数原型
+```c++
+#include <pthread.h>
 
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+	void *(*start_routine) (void *), void *arg); 
+//参数: *thread传出参数 新创建线程的线程ID  *attr描述线程属性 *start_routine函数指针 *arg函数参数
+//成功返回0 失败返回-1 编译和链接的时候加 -lpthread
+```
+循环创建多个子线程
+```c++
+void* func(void* arg) {
+	int i = *((int*)arg);
+	sleep(i);
+	std::cout << "第" << i + 1 << "个线程" << "pid = "
+		<< getpid() << " tid = " << pthread_self() << std::endl;
+	delete static_cast<int*>(arg); // 释放内存
+	return nullptr;//返回函数调用者
+}
+int main(int argc, char* argv[]) {
+	std::cout << "main: pid = " << getpid() << " tid = " << pthread_self() << std::endl;
+	int ret, i; pthread_t tid;
+	for (i = 0; i < 5; i++) {//循环创建5个线程
+		int* arg = new int(i); // 为每个i的值分配内存
+		ret = pthread_create(&tid, nullptr, func, static_cast<void*>(arg));
+		if (ret)sys_err("pthread_create error");
+	}
+	pthread_exit((void *)0);
+}
+```
+验证线程间共享全局变量
+```c++
+int var = 100;//主、子线程共享全局变量
+void* func(void* arg) {
+	var = 200;
+	std::cout << "thread" << std::endl;
+	return nullptr;
+}
+int main(int argc, char* argv[]) {
+	std::cout << "var = " << var << std::endl;
+	pthread_t tid;
+	pthread_create(&tid, nullptr, func, nullptr);
+	sleep(1);
+	std::cout << "after pthread_create, var = " << var << std::endl;
+	return 0;
+}
+```
+### pthread_exit/pthread_join库函数
+exit：退出当前进程
+return: 返回到调用者
+pthread_exit：退出当前线程
 
+函数原型
+```c++
+#include <pthread.h>
 
-
-
-
-
+void pthread_exit(void *retval);
+int pthread_join(pthread_t thread, void **retval);
+```
 
 
 
