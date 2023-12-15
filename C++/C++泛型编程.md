@@ -1278,7 +1278,7 @@ void demo() {
 
 ### **STL常用算法
 
-\#include< algorithm > < functional > < numeric >
+#include<algorithm> <functional> <numeric>
 
 #### ***常用遍历算法
 
@@ -1481,6 +1481,20 @@ void demo() {
 }
 ```
 
+#### max_element/min_element/minmax_element
+
+```c++
+void demo() {
+	vector<int>v = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
+	auto max_v = std::max_element(std::begin(v), std::end(v));
+	std::cout << "最大值是：" << *max_v << ",位于索引: " << std::distance(v.begin(), max_v) << std::endl;
+	auto min_v = std::min_element(std::begin(v), std::end(v));
+	std::cout << "最小值是: " << *min_v << ",位于索引: " << std::distance(v.begin(), min_v) << std::endl;
+	auto minmaxPair = std::minmax_element(std::begin(v), std::end(v));
+	std::cout << "最小值是: " << *minmaxPair.first << ",位于索引: " << std::distance(std::begin(v), minmaxPair.first) << std::endl;
+	std::cout << "最大值是: " << *minmaxPair.second << ",位于索引: " << std::distance(std::begin(v), minmaxPair.second) << std::endl;
+}
+```
 ### ***常用计数算法
 
 ##### count
