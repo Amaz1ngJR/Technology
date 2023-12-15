@@ -1474,11 +1474,60 @@ pthread_exit：退出当前线程
 #include <pthread.h>
 
 void pthread_exit(void *retval);
-int pthread_join(pthread_t thread, void **retval);
+int pthread_join(pthread_t thread, void **retval);// void **retval传出参数
+```
+```c++
+struct thrd {
+	int var;
+	char str[256];
+};
+
+void* func(void* arg) {
+	thrd* tval = new(thrd);
+	tval->var = 100;
+	strcpy(tval->str, "hello");
+	return (void*)tval;
+}
+int main(int argc, char* argv[]) {
+	pthread_t tid;
+	thrd* retval;
+	int ret = pthread_create(&tid, nullptr, func, nullptr);
+	if (ret)sys_err("pthread_create error");
+	ret = pthread_join(tid, (void**)&retval);
+	if (ret)sys_err("pthread_join error");
+	std::cout << "var = " << retval->var << " str = " << retval->str << std::endl;
+	pthread_exit(nullptr);
+}
 ```
 
+### pthread_cancel库函数
+杀死(取消)线程 对应于kill函数 对线程的取消并不是实时的 而是需要等待线程到达某个取消点
+函数原型
+```c++
+#include <pthread.h>
 
-
+int pthread_cancel(pthread_t thread);
+```
+```c++
+void* func(void* arg) {
+	while (1) {
+		std::cout << "thread:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
+		sleep(1);
+	}
+	return nullptr;
+}
+int main(int argc, char* argv[]) {
+	pthread_t tid;
+	int ret = pthread_create(&tid, nullptr, func, nullptr);
+	if (ret)sys_err("pthread_create error");
+	std::cout << "main:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
+	sleep(5);
+	ret = pthread_cancel(tid);  //终止线程
+	if (ret)sys_err("pthread_cancel error");
+	while (1);
+	pthread_exit(nullptr);
+}
+```
 
 
 
