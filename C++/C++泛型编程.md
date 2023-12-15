@@ -1428,41 +1428,28 @@ void demo() {
 }
 ```
 
-##### lower_bound
+##### lower/upper_bound
 
-//在已排序的容器中二分查找第一个大于或等于给定值的元素的位置    返回一个迭代器
-
+//lower_bound在已排序的容器中二分查找第一个大于或等于给定值的元素的位置    返回一个迭代器
+//upper_bound在已排序的容器中二分查找第一个大于给定值的元素的位置 返回一个迭代器
 ```c++
 void demo() {
 	std::vector<int> vec = { 1,2,4,4,5,6,7,8,9 };
 	int target = 5;
+
 	auto it = std::lower_bound(vec.begin(), vec.end(), target);
 	if (it != vec.end()) {
-		std::cout << "第一个不小于 " << target << " 的元素的位置是："
+		std::cout << "第一个大于等于 " << target << " 的元素的位置是："
 			<< std::distance(vec.begin(), it) << std::endl;
 	}
-	else {
-		std::cout << "容器中没有不小于 " << target << " 的元素。" << std::endl;
-	}
-}
-```
-
-##### upper_bound
-
-//在已排序的容器中二分查找第一个大于给定值的元素的位置 返回一个迭代器
-
-```c++
-void demo() {
-	std::vector<int> vec = { 1,2,4,4,5,6,7,8,9 };
-	int target = 5;
-	auto it = std::upper_bound(vec.begin(), vec.end(), target);
-	if (it != vec.end()) {
+	else std::cout << "容器中没有不小于 " << target << " 的元素。" << std::endl;
+	
+	auto it2 = std::upper_bound(vec.begin(), vec.end(), target);
+	if (it2 != vec.end()) {
 		std::cout << "第一个大于 " << target << " 的元素的位置是："
-			<< std::distance(vec.begin(), it) << std::endl;
+			<< std::distance(vec.begin(), it2) << std::endl;
 	}
-	else {
-		std::cout << "容器中没有大于 " << target << " 的元素。" << std::endl;
-	}
+	else std::cout << "容器中没有大于 " << target << " 的元素。" << std::endl;
 }
 ```
 
@@ -1481,7 +1468,7 @@ void demo() {
 }
 ```
 
-#### max_element/min_element/minmax_element
+##### max/min/mimmax_element
 
 ```c++
 void demo() {
