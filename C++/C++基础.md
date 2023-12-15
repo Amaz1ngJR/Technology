@@ -1365,11 +1365,11 @@ void removeFile(const std::string& sourcePath, const std::string& destinationPat
 //处理一个文件夹下的.obj文件
 int deal_files() {
 	// 指定文件夹路径
-	string folder_path = "D:/MyCode/source";//指定文件夹
-	string out__path = "D:/MyCode/target";//指定输出文件夹
+	std::string folder_path = "D:/MyCode/source";//指定文件夹
+	std::string out__path = "D:/MyCode/target";//指定输出文件夹
 	DIR* dir = opendir(folder_path.c_str());
 	if (dir == NULL) {
-		cout << "Failed to open folder." << endl;
+		std::cout << "Failed to open folder." << std::endl;
 		return 0;
 	}
 	// 读取文件夹下的所有文件
@@ -1380,28 +1380,28 @@ int deal_files() {
 			continue;
 		}
 		// 拼接文件的完整路径
-		string file_path = folder_path + "/" + entry->d_name;
+		std::string file_path = folder_path + "/" + entry->d_name;
 		std::string filename = entry->d_name;
 		std::string basename = filename.substr(0, filename.find_last_of("."));
-		string out_path = out__path + "/" + basename + ".vtk";//修改输出格式
+		std::string out_path = out__path + "/" + basename + ".vtk";//修改输出格式
 		//判断该路径是否为文件
 		struct stat statbuf;//见linux stat函数
 		if (stat(file_path.c_str(), &statbuf) == 0 && S_ISREG(statbuf.st_mode)) {
 			// 打开文件并读取文件内容
 			ifstream file(file_path);
-			string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+			std::string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
 			// 在此处处理文件内容，例如打印输出;
 			file.close(); // 关闭文件流
-			string file_ext = get_file_extension(file_path);// 获取文件后缀
+			std::string file_ext = get_file_extension(file_path);// 获取文件后缀
 			if (file_ext == "obj") {
-				cout << "打开" << file_path << "  " << endl;
+				std::cout << "打开" << file_path << "  " << std::endl;
 				file.close(); // 关闭文件流
 				/*stringstream ss;
 				ss << "D:/MyCode/source" << entry->d_name;
 				string destinationFilePath = ss.str();
 				removeFile(file_path, destinationFilePath);*/
 				VtkToObj(file_path, out_path);
-				cout << "----------------------done--------------------" << endl;
+				std::cout << "----------------------done--------------------" << std::endl;
 			}
 		}
 	}
