@@ -1428,6 +1428,11 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 ```
 循环创建多个子线程
 ```c++
+void sys_err(const int& ret) {//线程中的error 不能再使用perror了
+	std::cout << "error:" << strerror(ret) << std::endl;
+	exit(1);
+}
+
 void* func(void* arg) {
 	int i = *((int*)arg);
 	sleep(i);
@@ -1442,7 +1447,7 @@ int main(int argc, char* argv[]) {
 	for (i = 0; i < 5; i++) {//循环创建5个线程
 		int* arg = new int(i); // 为每个i的值分配内存
 		ret = pthread_create(&tid, nullptr, func, static_cast<void*>(arg));
-		if (ret)sys_err("pthread_create error");
+		if (ret)sys_err(ret);
 	}
 	pthread_exit((void *)0);
 }
@@ -1457,7 +1462,7 @@ void* func(void* arg) {
 }
 int main(int argc, char* argv[]) {
 	std::cout << "var = " << var << std::endl;
-	pthread_t tid;
+	pthread_t tid;//线程ID pthread_create传出参数
 	pthread_create(&tid, nullptr, func, nullptr);
 	sleep(1);
 	std::cout << "after pthread_create, var = " << var << std::endl;
@@ -1489,12 +1494,12 @@ void* func(void* arg) {
 	return (void*)tval;
 }
 int main(int argc, char* argv[]) {
-	pthread_t tid;
+	pthread_t tid;//线程ID pthread_create传出参数
 	thrd* retval;
 	int ret = pthread_create(&tid, nullptr, func, nullptr);
-	if (ret)sys_err("pthread_create error");
+	if (ret)sys_err(ret);
 	ret = pthread_join(tid, (void**)&retval);
-	if (ret)sys_err("pthread_join error");
+	if (ret)sys_err(ret);
 	std::cout << "var = " << retval->var << " str = " << retval->str << std::endl;
 	pthread_exit(nullptr);
 }
@@ -1505,7 +1510,6 @@ int main(int argc, char* argv[]) {
 函数原型
 ```c++
 #include <pthread.h>
-
 int pthread_cancel(pthread_t thread); 杀死线程ID为thread的线程 需要取消点 成功返回0失败-1
 ```
 ```c++
@@ -1530,12 +1534,12 @@ void* func3(void* arg) {
 	return (void*)666;//在主函数中通过pthread_cancel退出
 }
 int main(int argc, char* argv[]) {
-	pthread_t tid;
+	pthread_t tid;//线程ID pthread_create传出参数
 	void* ptr = nullptr;
 	std::cout << "main:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
 
 	int ret = pthread_create(&tid, nullptr, func1, nullptr);
-	if (ret)sys_err("pthread_create error");
+	if (ret)sys_err(ret);
 	pthread_join(tid, &ptr);
 	std::cout << "thread 1 exit code = " << (long)ptr << std::endl;
 
@@ -1548,6 +1552,28 @@ int main(int argc, char* argv[]) {
 	pthread_cancel(tid);
 	pthread_join(tid, &ptr);
 	std::cout << "thread 3 exit code = " << (long)ptr << std::endl;
+
+	pthread_exit(nullptr);
+}
+```
+### pthread_detach库函数
+函数原型
+```c++
+#include <pthread.h>
+int pthread_detach(pthread_t thread);//成功返回0 失败-1
+```
+```c++
+int main() {
+	pthread_t tid;//线程ID pthread_create传出参数
+
+	int ret = pthread_create(&tid, nullptr, func1, nullptr);
+	if (ret)sys_err(ret);
+	ret = pthread_detach(tid);//分离子线程
+	if (ret)sys_err(ret);
+	sleep(1);//让子进程先结束
+	ret = pthread_join(tid, nullptr);//等待回收子线程
+	std::cout << "join ret = " << ret << std::endl;
+	if (ret)sys_err(ret);
 
 	pthread_exit(nullptr);
 }
