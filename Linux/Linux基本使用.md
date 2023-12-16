@@ -3,6 +3,14 @@
 ```
 Win + R： mstsc 远程连接
 ```
+```
+Host 508
+    HostName 10.1.115.92
+Host 606
+    HostName 10.1.21.164
+    User yjr
+    port 22
+```
 ## 用户和权限
 ### 切换用户
 su [ 选项 ]  [ 用户名 ]
