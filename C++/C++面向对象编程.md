@@ -704,7 +704,7 @@ C++允许一个类继承多个类
 羊继承了动物的数据，驼同样继承了动物的数据，羊驼继承了羊和驼的数据。当羊驼使用数据时，就会产生二义性。羊驼继承自动物的数据继承了两份，其实我们应该清楚，这份数据我们只需要一份就可以。
 
 #### ***虚继承
-
+使用虚继承解决菱形继承带来的问题
 ```c++
 class Animal {
 public:
@@ -737,9 +737,7 @@ void demo() {
 	cout << "b.m_age= " << b.m_age << endl;
 }
 ```
-
 使用VS开发人员命令提示符查看 SheepTuo1和SheepTuo2的区别
-
 ```c++
 class SheepTuo1 size(8)://继承了两份m_age 大小为8字节
         +---
@@ -778,7 +776,34 @@ SheepTuo2::$vbtable@Tuo2@://虚基类表
 vbi:       class  offset o.vbptr  o.vbte fVtorDisp
           Animal       8       0       4 0            
 ```
+使用虚继承设计一个不能被基础的类Test
+```c++
+class Test;
+class Base {//创建一个基类 将构造函数和析构函数的属性设为私有
+	friend class Test;//将不能被继承的类声明为友元
+private:
+	Base() {};
+	~Base() {};
+};
+class Test :virtual public Base {}; //虚拟继承基类Base
+class Son :public Test {};//Test的派生类没有构造函数
+void test() {
+	Test a1;
+	//Son a2;
+}
+```
+```
+class Test      size(4):
+        +---
+ 0      | {vbptr}
+        +---
+        +--- (virtual base Base)
+        +---
 
+Test::$vbtable@:
+ 0      | 0
+ 1      | 4 (Testd(Test+0)Base)
+```
 ## *多态
 
 多态分为两类
