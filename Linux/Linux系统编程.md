@@ -1506,25 +1506,49 @@ int main(int argc, char* argv[]) {
 ```c++
 #include <pthread.h>
 
-int pthread_cancel(pthread_t thread);
+int pthread_cancel(pthread_t thread); 杀死线程ID为thread的线程 需要取消点 成功返回0失败-1
 ```
 ```c++
-void* func(void* arg) {
+void* func1(void* arg) {
+	std::cout << "thread 1 returning" << std::endl;
+        std::cout << "func1:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
+	return (void*)111;  //使用return取消线程
+}
+
+void* func2(void* arg) {
+	std::cout << "thread 2 returning" << std::endl;
+	pthread_exit((void*)222);  //使用pthread_exit
+}
+
+void* func3(void* arg) {
 	while (1) {
-		std::cout << "thread:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
-		sleep(1);
+		// std::cout << "thread 3 going to die in 3 seconds" << std::endl;
+		// sleep(1);
+		
+		pthread_testcancel();//添加取消点 可以进内核的函数
 	}
-	return nullptr;
+	return (void*)666;//在主函数中通过pthread_cancel退出
 }
 int main(int argc, char* argv[]) {
 	pthread_t tid;
-	int ret = pthread_create(&tid, nullptr, func, nullptr);
-	if (ret)sys_err("pthread_create error");
+	void* ptr = nullptr;
 	std::cout << "main:pid = " << getpid() << " tid = " << pthread_self() << std::endl;
-	sleep(5);
-	ret = pthread_cancel(tid);  //终止线程
-	if (ret)sys_err("pthread_cancel error");
-	while (1);
+
+	int ret = pthread_create(&tid, nullptr, func1, nullptr);
+	if (ret)sys_err("pthread_create error");
+	pthread_join(tid, &ptr);
+	std::cout << "thread 1 exit code = " << (long)ptr << std::endl;
+
+        pthread_create(&tid, nullptr, func2, nullptr);
+	pthread_join(tid, &ptr);
+	std::cout << "thread 2 exit code = " << (long)ptr << std::endl;
+
+	pthread_create(&tid, nullptr, func3, nullptr);
+	sleep(3);
+	pthread_cancel(tid);
+	pthread_join(tid, &ptr);
+	std::cout << "thread 3 exit code = " << (long)ptr << std::endl;
+
 	pthread_exit(nullptr);
 }
 ```
