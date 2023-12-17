@@ -1568,7 +1568,7 @@ int main() {
 
 	int ret = pthread_create(&tid, nullptr, func1, nullptr);
 	if (ret)sys_err(ret);
-	ret = pthread_detach(tid);//分离子线程
+	ret = pthread_detach(tid);//分离子线程 线程结束会自动清理PCB 无需回收 
 	if (ret)sys_err(ret);
 	sleep(1);//让子进程先结束
 	ret = pthread_join(tid, nullptr);//等待回收子线程
@@ -1579,9 +1579,15 @@ int main() {
 }
 ```
 
-
-
-
+### 线程和进程控制原语对比
+| ------------------ | --------------- |
+|   线程控制原语    |  进程控制原语     |
+|   pthread_create()  |   fork()   |
+|   pthread_self()    |   getpid()   |
+|   pthread_exit()    |   exit()   |
+|   pthread_join()    |   waitpid()   |
+|   pthread_cancel()  |   kill()   |
+|   pthread_detach    |  NULL  |
 
 
 
