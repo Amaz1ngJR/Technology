@@ -1580,14 +1580,14 @@ int main() {
 ```
 
 ### 线程和进程控制原语对比
-| ------------------ | --------------- |
-|   线程控制原语    |  进程控制原语     |
-|   pthread_create()  |   fork()   |
-|   pthread_self()    |   getpid()   |
-|   pthread_exit()    |   exit()   |
-|   pthread_join()    |   waitpid()   |
-|   pthread_cancel()  |   kill()   |
-|   pthread_detach    |  NULL  |
+|     |   线程控制原语    |  进程控制原语     |
+| --- | ------------------ | --------------- |
+| 创建 |   pthread_create()  |   fork()   |
+| 查看ID |   pthread_self()    |   getpid()   |
+| 退出 |   pthread_exit()    |   exit()   |
+| 阻塞等待 |   pthread_join()    |   waitpid()   |
+| 终止取消 |   pthread_cancel()  |   kill()   |
+| 分离 |   pthread_detach    |  NULL  |
 
 
 
