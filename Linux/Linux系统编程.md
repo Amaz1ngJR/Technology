@@ -1578,6 +1578,33 @@ int main() {
 	pthread_exit(nullptr);
 }
 ```
+### 通过线程属性来分离线程
+```c++
+pthread_create()中的*attr为指向线程属性结构体pthread_attr_t的指针
+struct pthread_attr_t {
+	int etachstate;//线程的分离状态
+	int schedpolicy;//线程的调度策略
+	struct sched_param schedparam;//线程的调度参数
+	int inheritsched;//线程的继承性
+	int scope;//线程的作用域
+
+	size_t guardsize;//线程栈末尾的警戒缓冲区大小(位于栈末尾)
+	int stackaddr_set;//线程的栈设置
+	void* stackaddr;//线程栈的位置
+	size_t stacksize;//线程栈的大小(默认平均分配)
+};
+```
+```c++
+//先初始化线程属性
+int pthread_attr_init(pthread_attr_t *attr);//成功0
+//设置线程的分离属性 用两个宏PTHREAD_CREATE_DETACHED、PTHREAD_CREATE_JOINABLE分别表示分离线程、非分离线程
+int pthread_attr_setdetachstate(pthread_attr_t *attr,int detachstate);
+//获取线程的分离属性
+int pthread_attr_getdetachstate(pthread_attr_t *attr,int *detachstate); 
+//再使用pthread_create()创建线程
+//销毁线程属性所占用的资源
+int pthread_attr_destroy(pthread_attr_t *attr);//成功0
+```
 
 ### 线程和进程控制原语对比
 |     |   线程控制原语    |  进程控制原语     |
