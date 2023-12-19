@@ -507,7 +507,7 @@ void demo() {
 	person p1(18, 123);
 	//插入
 	v1.push_back(p1);//容器尾部插入
-	//emplace_back较于push_back直接在容器内部进行构造 避免了拷贝构造或者移动构造
+	//emplace_back较于push_back可以直接在容器内部进行构造 避免了拷贝构造或者移动构造 如果插入的是构造好的对象等同于push_back
 	v1.emplace_back(18, 123);//容器尾部插入
 	v1.insert(v1.begin(), p1);//在迭代器指向位置插入
 	v1.insert(v1.begin(), 2, p1);//插2个进去
