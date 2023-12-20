@@ -1479,6 +1479,7 @@ pthread_exit：退出当前线程
 #include <pthread.h>
 
 void pthread_exit(void *retval);
+//阻塞回收线程
 int pthread_join(pthread_t thread, void **retval);// void **retval传出参数
 ```
 ```c++
@@ -1604,6 +1605,26 @@ int pthread_attr_getdetachstate(pthread_attr_t *attr,int *detachstate);
 //再使用pthread_create()创建线程
 //销毁线程属性所占用的资源
 int pthread_attr_destroy(pthread_attr_t *attr);//成功0
+```
+```c++
+int main(int argc, char* argv[]) {
+	pthread_t tid;
+	pthread_attr_t attr;
+	int ret = pthread_attr_init(&attr);//初始化线程属性
+	if (ret)sys_err(ret);
+
+	ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);//设置线程属性为分离属性
+	if (ret)sys_err(ret);
+
+	ret = pthread_create(&tid, &attr, func, nullptr);//创建线程
+	if (ret)sys_err(ret);
+
+	ret = pthread_attr_destroy(&attr);//销毁线程
+	if(ret)sys_err(ret);
+
+	ret = pthread_join(tid, nullptr);
+	if (ret)sys_err(ret);
+}
 ```
 
 ### 线程和进程控制原语对比
