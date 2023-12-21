@@ -1428,8 +1428,15 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 ```
 循环创建多个子线程
 ```c++
+//避免在多线程模型中调用fork 除非马上exec
+//fork创建出的子进程中只有调用fork的线程存在 其他线程在子进程中均pthread_exit
+//避免在多线程中引用信号机制 当信号来的时候多个子线程(屏蔽字独立 信号的处理方式、未决信号集共享)谁抢到谁处理
 void sys_err(const int& ret) {//线程中的error 不能再使用perror了
 	std::cout << "error:" << strerror(ret) << std::endl;
+	exit(1);
+}
+void sys_err(const std::string& s, const int& ret) {
+	std::cout << s << " error:" << strerror(ret) << std::endl;
 	exit(1);
 }
 
@@ -1452,6 +1459,7 @@ int main(int argc, char* argv[]) {
 	pthread_exit((void *)0);
 }
 ```
+
 验证线程间共享全局变量
 ```c++
 int var = 100;//主、子线程共享全局变量
@@ -1502,7 +1510,7 @@ int main(int argc, char* argv[]) {
 	ret = pthread_join(tid, (void**)&retval);
 	if (ret)sys_err(ret);
 	std::cout << "var = " << retval->var << " str = " << retval->str << std::endl;
-	pthread_exit(nullptr);
+	pthread_exit(nullptr);//主线程退出 其他线程不退出 主线程应调用pthread_exit
 }
 ```
 
@@ -1595,6 +1603,7 @@ struct pthread_attr_t {
 	size_t stacksize;//线程栈的大小(默认平均分配)
 };
 ```
+步骤
 ```c++
 //先初始化线程属性
 int pthread_attr_init(pthread_attr_t *attr);//成功0
@@ -1610,20 +1619,18 @@ int pthread_attr_destroy(pthread_attr_t *attr);//成功0
 int main(int argc, char* argv[]) {
 	pthread_t tid;
 	pthread_attr_t attr;
+
 	int ret = pthread_attr_init(&attr);//初始化线程属性
 	if (ret)sys_err(ret);
 
 	ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);//设置线程属性为分离属性
 	if (ret)sys_err(ret);
 
-	ret = pthread_create(&tid, &attr, func, nullptr);//创建线程
+	ret = pthread_create(&tid, &attr, func, nullptr);//借助修改后的线程属性 创建为分离态的新线程
 	if (ret)sys_err(ret);
 
 	ret = pthread_attr_destroy(&attr);//销毁线程
 	if(ret)sys_err(ret);
-
-	ret = pthread_join(tid, nullptr);
-	if (ret)sys_err(ret);
 }
 ```
 
@@ -1636,6 +1643,8 @@ int main(int argc, char* argv[]) {
 | 阻塞等待 |   pthread_join()    |   waitpid()   |
 | 终止取消 |   pthread_cancel()  |   kill()   |
 | 分离 |   pthread_detach    |  NULL  |
+
+## *线程同步
 
 
 
