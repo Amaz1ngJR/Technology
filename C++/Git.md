@@ -55,6 +55,15 @@ git branch -d master #强制删除-D
 ```bash
 git remote add origin_name https://github.com/Amaz1ngJR/Test.git
 ```
+查看当前本地仓库的远程仓库关联情况
+```bash
+git remote -v
+```
+取消本地仓库和远程仓库的关联
+```bash
+git remote rm origin
+```
+
 将本地仓库的更改推送到 GitHub
 ```bash
 git push -u origin_name main
