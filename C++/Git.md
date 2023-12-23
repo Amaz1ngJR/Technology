@@ -25,9 +25,33 @@ git reset filename #清空某个文件的缓存区
 ```
 提交暂存区中的更改到本地git仓库
 ```bash
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+#to set your account's default identity.
+#Omit --global to set the identity only in this repository
+git config user.name yjr
+git config user.email superyanjunru@gmail.com
+```
+```bash
 git commit -m "Initial commit(提交信息)"
 ```
-将本地仓库关联到GitHub仓库
+查看本地仓库分支
+```bash
+git branch  #默认是master
+git status
+```
+创建并切换到main分支
+```bash
+git branch main #创建main分支
+git checkout main #切换到main分支
+#上述两步合成一步
+git checkout -b main
+```
+删除原有的master分支
+```bash
+git branch -d master #强制删除-D
+```
+将本地仓库(同时取别名为origin_name)关联到GitHub仓库
 ```bash
 git remote add origin_name https://github.com/Amaz1ngJR/Test.git
 ```
