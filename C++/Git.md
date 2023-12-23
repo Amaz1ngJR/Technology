@@ -33,11 +33,11 @@ git config user.name yjr
 git config user.email superyanjunru@gmail.com
 ```
 ```bash
-git commit -m "Initial commit(提交信息)"
+git commit -m "Initial commit(提交信息)" #提交到所在的分支
 ```
 查看本地仓库分支
 ```bash
-git branch  #默认是master
+git branch  #查看当前是哪个分支 默认是master 
 git status
 ```
 创建并切换到main分支
