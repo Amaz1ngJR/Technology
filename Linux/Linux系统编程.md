@@ -1646,7 +1646,10 @@ int main(int argc, char* argv[]) {
 
 ## *线程同步
 协同步调 对公共区域数据按序访问 防止数据混乱 出现与时间有关的错误
-### 互斥锁mutex(建议锁 锁本身不具备强制性)
+### 锁
+#### 互斥锁mutex
+互斥锁也称互斥量 是一种建议锁 本身不具备强制性
+
 函数原型
 ```c++
 #include <pthread.h>//以下5个函数 成功返回0 失败返回错误号
@@ -1697,7 +1700,68 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 ```
-### 死锁
+#### 读写锁
+```
+锁只有一把 读共享(多个读可以成功加上锁) 写独占(多个写争夺锁 同一时间只能有一个写) 写锁优先级高(但读锁的时候 也会阻塞等待 若等待的时候还有新来的读 则读也阻塞在所有写后面)
+```
+函数原型
+```c++
+#include <pthread.h>//以下7个函数 成功返回0 失败返回错误号
+
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);//读锁
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);//读try锁
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);//写锁
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);//写try锁
+int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock,
+	const pthread_rwlockattr_t *restrict attr);//初始化读写锁
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);//解锁
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);//销毁读写锁
+```
+```c++
+int number;
+pthread_rwlock_t rwlock;//创建全局读写锁
+
+void *th_write(void *arg){
+	int t;
+	int i = (long long) arg;
+	while(1){
+		pthread_rwlock_wrlock(&rwlock);//写锁
+		t = number;
+		usleep(1000);
+		std::cout << "----write" << i << ": " << pthread_self() 
+			<<" number = "<< t << " ++number = " << ++number << std::endl;
+		pthread_rwlock_unlock(&rwlock);//解锁
+		usleep(1000);
+	}
+	return nullptr;
+}
+
+void *th_read(void *arg){
+	int i = (long long)arg;
+	while(1){
+		pthread_rwlock_rdlock(&rwlock);//读锁
+		std::cout<< "----read" << i << ": " <<pthread_self()
+			<< "number = " << number << std::endl;
+		pthread_rwlock_unlock(&rwlock);//解锁
+		usleep(2000);
+	}
+	return nullptr;
+}
+
+int main(int argc, char* argv[]) {
+	pthread_t tid[8];//创建8个线程
+	pthread_rwlock_init(&rwlock, nullptr);//初始化读写锁
+	for(int i = 0; i < 3; i++)
+		pthread_create(&tid[i], nullptr, th_write, (void *)i);
+	for(int i = 0; i < 5; i++)
+		pthread_create(&tid[i+3], nullptr, th_read, (void *)i);
+	for(int i = 0; i < 8; i++)
+		pthread_join(tid[i], nullptr);
+	pthread_rwlock_destroy(&rwlock);//销毁读写锁
+	return 0;
+}
+```
+#### 死锁
 产生的原因
 ```
 互斥条件：进程/线程试图同时对共享资源进行排他性控制 例如使用互斥锁 如果一个进程在持有资源A的锁的同时试图获取资源B的锁 而另一个进程正在持有资源B的锁并试图获取资源A的锁 就可能发生死锁
@@ -1708,6 +1772,12 @@ int main(int argc, char* argv[]) {
 
 循环等待条件：存在一个等待进程的循环链 其中每个进程都在等待下一个进程持有的资源 如果A等待B的资源 B等待C的资源 而C又在等待A的资源 就形成了一个死锁
 ```
+### 条件变量
+
+
+
+
+
 
 
 
