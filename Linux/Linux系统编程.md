@@ -1645,11 +1645,69 @@ int main(int argc, char* argv[]) {
 | 分离 |   pthread_detach    |  NULL  |
 
 ## *线程同步
+协同步调 对公共区域数据按序访问 防止数据混乱 出现与时间有关的错误
+### 互斥锁mutex(建议锁 锁本身不具备强制性)
+函数原型
+```c++
+#include <pthread.h>//以下5个函数 成功返回0 失败返回错误号
 
+int pthread_mutex_lock(pthread_mutex_t *mutex);//创建锁
+int pthread_mutex_init(pthread_mutex_t *restrict mutex,
+   const pthread_mutexattr_t *restrict attr);//初始化锁mutex的属性attr
+int pthread_mutex_trylock(pthread_mutex_t *mutex);//尝试获取锁 非阻塞 锁被占用立即返回EBUSY(被占用)
+int pthread_mutex_unlock(pthread_mutex_t *mutex);//解锁
+int pthread_mutex_destroy(pthread_mutex_t *mutex);//销毁锁
+//------------------------
+pthread_mutex_t 类型 本质是结构体 可以简单当成整数看待
+pthread_mutex_t mutex 取值0、1
+```
+```c++
+pthread_mutex_t mutex;//创建全局互斥锁
 
+void* func(void* arg) {
+	srand(time(nullptr));
+	while (1) {
+		pthread_mutex_lock(&mutex);//加锁
+		std::cout << "hello";
+		sleep(rand() % 3);
+		std::cout << "word" << std::endl;
+		pthread_mutex_unlock(&mutex);//解锁 访问结束立即解锁 锁的粒度要小
+		sleep(rand() % 3);
+	}
+	return nullptr;
+}
 
+int main(int argc, char* argv[]) {
+	pthread_t tid;
+	srand(time(nullptr));
 
+	int ret = pthread_mutex_init(&mutex, nullptr);//初始化互斥锁
+	if(ret)sys_err("mutex_init", ret);
+	pthread_create(&tid, nullptr, func, nullptr);
+	while (1) {
+		pthread_mutex_lock(&mutex);//加锁
+		std::cout << "HELLO";
+		sleep(rand() % 3);
+		std::cout << "WORD" << std::endl;
+		pthread_mutex_unlock(&mutex);//访问结束立即解锁 锁的粒度要小
+		sleep(rand() % 3);
+	}
+	pthread_join(tid, nullptr);
+	pthread_mutex_destroy(&mutex);//销毁互斥锁
+	return 0;
+}
+```
+### 死锁
+产生的原因
+```
+互斥条件：进程/线程试图同时对共享资源进行排他性控制 例如使用互斥锁 如果一个进程在持有资源A的锁的同时试图获取资源B的锁 而另一个进程正在持有资源B的锁并试图获取资源A的锁 就可能发生死锁
 
+持有并等待条件：进程持有至少一个资源 但在等待获取其他资源时阻塞 如果一个进程持有资源A 而另一个进程正在等待获取资源A 同时持有资源B 则可能导致死锁
+
+无抢占条件：资源不能被强制性地从一个进程中取走 而只能由持有它的进程显式地释放 如果一个进程在持有资源时阻塞 其他进程无法抢占这个资源 可能导致死锁
+
+循环等待条件：存在一个等待进程的循环链 其中每个进程都在等待下一个进程持有的资源 如果A等待B的资源 B等待C的资源 而C又在等待A的资源 就形成了一个死锁
+```
 
 
 
