@@ -372,7 +372,8 @@ void write_extern(void)
 }
 输出:Count is 5
 ```
-
+#### restrict(c语言)
+使用了 restrict 修饰的指针所指向的内存区域不会被其他没有使用 restrict 修饰的指针所访问
 #### thread_local
 
 使用 thread_local 说明符声明的变量仅可在它在其上创建的线程上访问。 变量在创建线程时创建，并在销毁线程时销毁。 每个线程都有其自己的变量副本。
