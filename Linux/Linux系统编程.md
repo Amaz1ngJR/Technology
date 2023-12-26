@@ -1657,6 +1657,7 @@ int main(int argc, char* argv[]) {
 int pthread_mutex_lock(pthread_mutex_t *mutex);//创建锁
 int pthread_mutex_init(pthread_mutex_t *restrict mutex,
    const pthread_mutexattr_t *restrict attr);//初始化锁mutex的属性attr
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//静态初始化
 int pthread_mutex_trylock(pthread_mutex_t *mutex);//尝试获取锁 非阻塞 锁被占用立即返回EBUSY(被占用)
 int pthread_mutex_unlock(pthread_mutex_t *mutex);//解锁
 int pthread_mutex_destroy(pthread_mutex_t *mutex);//销毁锁
@@ -1714,6 +1715,7 @@ int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);//写锁
 int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);//写try锁
 int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock,
 	const pthread_rwlockattr_t *restrict attr);//初始化读写锁
+pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;//静态初始化
 int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);//解锁
 int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);//销毁读写锁
 ```
@@ -1773,11 +1775,147 @@ int main(int argc, char* argv[]) {
 循环等待条件：存在一个等待进程的循环链 其中每个进程都在等待下一个进程持有的资源 如果A等待B的资源 B等待C的资源 而C又在等待A的资源 就形成了一个死锁
 ```
 ### 条件变量
+本身不是锁 但是通常结合锁来使用
 
+函数原型
+```c++
+#include <pthread.h>//以下6个函数 成功返回0 失败返回错误号
 
+int pthread_cond_init(pthread_cond_t *restrict cond,
+   const pthread_condattr_t *restrict attr);//动态初始化
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;//静态初始化
+int pthread_cond_wait(pthread_cond_t *restrict cond,
+           pthread_mutex_t *restrict mutex);//阻塞等待一个条件变量
+//函数作用：原子操作[1、阻塞等待条件变量cond满足 2、释放已掌握的互斥锁(相当于unlock &mutex)] 阻塞等待条件满足 并释放已有的锁
+//3、当条件满足被唤醒 函数返回时 解除阻塞并重新申请获取互斥锁 lock &mutex 
+int pthread_cond_timedwait(pthread_cond_t *restrict cond,
+           pthread_mutex_t *restrict mutex,
+           const struct timespec *restrict abstime);//加一个等待时间的阻塞等待一个条件变量
+int pthread_cond_signal(pthread_cond_t *cond);//条件满足后 通知阻塞在该条件变量cond的至少1个线程
+int pthread_cond_broadcast(pthread_cond_t *cond);//条件满足后 通知阻塞在该条件变量cond的所有线程
+int pthread_cond_destroy(pthread_cond_t *cond);//销毁信号量
+```
+条件变量的生产者多消费者模型
+```c++
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//定义初始化一个互斥锁
+pthread_cond_t has_data = PTHREAD_COND_INITIALIZER;//定义初始化一个条件变量
+struct msg{
+	int num;
+	struct msg *next;
+};
+struct msg *head;
+void *produser(void *arg){
+	while(1){
+		struct msg *ptr = new(msg);
+		ptr->num = rand()%100 + 1; //1、生产数据
+		std::cout << "----produser" << ptr->num << std::endl;
+		
+		pthread_mutex_lock(&mutex); //2、加锁
+		ptr->next = head;   //3、写公共区域
+		head = ptr;
+		pthread_mutex_unlock(&mutex); //4、解锁
+		
+		pthread_cond_signal(&has_data);//5、通知消费者
+		sleep(rand() % 3);
+	}
+	return nullptr;
+}
+void *consumer(void *arg){
+	while(1){
+		struct msg *ptr;
+		pthread_mutex_lock(&mutex);
+		while(!head) pthread_cond_wait(&has_data, &mutex);
+		
+		ptr = head;
+		head = ptr->next;
+		pthread_mutex_unlock(&mutex);
 
+		std::cout << "----consumer: " << pthread_self() << " " << ptr->num << std::endl;
+		delete(ptr);
+		sleep(rand() % 3);
+	}
+	return nullptr;
+}
+int main(){
+	pthread_t pid, cid;
+	srand(time(nullptr));
 
+	int ret = pthread_create(&pid, nullptr, produser, nullptr);//pro
+	if(ret)sys_err("pthread_create_pro", ret);
+	//创建多个消费者
+	ret = pthread_create(&cid, nullptr, consumer, nullptr);//consumer
+	if(ret)sys_err("pthread_create_con", ret);
+	ret = pthread_create(&cid, nullptr, consumer, nullptr);//consumer
+	if(ret)sys_err("pthread_create_con", ret);
+	ret = pthread_create(&cid, nullptr, consumer, nullptr);//consumer
+	if(ret)sys_err("pthread_create_con", ret);
 
+	pthread_join(pid, nullptr);
+	pthread_join(cid, nullptr);
+}
+```
+### 信号量
+互斥量初始化值为1 加锁是-1 解锁是+1 信号量相当于初始化值为N(可以同时访问共享数据区的线程数)的互斥量(提高并行度)
 
+函数原型
+```c++
+#include <semaphore.h>//以下6个函数 成功返回0 失败返回错误值
 
+int sem_init(sem_t *sem, int pshared, unsigned int value);//初始化信号量
+int sem_destroy(sem_t *sem);
+int sem_wait(sem_t *sem);//先--判断信号量是否小于0 小于0则阻塞
+int sem_trywait(sem_t *sem);
+int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
+int sem_post(sem_t *sem);//先++判断信号量是否小于0 小于0则阻塞
+```
+信号量实现生产者消费者
+```c++
+const int NUM = 5;
+int queue[NUM];//全局数组实现环形队列
+sem_t blank_number, product_number;//空格信号量、产品信号量
 
+void *produser(void *arg){
+	int i = 0;
+	while(1){
+		sem_wait(&blank_number);//生产一个产品
+		queue[i] = rand()%100 + 1;
+		std::cout << "----produser" << queue[i] << std::endl;
+		sem_post(&product_number);//将产品数++
+
+		i = (i + 1) % NUM;
+		sleep(rand() % 2);
+	}
+	return nullptr;
+}
+void *consumer(void *arg){
+	int i = 0;
+	while(1){
+		sem_wait(&product_number);//消费者将产品数-- 小于0阻塞
+		std::cout << "----consumer: " << pthread_self() << " " << queue[i] << std::endl;
+		queue[i]=0;//消费一个产品
+		sem_post(&blank_number);//将空格数++
+
+		i = (i + 1) % NUM;
+		sleep(rand() % 2);
+	}
+	return nullptr;
+}
+
+int main(){
+	pthread_t pid, cid;
+	
+	sem_init(&blank_number, 0, NUM);//初始化空格信号量为5
+	sem_init(&product_number, 0 , 0);//初始化产品数为0
+
+	pthread_create(&pid, nullptr, produser, nullptr);//创建生产者
+	pthread_create(&cid, nullptr, consumer, nullptr);//创建消费者
+
+	pthread_join(pid, nullptr);
+	pthread_join(cid, nullptr);
+
+	sem_destroy(&blank_number);//销毁信号量
+	sem_destroy(&product_number);
+
+	return 0;
+}
+```
