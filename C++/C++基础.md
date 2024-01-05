@@ -15,10 +15,12 @@ void demo() {
 }
 输出：‘0’=48 ‘9’=57 a=97 z=122 A=65 Z=90
 大写变小写：chara=char(int(chara)+32);
-void demo() { //#include <cctype>
+
+void demo() { //#include <cctype> c语言#include<ctype.h>
 	std::string str = "HelloWorld";
 	for (char &c : str) {
-		c = std::tolower(c);
+		c = std::tolower(c);//大写变小写
+		c = std::toupper(c);//小写变大写
 	}
 	std::cout << str << std::endl;
 }
