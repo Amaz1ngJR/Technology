@@ -14,9 +14,27 @@ void demo() {
 		<< " z= " << int(z) << " A= " << int(A) << " Z= " << int(Z) << endl;
 }
 输出：‘0’=48 ‘9’=57 a=97 z=122 A=65 Z=90
-大写变小写chara=char(int(chara)+32);
+大写变小写：chara=char(int(chara)+32);
+void demo() { //#include <cctype>
+	std::string str = "HelloWorld";
+	for (char &c : str) {
+		c = std::tolower(c);
+	}
+	std::cout << str << std::endl;
+}
 ```
+判断字符是否是数字或字母
+```c++
+void demo() { //#include <cctype>
+	char myChar = 'A';
 
+	if (isalnum(myChar)) {
+		std::cout << myChar << " 是字母或数字" << std::endl;
+	} else {
+		std::cout << myChar << " 不是字母或数字" << std::endl;
+	}
+}
+```
 转义字符
 
 ```c++
