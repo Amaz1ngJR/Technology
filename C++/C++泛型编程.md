@@ -1278,7 +1278,7 @@ void demo() {
 
 ### **STL常用算法
 
-#include<algorithm> <functional> <numeric>
+#include < algorithm > < functional > < numeric >
 
 #### ***常用遍历算法
 
