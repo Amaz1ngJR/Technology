@@ -1324,6 +1324,52 @@ void demo() {
 	for_each(w.begin(), w.end(), print01());
 }
 ```
+
+##### remove/remove_if
+//移动满足条件的元素到容器末尾std::remove(begin(),end(), value); std::remove_if(begin(),end(), _pre);
+```c++
+void demo() {
+	std::vector<int> numbers = { 1, 2, 3, 2, 4, 5 };
+	// 移除值为 2 的元素
+	auto new_end1 = std::remove(numbers.begin(), numbers.end(), 2);
+	// 移除奇数元素
+	auto new_end2 = std::remove_if(numbers.begin(), numbers.end(), [](int x) { return x % 2 != 0; });
+	// 使用 erase 方法真正删除元素
+	numbers.erase(new_end1, numbers.end());
+}
+```
+##### remove_copy/remove_copy_if
+//std::remove_copy(begin(),end(), result, value);std::remove_copy_if(begin(),end(), result, _pre);
+```c++
+void demo() {
+	std::vector<int> numbers = { 1, 2, 3, 2, 4, 5 };
+	std::vector<int> res;//使用back_inserter不用预分配空间#include <iterator>
+	std::remove_copy(numbers.begin(), numbers.end(), std::back_inserter(res), 2);
+	std::cout << res.size() << std::endl;
+	for (const int& v : res) { std::cout << v << " "; }
+	
+	std::vector<int> res2(numbers.size());//预分配空间
+	auto new_end = std::remove_copy_if(numbers.begin(), numbers.end(),
+		res2.begin(), [](int x) { return x % 2 == 0; });
+	std::cout << res2.size() << std::endl;
+	for (const int& v : res2) { std::cout << v << " "; }
+	res2.erase(new_end, res2.end());//删除多余的预分配空间
+	std::cout << std::endl << res2.size() << std::endl;
+}
+```
+##### unique
+将【相邻的】重复的元素移到序列的末尾 并返回一个迭代器 指向去除重复元素后的范围的末尾位置
+```c++
+void demo() {
+	std::vector<int> numbers = { 4, 2, 4, 1, 3, 2, 5, 4 };
+	// 先对容器进行排序
+	std::sort(numbers.begin(), numbers.end());
+	auto new_end = std::unique(numbers.begin(), numbers.end());
+	// 使用新的逻辑末尾迭代器来获取去除重复元素后的范围
+	numbers.erase(new_end, numbers.end());
+	for (const int& num : numbers) std::cout << num << " ";
+}
+```
 #### ***常用查找算法
 
 ##### find
@@ -1595,9 +1641,11 @@ void demo() {
 
 ```c++
 void demo() {
-	vector<int>v1, target;
-	target.resize(v1.size());
-	copy(v1.begin(), v1.end(), target.begin());
+	std::vector<int>v1, target;
+	target.resize(v1.size());//预分配空间
+	std::copy(v1.begin(), v1.end(), target.begin());
+	//使用back_inserter在容器的末尾插入元素#include <iterator>
+	std::copy(v1.begin(), v1.end(), std::back_inserter(target));//使用back_inserter不用预分配空间
 }
 ```
 
