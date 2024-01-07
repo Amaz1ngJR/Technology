@@ -689,7 +689,7 @@ void demo() {
     	p1.pop_front();//容器开头删除
 	p1.erase(p1.begin());//删除迭代器指向的元素
 	p1.erase(p1.begin(), p1.end());//删除[)区间
-	p1.remove(1);//删除容器中所有是1的元素
+	p1.remove(1);//将容器中所有是1的元素移动到容器末尾 并返回新end 后续使用erase真正删除这些元素
 	p1.clear();//清空
 }
 ```
