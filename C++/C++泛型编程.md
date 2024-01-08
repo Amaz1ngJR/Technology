@@ -534,6 +534,8 @@ void demo() {
 	//initializer_list<>初始化列表模板
 	v.emplace_back(initializer_list<int>{1, 2});
 	v.emplace_back(initializer_list<int>{3, 4});
+	//v.emplace_back(vector<int>{3, 4});
+	//v.push_back({3, 4});
 	for (const auto& vv : v) {//输出1,2;3,4
 		for (const int& vvv : vv)
 			cout << vvv << " ";
