@@ -376,7 +376,7 @@ void demo() {
 ### stat/lstat函数
 函数原型
 ```c++
-#include <sys/types.h> 包含在#include <unistd.h>
+#include <sys/types.h> //包含在#include <unistd.h>
 #include <sys/stat.h>
 
 int stat(const char *pathname, struct stat *statbuf);  //能够穿透符号链接
@@ -536,7 +536,7 @@ int main(int argc, char* argv[]) {
 ### fork函数
 函数原型
 ```c++
-#include <sys/types.h> 包含在#include <unistd.h>
+#include <sys/types.h> //包含在#include <unistd.h>
 
 pid_t fork(void);  //创建一个子进程 无参数 
 //内部是当程序Base执行到fork() 会在内存复制一份作为子进程Son
@@ -661,7 +661,7 @@ int main(int argc, char* argv[]) {
 ### wait/waitpid函数
 函数原型
 ```c++
-#include <sys/types.h> 包含在#include <unistd.h>
+#include <sys/types.h> //包含在#include <unistd.h>
 #include <sys/wait.h>
 
 pid_t wait(int *wstatus);
@@ -817,7 +817,7 @@ mkfifo 管道名
 ```
 使用库函数mkfifo
 ```c++
-#include <sys/types.h> 包含在#include <unistd.h>
+#include <sys/types.h> //包含在#include <unistd.h>
 #include <sys/stat.h>
 
 int mkfifo(const char *pathname, mode_t mode);
@@ -1066,7 +1066,7 @@ kill -l
 #### kill函数
 函数原型
 ```c++
-#include <sys/types.h>
+#include <sys/types.h>//包含在#include <unistd.h>
 #include <signal.h>
 
 int kill(pid_t pid, int sig); //发送信号给有权限发送的进程
