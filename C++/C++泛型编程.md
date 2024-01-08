@@ -544,17 +544,12 @@ void demo() {
 去重
 ```c++
 void demo() {
-	vector<int>a = { 8,8,8,8 };
-	vector<int>b = { 6,6,6 };
-	vector<int>c = { 8,6,6,6 };
-	vector<int>d = { 8,8,8,8 };
-	vector<int>e = { 8,8,8,8,1 };
 	vector<vector<int>>test;
-	test.emplace_back(a);
-	test.emplace_back(b);
-	test.emplace_back(c);
-	test.emplace_back(d);
-	test.emplace_back(e);
+	test.emplace_back(initializer_list<int>{ 8,8,8,8 });
+	test.emplace_back(initializer_list<int>{ 6,6,6 });
+	test.emplace_back(initializer_list<int>{ 8,6,6,6 });
+	test.emplace_back(initializer_list<int>{ 8,8,8,8 });
+	test.emplace_back(initializer_list<int>{ 8,8,8,8,1 });
 	sort(test.begin(), test.end());//先排序
 	//unique将相邻的重复元素放到容器末尾并返回一个新的end迭代器
 	auto newend = unique(test.begin(), test.end());
