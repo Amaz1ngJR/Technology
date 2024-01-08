@@ -54,7 +54,8 @@ addr.sin_port = htons(9527);
 //int dst;
 //addr.sin_addr.s_addr = inet_pton(AF_INET, "192.157,22,45", (void*)&dst);
 addr.sin_addr.s_addr = htonl(INADDR_ANY);//取出系统中有效的任意IP地址(二进制类型)
-bind(fd, (struct  sockaddr*)&addr, size);
+size = sizeof(addr)
+bind(fd, (struct  sockaddr*)&addr, size);//成功返回0 失败-1
 ```
 socker模型创建流程图
 
@@ -75,5 +76,22 @@ socket();//产生一个套接字C 得到一个fd2句柄
 connect();//绑定C的IP和端口并与另一个套接字连接
 ```
 ## socket函数
+```c++
+#include <sys/types.h> //包含在#include <unistd.h>
+#include <sys/socket.h>
 
+int socket(int domain, int type, int protocol);//创建一个套接字 成功返回套接字的fd 失败返回-1
+// domain:AF_INET、AF_INET6、AF_UNIX/AF_LOCAL(本地套接字)
+// type: SOCK_STREAM(流式协议TCP)、SOCK_DGRAM(报式协议UDP)
+//protocol:选用协议中的代表协议 默认传0 tcp/udp
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//给套接字绑定地址结构(IP和端口号)详见上述socket数据结构
+int listen(int sockfd, int backlog);//设置同时与服务器连接的上限数backlog最大128(同时进行三次握手的客户端数量)成功返回0 失败-1
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);//阻塞等待客户端建立连接 成功返回与客户端联立联系的新套接字的fd
+//sockfd: 传入socket返回的fd但是并不是用该套接字与客户端连接而是使用该套接字的地址结构
+//addr: 传出参数 成功与服务器建立连接的那个客户端的地址结构 不同于bind中的是传入参数 传的是自身的地址结构
+//addrlen: 传入传出参数 入：addr大小 出：addr实际大小
+
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//使用现有的socket与服务器建立连接 成功返回0 失败-1
+//addr:传入参数 服务器的地址结构 客户端可以使用bind绑定地址结构 不使用的话系统采用隐式绑定
+```
 # 高并发服务器
