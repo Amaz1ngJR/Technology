@@ -519,9 +519,30 @@ void demo() {
 	v1.clear();//清空
 }
 ```
-
+emplace_back/emplace
 ```c++
-//去重
+void demo() {
+	vector<vector<int>>v;
+	v.emplace_back(1, 2);//调用vector<int>(1,2)
+	v.emplace_back(3, 4);//调用vector<int>(3,4)
+	for (const auto& vv : v) {//输出2;4,4,4;
+		for (const int& vvv : vv) 
+			cout << vvv << " ";
+		cout << endl;
+	}
+	v.clear();
+	//initializer_list<>初始化列表模板
+	v.emplace_back(initializer_list<int>{1, 2});
+	v.emplace_back(initializer_list<int>{3, 4});
+	for (const auto& vv : v) {//输出1,2;3,4
+		for (const int& vvv : vv)
+			cout << vvv << " ";
+		cout << endl;
+	}
+}
+```
+去重
+```c++
 void demo() {
 	vector<int>a = { 8,8,8,8 };
 	vector<int>b = { 6,6,6 };
