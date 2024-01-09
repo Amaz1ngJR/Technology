@@ -94,4 +94,109 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);//阻塞等待
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//使用现有的socket与服务器建立连接 成功返回0 失败-1
 //addr:传入参数 服务器的地址结构 客户端可以使用bind绑定地址结构 不使用的话系统采用隐式绑定
 ```
+具体实现服务器与客户端【客户端输入小写字母 服务器将其转换成大写字母】
+
+服务器端
+```c++
+#include <iostream>
+#include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
+void sys_err(const char* str) {
+	perror(str);
+	exit(1);
+}
+
+const uint32_t SERV_PORT = 9527;
+int main() {
+	struct sockaddr_in serv_addr, clit_addr;
+	socklen_t clit_addr_len;
+	char buf[BUFSIZ], client_IP[1024];//BUFSIZ = 4096
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(SERV_PORT);
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
+	if (!~lfd)sys_err("socket error");
+
+	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
+	if (!~res)sys_err("bind error");
+
+	res = listen(lfd, 128);
+	if (!~res)sys_err("listen error");
+
+	clit_addr_len = sizeof(clit_addr);
+	int cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);
+	if (cfd == -1)sys_err("accept error");
+	std::cout << "client_IP = " <<
+		inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_IP, 1024)
+		<< " client_Port = " << ntohs(clit_addr.sin_port) << std::endl;
+
+	while (1) {//运行该代码后 新建终端 输入 nc 127.1 9527(端口号)无需设置客户端 测试连接
+		int ret = read(cfd, buf, sizeof(buf));
+		write(STDOUT_FILENO, buf, ret);
+		for (int i = 0; i < ret; i++) {
+			buf[i] = toupper(buf[i]);
+		}
+		write(cfd, buf, ret);
+	}
+    //close(cfd);
+    //close(lfd);
+    return 0;
+}
+```
+客户端
+```c++
+const uint32_t SERV_PORT = 9527;
+int main() {
+	struct sockaddr_in serv_addr;
+	char buf[BUFSIZ];//BUFSIZ = 4096
+
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(SERV_PORT);
+	inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
+
+	int cfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
+	if (!~cfd)sys_err("socket error");
+
+	int res = connect(cfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
+	if (!~res)sys_err("connect error");
+	
+	int cnt = 5;
+	while (cnt--) {
+		write(cfd, "hello", 5);
+		res = read(cfd, buf, sizeof(buf));
+		write(STDOUT_FILENO, buf, res);
+		sleep(1);
+	}
+	close(cfd);
+	return 0;
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 高并发服务器
