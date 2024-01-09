@@ -144,9 +144,9 @@ int main() {
 		}
 		write(cfd, buf, ret);
 	}
-    //close(cfd);
-    //close(lfd);
-    return 0;
+	//close(cfd);
+	//close(lfd);
+	return 0;
 }
 ```
 客户端
