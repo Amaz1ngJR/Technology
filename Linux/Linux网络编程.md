@@ -189,6 +189,7 @@ int main() {
 #include <ctype.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <signal.h>
 
 void catch_child(int signum) {
 	while (waitpid(0, nullptr, WNOHANG) > 0);
