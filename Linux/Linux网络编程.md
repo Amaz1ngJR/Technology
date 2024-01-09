@@ -177,26 +177,74 @@ int main() {
 	return 0;
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # 高并发服务器
+
+## 多进程并发服务器
+
+```c++
+#include <iostream>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
+void catch_child(int signum) {
+	while (waitpid(0, nullptr, WNOHANG) > 0);
+	return;
+}
+
+const uint32_t SERV_PORT = 9527;
+
+int main() {
+	struct sockaddr_in srv_addr, clt_addr;
+	memset(&srv_addr, 0, sizeof(srv_addr));
+	srv_addr.sin_family = AF_INET;
+	srv_addr.sin_port = htons(SERV_PORT);
+	srv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);
+	bind(lfd, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
+	listen(lfd, 128);
+	socklen_t clt_addr_len = sizeof(clt_addr);
+
+	int pid, cfd, ret; char buf[BUFSIZ];
+	while (1) {
+		cfd = accept(lfd, (struct sockaddr*)&clt_addr, &clt_addr_len);
+		pid = fork();
+		if (pid < 0)sys_err("fork error");
+		if (!pid) {
+			close(lfd);// 子进程作为客户端关闭监听的套接字
+			break;
+		}
+		else {
+			struct sigaction act;
+			act.sa_handler = catch_child;
+			sigemptyset(&act.sa_mask);
+			act.sa_flags = 0;
+
+			ret = sigaction(SIGCHLD, &act, nullptr);
+			if (ret)sys_err("sigaction error");
+			close(cfd);//父进程作为服务器仅需要lfd用来建立连接
+		}
+	}
+	if (!pid) {//子进程
+		while (1) {
+			ret = read(cfd, buf, sizeof(buf));
+			if (!ret) {
+				close(cfd);
+				exit(1);
+			}
+			for (int i = 0; i < ret; i++)
+				buf[i] = toupper(buf[i]);
+			write(cfd, buf, ret);
+			write(STDOUT_FILENO, buf, ret);
+		}
+	}
+	return 0;
+}
+```
+## 多线程并发服务器
+
+## 多路I/O转接服务器
