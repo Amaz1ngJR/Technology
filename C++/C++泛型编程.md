@@ -795,6 +795,7 @@ void demo() {
 	str3.append(" love play");//把参数string拼接到str3后面
 	str3.append("games abcde", 5);//从"games abcde"中截取前5个字符拼接到str3后面
 	str3.append(str2, 5, 12);//从str2中下标5开始截取前12个字符
+	str3.append(3, '!')//末尾插入3个char
 	cout << "str3 =" << str3 << endl;
 }
 ```
