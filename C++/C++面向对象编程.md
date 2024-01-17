@@ -356,7 +356,7 @@ private:  //禁用默认的拷贝构造和拷贝赋值
 
 使用一个基类解决这个问题
 ```c++
-class Uncopyable{
+class Uncopyable {
 protected:
 	Uncopyable();
 	~Uncopyable();
@@ -365,7 +365,7 @@ private:  //禁用默认的拷贝构造和拷贝赋值
 	Uncopyable& operator=(const Uncopyable& rhs);
 };
 
-class Empty private:Uncopyable{};//不再声明拷贝构造和拷贝赋值
+class Empty :private Uncopyable {};//不再声明拷贝构造和拷贝赋值
 ```
 可以使用delete禁用 c++11(delete/default)
 ```c++
