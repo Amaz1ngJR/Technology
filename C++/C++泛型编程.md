@@ -1706,7 +1706,16 @@ void demo() {
 	accumulate(v.begin(), v.end(), 6);//从初始值6开始累加v中元素
 }
 ```
-
+##### partial_sum
+计算前缀和
+```c++
+void demo() {
+	std::vector<int>v = { 1, 2, 3, 4 };
+	std::vector<int>pre(v.size() + 1);
+	std::partial_sum(v.begin(), v.end(), pre.begin() + 1);
+	for (const int& p : pre)std::cout << p << " ";
+}
+```
 ##### fill
 
 区间push_back (begin(),end(),val)
