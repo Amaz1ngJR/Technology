@@ -425,7 +425,7 @@ void demo() {
 	v1 = v2;//将v2赋值给v1
 	//assign
 	v1.assign(v2.begin(), v2.end());//将v2[)区间赋值给v1
-	v1.assign(3, 6);//将3个6赋值给v1
+	v1.assign(3, 6);//将3个6赋值给v1 如果v1的大小大于3 那么大于部分元素清空(这是和resize的区别)
 }
 ```
 
