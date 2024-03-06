@@ -1,3 +1,4 @@
+c++
 ```c++
 int n = 100, m = 100, a = 50;
 vector<int> v1(n);
@@ -7,6 +8,7 @@ for (int i = 0; i < n; i++)
     if (i < j && i < a) //&& || !
       return false; //true
 ```
+python
 ```python
 n = 100
 m = 100
