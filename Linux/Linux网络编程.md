@@ -115,23 +115,24 @@ int main() {
 	struct sockaddr_in serv_addr, clit_addr;
 	socklen_t clit_addr_len;
 	char buf[BUFSIZ], client_IP[1024];//BUFSIZ = 4096
-
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(SERV_PORT);
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	//设置服务端socket数据结构 网络地址
+	serv_addr.sin_family = AF_INET;//IPV4
+	serv_addr.sin_port = htons(SERV_PORT);//绑定端口号
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//绑定系统中有效的任意IP地址
 
 	int lfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
-	if (!~lfd)sys_err("socket error");
+	if (lfd == -1)sys_err("socket error");
 
-	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
-	if (!~res)sys_err("bind error");
+	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));//绑定A的网络地址
+	if (res == -1)sys_err("bind error");
 
-	res = listen(lfd, 128);
-	if (!~res)sys_err("listen error");
+	res = listen(lfd, 128);//设置监听的上限(同时与A建立连接的数量)
+	if (res == -1)sys_err("listen error");
 
 	clit_addr_len = sizeof(clit_addr);
-	int cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);
-	if (cfd == -1)sys_err("accept error");
+	int cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);//阻塞等待客户端连接
+	if (cfd == -1)sys_err("accept error");//与客户端连接后返回一个与客户端连接的新套接字B用来与客户端通信
+	//输出客户端的网络地址
 	std::cout << "client_IP = " <<
 		inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_IP, 1024)
 		<< " client_Port = " << ntohs(clit_addr.sin_port) << std::endl;
