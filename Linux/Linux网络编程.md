@@ -94,7 +94,18 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);//阻塞等待
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//使用现有的socket与服务器建立连接 成功返回0 失败-1
 //addr:传入参数 服务器的地址结构 客户端可以使用bind绑定地址结构 不使用的话系统采用隐式绑定
 ```
-具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】
+**设置端口复用**
+```c++
+#include <sys/types.h>    
+#include <sys/socket.h>
+
+int setsockopt(int sockfd, int level, int optname,
+                      const void *optval, socklen_t optlen);//成功0失败-1
+//设置端口复用
+int opt = 1;
+setsockopt(lfd, SLO_SOCKET, SO_REUSEADDR/SO_REUSEPORT, (void *)&opt, sizeof(opt));
+```
+**具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】**
 
 服务器端
 ```c++
