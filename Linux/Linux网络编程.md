@@ -330,3 +330,96 @@ int main() {
 }
 ```
 ## 多路I/O转接服务器
+### select
+```c++
+#include <sys/select.h>
+
+int select(int nfds, fd_set *readfds, fd_set *writefds,
+	  fd_set *exceptfds, struct timeval *timeout);
+//参数: nfds:所监听的所有文件描述符的最大值再+1(背后是一个for循环该值是循环的上限所以再加1)
+//fd_set *三个参数(读、写、异常事件)都是传入传出参数 传入的时候是需要监听的文件描述符位图 传出的是实际发生事件的文件描述符位图 可以传空
+void FD_CLR(int fd, fd_set *set);//将某个fd从fd位图中清出去(位图中删除)
+int  FD_ISSET(int fd, fd_set *set);//判断fd是否在位图中 
+void FD_SET(int fd, fd_set *set);//位图中添加fd
+void FD_ZERO(fd_set *set);//把该位图的每个二进制位都置为0(清空位图)
+// timeout是等待时长 1：NULL 永远等下去 2： 设置timeval 等待的时间 3：timeval 里时间全为0 检查描述字后立即返回 轮询
+struct timeval {
+	long tv_sec; //秒
+	long tv_usec;//微妙
+}
+// 函数返回满足三个fd_set事件的总数
+```
+**select实现多路I/O转接服务器**
+```c++
+#include <iostream>
+#include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/types.h>   
+#include <sys/socket.h>
+#include <sys/select.h>
+
+
+const uint32_t SERV_PORT = 9527;
+const uint32_t BUFSIZ = 4096
+
+int main() {
+	char buf[BUFSIZ];
+	struct sockaddr_in serv_addr, clit_addr;
+	memset(&serv_addr, 0, sizeof(serv_addr));//memset逐字节赋值
+	socklen_t clit_addr_len;
+	//设置服务端socket数据结构 网络地址
+	serv_addr.sin_family = AF_INET;//IPV4
+	serv_addr.sin_port = htons(SERV_PORT);//绑定端口号
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//绑定系统中有效的任意IP地址
+
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
+	if (lfd == -1)sys_err("socket error");
+	//设置端口复用 
+	int opt = 1, maxfd = lfd;	
+	setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+
+	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));//绑定A的网络地址
+	if (res == -1)sys_err("bind error");
+	res = listen(lfd, 128);//设置监听的上限(同时与A建立连接的数量)
+	if (res == -1)sys_err("listen error");
+
+	fd_set rset, allset;
+	FD_ZERO(&allset);//位图全置零
+	FD_SET(lfd, &allset);//将lfd加入到监控位图中
+
+	while (1) {
+		rset = allset;//传入之前
+		int nready = select(maxfd + 1,&rset, nullptr, nullptr, nullptr);
+		if (nready < 0) sys_err("nready error");
+		if (FD_ISSET(lfd, &rest)){//rest传出之后 有新的客户端连接请求
+			clit_addr_len = sizeof(clit_addr);
+			int connfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);//不会阻塞
+			FD_SET(connfd, &allset);//向监控位图里添加新的文件描述符
+
+			if (maxfd < connfd) maxfd = connfd;
+			if (--nready == 0) continue; //只有lfd有事件 而该if就是处理lfd的
+		}
+		for (int i = lfd + 1; i <= maxfd; ++i){
+			if (FD_ISSET(i, &rset)){
+				int n = read(i, buf, sizeof(buf));
+				if (!n) {//客户端关闭连接
+					close(i);//服务器也关闭连接
+					FD_CLR(i, &allset); //解除对此文件的监控
+				}
+				else if (n > 0){
+					for (int j = 0; j < n; ++j)
+						buf[j] = toupper(buf[j]);
+					write(i, buf , n);
+				}
+			}
+		}
+	}
+	close(lfd);
+	return 0;
+}
+```
+### poll
+
+### epoll
