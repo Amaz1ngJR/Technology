@@ -182,7 +182,6 @@ int main() {
 # 高并发服务器
 
 ## 多进程并发服务器
-
 ```c++
 #include <iostream>
 #include <unistd.h>
@@ -211,10 +210,10 @@ int main() {
 	int lfd = socket(AF_INET, SOCK_STREAM, 0);
 	bind(lfd, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
 	listen(lfd, 128);
-	socklen_t clt_addr_len = sizeof(clt_addr);
 
 	int pid, cfd, ret; char buf[BUFSIZ];
 	while (1) {//父进程负责接受客户端的连接请求，而子进程则负责处理已经建立连接的客户端
+		socklen_t clt_addr_len = sizeof(clt_addr);
 		cfd = accept(lfd, (struct sockaddr*)&clt_addr, &clt_addr_len);//接受客户端连接 返回新套接字B
 		pid = fork();
 		if (pid < 0)sys_err("fork error");
@@ -250,5 +249,71 @@ int main() {
 }
 ```
 ## 多线程并发服务器
+```c++
+#include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
+const uint32_t SERV_PORT = 9527;
+const uint32_t MAXLINE = 8192;
+
+struct s_info{//将网络地址与cfd绑定的结构体
+	struct sockaddr_in cliaddr;
+	int connfd;
+};
+
+void *do_work(void *arg){
+	struct s_info *ts = (struct s_info*)arg;
+	char buf[MAXLINE];
+	char str[INET_ADDRSTRLEN];
+
+	while (1) {
+		int n = read(ts->connfd, buf, MAXLINE); //读客户端
+		if (!n) {
+			std::cout << "客户端fd" << ts->connfd << "关闭" << std::endl;
+			break;
+		}
+		//输出客户端的网络地址
+		std::cout << "client_IP = " <<
+			inet_ntop(AF_INET, &(*ts).cliaddr.sin_addr, str, sizeof(str))
+			<< " client_Port = " << ntohs((*ts).cliaddr.sin_port) << std::endl;
+		for (int i = 0; i < n; ++i)
+			buf[i] = toupper(buf[i]);//小写转换成大写
+		write(STDOUT_FILENO, buf, n);//写出到屏幕
+		write(ts->connfd, buf, n);//写回给客户端
+	}
+}
+
+int main() {
+	struct sockaddr_in serv_addr, clt_addr;
+	struct s_info ts[256];//创建结构体数组
+	memset(&serv_addr, 0, sizeof(serv_addr));//memset逐字节赋值
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(SERV_PORT);
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	// 创建监听套接字A并绑定网络地址
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);
+	bind(lfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	listen(lfd, 128);
+
+	int i = 0;
+	pthread_t tid;
+	while (1) {//主线程负责接受客户端的连接请求，而子线程则负责处理已经建立连接的客户端
+		socklen_t clt_addr_len = sizeof(clt_addr);
+		int connfd = accept(lfd, (struct sockaddr*)&clt_addr, &clt_addr_len);//接受客户端连接 返回新套接字B
+		ts[i].cliaddr = clt_addr;
+		ts[i].connfd = connfd;
+		
+		pthread_create(&tid, nullptr, do_work, (void*)&ts[i]);//这里ts是只读的 可以直接传地址
+		pthread_detach(tid); //子线程分离 防止僵尸线程产生
+		++i;
+	}
+
+	return 0;
+}
+```
 ## 多路I/O转接服务器
