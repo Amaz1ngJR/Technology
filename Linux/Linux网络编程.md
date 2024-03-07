@@ -130,20 +130,20 @@ int main() {
 	if (res == -1)sys_err("listen error");
 
 	clit_addr_len = sizeof(clit_addr);
-	int cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);//阻塞等待客户端连接
-	if (cfd == -1)sys_err("accept error");//与客户端连接后返回一个与客户端连接的新套接字B用来与客户端通信
+	int cfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);//阻塞等待客户端 返回与客户端连接的新套接字B cfd
+	if (cfd == -1)sys_err("accept error");
 	//输出客户端的网络地址
 	std::cout << "client_IP = " <<
 		inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_IP, 1024)
 		<< " client_Port = " << ntohs(clit_addr.sin_port) << std::endl;
 
 	while (1) {//运行该代码后 新建终端 输入 nc 127.1 9527(端口号)无需设置客户端 测试连接
-		int ret = read(cfd, buf, sizeof(buf));
-		write(STDOUT_FILENO, buf, ret);
+		int ret = read(cfd, buf, sizeof(buf));//从客户端套接字读取数据到缓冲区
+		write(STDOUT_FILENO, buf, ret);//将buf内容写入到终端
 		for (int i = 0; i < ret; i++) {
-			buf[i] = toupper(buf[i]);
+			buf[i] = toupper(buf[i]);//将缓冲区中的字符转换为大写
 		}
-		write(cfd, buf, ret);
+		write(cfd, buf, ret);//将转换后的数据写回客户端
 	}
 	//close(cfd);
 	//close(lfd);
