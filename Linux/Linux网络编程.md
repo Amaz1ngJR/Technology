@@ -285,6 +285,8 @@ void *do_work(void *arg){
 		write(STDOUT_FILENO, buf, n);//写出到屏幕
 		write(ts->connfd, buf, n);//写回给客户端
 	}
+	close(ts->connfd);// 关闭客户端套接字
+	return (void *)0; //pthread_exit(0);
 }
 
 int main() {
