@@ -103,7 +103,7 @@ int setsockopt(int sockfd, int level, int optname,
                       const void *optval, socklen_t optlen);//成功0失败-1
 //设置端口复用 在bind之前设置
 int opt = 1;
-setsockopt(lfd, SLO_SOCKET, SO_REUSEADDR/SO_REUSEPORT, (void *)&opt, sizeof(opt));
+setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR/SO_REUSEPORT, (void *)&opt, sizeof(opt));
 ```
 **具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】**
 
