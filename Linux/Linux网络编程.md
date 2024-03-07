@@ -101,7 +101,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//使用
 
 int setsockopt(int sockfd, int level, int optname,
                       const void *optval, socklen_t optlen);//成功0失败-1
-//设置端口复用
+//设置端口复用 在bind之前设置
 int opt = 1;
 setsockopt(lfd, SLO_SOCKET, SO_REUSEADDR/SO_REUSEPORT, (void *)&opt, sizeof(opt));
 ```
