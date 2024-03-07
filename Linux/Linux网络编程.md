@@ -154,27 +154,28 @@ int main() {
 ```c++
 const uint32_t SERV_PORT = 9527;
 int main() {
-	struct sockaddr_in serv_addr;
+	struct sockaddr_in serv_addr;// 定义服务器地址结构体
 	char buf[BUFSIZ];//BUFSIZ = 4096
 
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(SERV_PORT);
-	inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
+    	// 设置服务器地址结构体的成员
+	serv_addr.sin_family = AF_INET;// 使用IPv4地址
+	serv_addr.sin_port = htons(SERV_PORT);// 设置服务器端口号，将主机字节序转换为网络字节序
+	inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);//点分十进制->网络字节序
 
-	int cfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
-	if (!~cfd)sys_err("socket error");
+	int cfd = socket(AF_INET, SOCK_STREAM, 0);//创建客户端套接字
+	if (cfd == -1)sys_err("socket error");
 
 	int res = connect(cfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
-	if (!~res)sys_err("connect error");
+	if (res == -1)sys_err("connect error");
 	
-	int cnt = 5;
+	int cnt = 5;// 发送消息的次数
 	while (cnt--) {
-		write(cfd, "hello", 5);
-		res = read(cfd, buf, sizeof(buf));
-		write(STDOUT_FILENO, buf, res);
+		write(cfd, "hello", 5);//向服务端发送一次 hello
+		res = read(cfd, buf, sizeof(buf));//从服务器端接收数据到缓冲区
+		write(STDOUT_FILENO, buf, res);//将从服务器接收的数据写入到标准输出
 		sleep(1);
 	}
-	close(cfd);
+	close(cfd);// 关闭套接字
 	return 0;
 }
 ```
