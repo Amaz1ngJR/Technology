@@ -94,7 +94,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);//阻塞等待
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);//使用现有的socket与服务器建立连接 成功返回0 失败-1
 //addr:传入参数 服务器的地址结构 客户端可以使用bind绑定地址结构 不使用的话系统采用隐式绑定
 ```
-具体实现服务器与客户端【客户端输入小写字母 服务器将其转换成大写字母】
+具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】
 
 服务器端
 ```c++
@@ -202,47 +202,48 @@ const uint32_t SERV_PORT = 9527;
 
 int main() {
 	struct sockaddr_in srv_addr, clt_addr;
-	memset(&srv_addr, 0, sizeof(srv_addr));
+	memset(&srv_addr, 0, sizeof(srv_addr));//memset逐字节赋值
 	srv_addr.sin_family = AF_INET;
 	srv_addr.sin_port = htons(SERV_PORT);
 	srv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
+	// 创建监听套接字
 	int lfd = socket(AF_INET, SOCK_STREAM, 0);
 	bind(lfd, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
 	listen(lfd, 128);
 	socklen_t clt_addr_len = sizeof(clt_addr);
 
 	int pid, cfd, ret; char buf[BUFSIZ];
-	while (1) {
-		cfd = accept(lfd, (struct sockaddr*)&clt_addr, &clt_addr_len);
+	while (1) {//父进程负责接受客户端的连接请求，而子进程则负责处理已经建立连接的客户端
+		cfd = accept(lfd, (struct sockaddr*)&clt_addr, &clt_addr_len);//接受客户端连接 返回新套接字B
 		pid = fork();
 		if (pid < 0)sys_err("fork error");
-		if (!pid) {
+		if (!pid) {// 子进程
 			close(lfd);// 子进程作为客户端关闭监听的套接字
 			break;
 		}
-		else {
+		else { // 父进程设置 SIGCHLD 信号处理函数，避免僵尸进程
 			struct sigaction act;
 			act.sa_handler = catch_child;
 			sigemptyset(&act.sa_mask);
 			act.sa_flags = 0;
-
 			ret = sigaction(SIGCHLD, &act, nullptr);
 			if (ret)sys_err("sigaction error");
 			close(cfd);//父进程作为服务器仅需要lfd用来建立连接
 		}
 	}
-	if (!pid) {//子进程
+
+	if (!pid) {//子进程处理已经建立连接的客户端
 		while (1) {
-			ret = read(cfd, buf, sizeof(buf));
-			if (!ret) {
-				close(cfd);
-				exit(1);
+			ret = read(cfd, buf, sizeof(buf));// 读取客户端发送的数据
+			if (!ret) {// 如果客户端关闭连接
+				close(cfd);// 关闭客户端套接字
+				exit(1);// 退出子进程
 			}
 			for (int i = 0; i < ret; i++)
-				buf[i] = toupper(buf[i]);
-			write(cfd, buf, ret);
-			write(STDOUT_FILENO, buf, ret);
+				buf[i] = toupper(buf[i]);// 将接收到的数据转换为大写
+			write(cfd, buf, ret);// 将转换后的数据写回客户端
+			write(STDOUT_FILENO, buf, ret);// 将转换后的数据写入标准输出
 		}
 	}
 	return 0;
