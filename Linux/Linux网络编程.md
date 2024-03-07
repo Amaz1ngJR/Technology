@@ -193,9 +193,9 @@ int main() {
 #include <sys/socket.h>
 #include <signal.h>
 
-void catch_child(int signum) {
+void catch_child(int signum) {//处理子进程退出的信号处理函数
 	while (waitpid(0, nullptr, WNOHANG) > 0);
-	return;
+	return;// 回收已经退出的子进程
 }
 
 const uint32_t SERV_PORT = 9527;
