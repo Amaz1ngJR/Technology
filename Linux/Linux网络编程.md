@@ -162,10 +162,10 @@ int main() {
 	serv_addr.sin_port = htons(SERV_PORT);// 设置服务器端口号，将主机字节序转换为网络字节序
 	inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);//点分十进制->网络字节序
 
-	int cfd = socket(AF_INET, SOCK_STREAM, 0);//创建客户端套接字
+	int cfd = socket(AF_INET, SOCK_STREAM, 0);//创建客户端套接字C
 	if (cfd == -1)sys_err("socket error");
 
-	int res = connect(cfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
+	int res = connect(cfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));//与服务器连接
 	if (res == -1)sys_err("connect error");
 	
 	int cnt = 5;// 发送消息的次数
