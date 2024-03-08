@@ -467,7 +467,7 @@ void sys_err(const char* str) {
 }
 
 int main() {
-	char buf[MAXLINE], str[1024];
+	char buf[MAXLINE], str[INET_ADDRSTRLEN];
 	struct sockaddr_in serv_addr, clit_addr;
 	struct pollfd client[OPEN_MAX];
 	memset(&serv_addr, 0, sizeof(serv_addr));//memset逐字节赋值
@@ -582,5 +582,98 @@ int epoll_pwait(int epfd, struct epoll_event *events,
 
 **epoll实现多路I/O转接服务器**
 ```c++
+#include <iostream>
+#include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/types.h>   
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <string.h>
 
+constexpr uint32_t SERV_PORT = 9527;
+constexpr uint32_t MAXLINE = 8192;
+constexpr int OPEN_MAX = 5000;
+
+void sys_err(const char* str) {
+	perror(str);
+	exit(1);
+}
+
+int main() {
+	char buf[MAXLINE], str[INET_ADDRSTRLEN];
+	struct sockaddr_in serv_addr, clit_addr;
+	struct epoll_event tep, ep[OPEN_MAX]; //tep: epoll_ctl参数 ep: epoll_wait参数
+	memset(&serv_addr, 0, sizeof(serv_addr));//memset逐字节赋值
+	socklen_t clit_addr_len;
+	//设置服务端socket数据结构 网络地址
+	serv_addr.sin_family = AF_INET;//IPV4
+	serv_addr.sin_port = htons(SERV_PORT);//绑定端口号
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//绑定系统中有效的任意IP地址
+
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
+	if (lfd == -1)sys_err("socket error");
+	//设置端口复用 
+	int opt = 1;	
+	setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+
+	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));//绑定A的网络地址
+	if (res == -1)sys_err("bind error");
+	res = listen(lfd, 128);//设置监听的上限(同时与A建立连接的数量)
+	if (res == -1)sys_err("listen error");
+
+	int efd = epoll_create(OPEN_MAX);//创建epoll模型 efd指向红黑树根节点
+	if (efd == -1) sys_err("epoll_create error");
+	tep.events = EPOLLIN;
+	tep.data.fd = lfd;
+
+	res = epoll_ctl(efd, EPOLL_CTL_ADD, lfd, &tep);//将lfd及结构体添加到红黑树上
+	if (res == -1) sys_err("epoll_ctl error");
+	
+	while (1) {
+		int nready = epoll_wait(efd, ep, OPEN_MAX, -1); //阻塞(-1)监听是否有客户端连接请求
+		if (nready == -1) sys_err("nready error");
+
+		for (int i = 0; i < nready; ++i){
+			if (!(ep[i].events & EPOLLIN)) continue; //跳过非读事件
+			if (ep[i].data.fd == lfd) {//lfd事件
+				clit_addr_len = sizeof(clit_addr);
+				int connfd = accept(lfd, (struct sockaddr *)&clit_addr, &clit_addr_len);
+				//输出客户端的网络地址
+				std::cout << "client_IP = " <<
+					inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, str, sizeof(str))
+					<< " client_Port = " << ntohs(clit_addr.sin_port) << std::endl;
+				tep.events = EPOLLIN;
+				tep.data.fd = connfd;
+
+				res = epoll_ctl(efd, EPOLL_CTL_ADD, connfd, &tep);//加入到红黑树中
+				if (res == -1) sys_err("epoll_ctl error");
+			}
+			else{//非lfd事件
+				int sockfd = ep[i].data.fd;
+				int n = read(sockfd, buf, MAXLINE);
+				if (!n) {//客户端关闭连接
+					res = epoll_ctl(efd, EPOLL_CTL_DEL, sockfd, nullptr);//红黑树删除该sockfd
+					if (res == -1) sys_err("epoll_ctl error");
+					close(sockfd);
+					std::cout << "close connect" << sockfd << std::endl;
+				}
+				else if (n < 0) {//出错
+					epoll_ctl(efd, EPOLL_CTL_DEL, sockfd, nullptr);//红黑树删除该sockfd
+					close(sockfd);
+				}
+				else {
+					for (int i = 0; i < n; ++i)
+						buf[i] = toupper(buf[i]);
+					write(sockfd, buf, n);
+					write(STDOUT_FILENO, buf, n);//写出到屏幕
+				}
+			}
+		}
+	
+	}
+	close(lfd);
+	return 0;
+}
 ```
