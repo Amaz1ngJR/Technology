@@ -559,19 +559,28 @@ int epoll_create1(int flags);//flags只支持EPOLL_CLOEXEC 在创建的epoll上�
 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 //参数: epfd:epoll_create函数的返回值   fd:待监听的fd
 //op:对该监听红黑树所做的操作:(增加fd到红黑树)EPOLL_CTL_ADD (修改fd的监听事件)EPOLL_CTL_MOD  (删除监听)EPOLL_CTL_DEL
-//event:
+//event: 是一个结构体地址   传出参数   函数成功返回0 失败-1
 struct epoll_event {
-	uint32_t     events;      /* Epoll 事件 */
+	uint32_t     events;      /* Epoll 事件 */ EPOLLIN读 EPOLLOUT写 EPOLLERR异常
 	epoll_data_t data;        /* User data variable */
 };
-
 typedef union epoll_data {
-               void        *ptr;
-               int          fd;
-               uint32_t     u32;
-               uint64_t     u64;
-           } epoll_data_t;
+	void        *ptr;
+	int          fd;  //对应函数参数里的fd 传出参数
+	uint32_t     u32; 
+	uint64_t     u64;
+} epoll_data_t;
+
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+//参数: envents: 一个结构体数组 不同于epoll_ctl中的envent只是一个结构体 传出参数 传出满足监听条件的fd对应的结构体
+//maxevents:告诉内核这个envents的大小 不能超过epoll_create时的size
+//timeout: >0 超时时间单位毫秒 -1 阻塞 0 立即返回   函数成功返回有多少文件描述符就绪 可作为循环上限 时间到返回0 失败返回-1
+int epoll_pwait(int epfd, struct epoll_event *events,
+	      int maxevents, int timeout,
+	      const sigset_t *sigmask);
 ```
 
 **epoll实现多路I/O转接服务器**
+```c++
 
+```
