@@ -350,6 +350,10 @@ struct timeval {
 // 函数返回满足三个fd_set事件的总数
 ```
 **select实现多路I/O转接服务器**
+```
+优点：跨平台使用 同时监视多个文件描述符 当有文件描述符准备好时 select函数就会返回 可以避免使用多个线程或进程来处理多个连接 节省了系统资源
+缺点：监听上限受文件描述符限制 最大1024 、 当需要监视的文件描述符数量增加时 select() 的性能可能会下降
+```
 ```c++
 #include <iostream>
 #include <unistd.h>
@@ -426,5 +430,22 @@ int main() {
 }
 ```
 ### poll
+```c++
+#include <poll.h>
 
+int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+//参数：fds:监听的文件描述符【数组】
+struct pollfd {
+	int   fd;         /* 文件描述符 */
+	short events;     /* 监听事件(读POLLIN、写POLLOUT、异常POLLOERR等) */
+	short revents;    /* 返回事件 */
+};
+//nfds:监听数组中实际有效监听个数(数组大小为n但是里面可能存的内容小于n) timeout：>0超时时长 单位毫秒 -1阻塞等待 0不阻塞
+//返回值：满足对应监听事件的文件描述符总个数 同select
+```
+
+**poll实现多路I/O转接服务器**
+```c++
+
+```
 ### epoll
