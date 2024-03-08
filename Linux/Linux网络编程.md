@@ -446,6 +446,106 @@ struct pollfd {
 
 **poll实现多路I/O转接服务器**
 ```c++
+#include <iostream>
+#include <unistd.h>
+#include <errno.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/types.h>   
+#include <sys/socket.h>
+#include <poll.h>
+#include <string.h>
 
+
+constexpr uint32_t SERV_PORT = 9527;
+constexpr uint32_t MAXLINE = 80;
+constexpr int OPEN_MAX = 1024;
+
+void sys_err(const char* str) {
+	perror(str);
+	exit(1);
+}
+
+int main() {
+	char buf[MAXLINE], str[1024];
+	struct sockaddr_in serv_addr, clit_addr;
+	struct pollfd client[OPEN_MAX];
+	memset(&serv_addr, 0, sizeof(serv_addr));//memset逐字节赋值
+	socklen_t clit_addr_len;
+	//设置服务端socket数据结构 网络地址
+	serv_addr.sin_family = AF_INET;//IPV4
+	serv_addr.sin_port = htons(SERV_PORT);//绑定端口号
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//绑定系统中有效的任意IP地址
+
+	int lfd = socket(AF_INET, SOCK_STREAM, 0);//产生监听的套接字A
+	if (lfd == -1)sys_err("socket error");
+	//设置端口复用 
+	int opt = 1, maxfd = 0;	
+	setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+
+	int res = bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));//绑定A的网络地址
+	if (res == -1)sys_err("bind error");
+	res = listen(lfd, 128);//设置监听的上限(同时与A建立连接的数量)
+	if (res == -1)sys_err("listen error");
+
+	client[0].fd = lfd;
+	client[0].events = POLLIN; 
+
+	for(int i = 1; i < OPEN_MAX; ++i)
+		client[i].fd = -1; //初始化
+	
+	while (1) {
+		int nready = poll(client, maxfd + 1, -1); //阻塞(-1)监听是否有客户端连接请求
+		if (nready < 0) sys_err("nready error");
+		if (client[0].revents & POLLIN) {  //listenfd有读事件就绪
+			clit_addr_len = sizeof(clit_addr);
+			int connfd = accept(lfd, (struct sockaddr *)&clit_addr, &clit_addr_len);
+			//输出客户端的网络地址
+			std::cout << "client_IP = " <<
+				inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, str, 1024)
+				<< " client_Port = " << ntohs(clit_addr.sin_port) << std::endl;
+			int i;
+			for (i = 1; i < OPEN_MAX; ++i) 
+				if (client[i].fd < 0) {
+					client[i].fd = connfd;//找到空闲位置放置connfd
+					break;
+				}
+			if (i == OPEN_MAX) perror("too many clients");
+
+			client[i].events = POLLIN; //设置监听读事件
+			if (i > maxfd) maxfd = i;  //更新client[]中最大下标
+			if (nready == 1) continue; //仅是lfd
+		}
+		for (int i = 1; i <= maxfd; ++i) {
+			int sockfd = client[i].fd;
+			if (sockfd < 0) continue;
+			if (client[i].revents & POLLIN) {
+				int n = read(sockfd, buf, MAXLINE);
+				if (n < 0) {
+					if (errno == EINTR) {}//被异常中断 需要重启
+					if (errno == EAGAIN) {} //以非阻塞方式读 但没数据 需要再次读
+					if (errno == ECONNRESET) {//连接被重置 需要关闭 移除监听队列
+						close(sockfd);
+						client[i].fd = -1;
+					}
+					else perror("read error");
+				}
+				else if (!n) {//客户端关闭连接
+					std::cout << "客户端" << i << "关闭连接" << std::endl;
+					close(sockfd);
+					client[i].fd = -1;
+				}
+				else {
+					for (int j = 0; j < n; ++j)
+						buf[j] = toupper(buf[j]);
+					write(sockfd, buf, n);
+				}
+				if(nready <= 1) break;
+			}
+		}
+	}
+	close(lfd);
+	return 0;
+}
 ```
 ### epoll
