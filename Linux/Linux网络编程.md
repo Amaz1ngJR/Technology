@@ -549,3 +549,29 @@ int main() {
 }
 ```
 ### epoll
+```c++
+#include <sys/epoll.h>
+
+int epoll_create(int size);//size为所创建的红黑树的监听结点数量(仅供内核参考 后面可以动态拓展) 
+int epoll_create1(int flags);//flags只支持EPOLL_CLOEXEC 在创建的epoll上设置O_CLOEXEC标志表示在执行时关闭文件描述符
+//返回指向新创建红黑树的根节点的文件描述符fd 失败返回-1
+
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+//参数: epfd:epoll_create函数的返回值   fd:待监听的fd
+//op:对该监听红黑树所做的操作:(增加fd到红黑树)EPOLL_CTL_ADD (修改fd的监听事件)EPOLL_CTL_MOD  (删除监听)EPOLL_CTL_DEL
+//event:
+struct epoll_event {
+	uint32_t     events;      /* Epoll 事件 */
+	epoll_data_t data;        /* User data variable */
+};
+
+typedef union epoll_data {
+               void        *ptr;
+               int          fd;
+               uint32_t     u32;
+               uint64_t     u64;
+           } epoll_data_t;
+```
+
+**epoll实现多路I/O转接服务器**
+
