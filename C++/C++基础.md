@@ -267,7 +267,7 @@ constexpr修饰常量
 ```c++
 #define NUMBER 1234 //如果发生错误 编译器给出的信息是1234 而不是NUMBER 如果这部分不是自己写的 来自某个头文件 会很难发现错误
 //使用constexpr来定义常量替换#define
-constexpr NUMBER = 1234;
+constexpr uint32_t NUMBER = 1234;
 ```
 class专属常量 无法使用#define创建一个class专属常量 
 ```c++
