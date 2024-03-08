@@ -359,10 +359,15 @@ struct timeval {
 #include <sys/types.h>   
 #include <sys/socket.h>
 #include <sys/select.h>
+#include <string.h>
 
 
 const uint32_t SERV_PORT = 9527;
-const uint32_t BUFSIZ = 4096
+
+void sys_err(const char* str) {
+	perror(str);
+	exit(1);
+}
 
 int main() {
 	char buf[BUFSIZ];
@@ -393,13 +398,13 @@ int main() {
 		rset = allset;//传入之前
 		int nready = select(maxfd + 1,&rset, nullptr, nullptr, nullptr);
 		if (nready < 0) sys_err("nready error");
-		if (FD_ISSET(lfd, &rest)){//rest传出之后 有新的客户端连接请求
+		if (FD_ISSET(lfd, &rset)){//rest传出之后 有新的客户端连接请求
 			clit_addr_len = sizeof(clit_addr);
 			int connfd = accept(lfd, (struct sockaddr*)&clit_addr, &clit_addr_len);//不会阻塞
 			FD_SET(connfd, &allset);//向监控位图里添加新的文件描述符
 
 			if (maxfd < connfd) maxfd = connfd;
-			if (--nready == 0) continue; //只有lfd有事件 而该if就是处理lfd的
+			if (nready == 1) continue; //只有lfd有事件 而该if就是处理lfd的
 		}
 		for (int i = lfd + 1; i <= maxfd; ++i){
 			if (FD_ISSET(i, &rset)){
