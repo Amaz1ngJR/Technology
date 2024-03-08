@@ -9,4 +9,6 @@
 # 镜像
 ```bash
 -i https://pypi.tuna.tsinghua.edu.cn/simple
+-i https://pypi.mirrors.ustc.edu.cn/simple
+-i https://mirrors.aliyun.com/pypi/simple/
 ```
