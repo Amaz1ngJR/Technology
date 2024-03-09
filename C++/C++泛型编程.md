@@ -1612,8 +1612,12 @@ void demo() {
 
 ```c++
 void demo() {
-	vector<int>v;
-	sort(v.begin(), v.end());
+	std::vector<int>v = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
+	std::sort(v.begin(), v.end());
+	//c20 #include <ranges>
+	std::ranges::sort(v);//直接对容器中的元素进行升序排序
+        
+
 }
 ```
 
