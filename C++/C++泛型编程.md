@@ -1614,10 +1614,16 @@ void demo() {
 void demo() {
 	std::vector<int>v = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
 	std::sort(v.begin(), v.end());
-	//c20 #include <ranges>
-	std::ranges::sort(v);//直接对容器中的元素进行升序排序
-        
 
+	//c20 #include <ranges>
+	std::ranges::sort(v);//直接对容器中的元素进行升序排序 其他用法与std::sort一样
+        //take使用注意事项：
+	//如果原始范围的大小小于指定的截取数量 则截取视图将包含整个原始范围的元素
+	//返回的视图是只读的 因此无法通过视图修改原始范围中的元素
+	//对返回的视图进行迭代时 它会迭代原始范围中的元素 直到达到截取数量为止
+	auto view = v | std::views::take(3);//返回的对象是惰性求值(不会立即计算结果 而是在需要时才执行)的
+	std::ranges::sort(view);//对前3个数排序
+	for (int& t : v)cout << t << " ";
 }
 ```
 
