@@ -64,6 +64,30 @@ DCL:数据控制语言 用来创建数据库用户、控制数据库的访问权
 |MEDIUMTEXT|	0-16 777 215|中等长度文本数据|
 |LONGBLOB	|0-4 294 967 295 |二进制形式的极大文本数据|
 |LONGTEXT	|0-4 294 967 295 |极大文本数据|
+## DDL-数据库操作
+创建数据库
+```mysql
+create database [if not exists] mybase [default charset字符集] [collate 排序规则];
+```
+查询数据库
+```mysql
+show databases; # 查看所有数据库
+select database(); # 查询当前数据库
+```
+删除数据库
+```mysql
+drop database [if exists] mybase;
+```
+使用数据库
+```mysql
+use mybase;
+```
+
+##
+
+##
+
+##
 # 函数
 
 # 约束
