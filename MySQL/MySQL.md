@@ -86,13 +86,48 @@ use mybase;
 ### 数据表操作
 创建数据表
 ```mysql
-create table mytable(
-id int comment '编号' # 字段1 字段1类型 [comment 字段1注释]
-#...
-)[comment 表注释];
+create table [if not exits] mytable(
+    id int comment 'ID', # 字段1 字段1类型 [comment 字段1注释]
+    name varchar(50) comment '姓名'
+)comment '用户表';
 ```
-##
-
+查询数据表
+```mysql
+show tables; # 查询当前数据库所有的表
+desc mytable; # 查询指定表名的表结构
+show create table mytable; #查询指定表的建表语句
+```
+删除数据表
+```mysql
+drop table [if exists]  mytable; # 删除数据表
+alter table  mytable drop id; # 删除表的字段
+truncate table mytable; # 删除指定表并重新创建该表
+```
+修改数据表
+```mysql
+alter table mytable rename to my_table; # 修改表名
+alter table mytable add ID int [comment 'id'][约束]; # 表中添加字段(如果表中有该字段 需要先删除)
+alter table mytable modify ID bigint; # 修改表中数据类型为bigint
+alter table mytable change id indx int [comment][约束]; #修改字段名和字段类型
+```
+## DML
+查看表中数据
+```mysql
+select *from mytable; # 返回mytable表中的所有数据
+select ID from mytable; # 返回mytable表中ID部分的数据
+```
+表中插入数据
+```mysql
+insert into mytable (id,name) values (1,'Amaz1ng'); # 给指定字段添加数据
+insert into mytable values (值1, 值2, ...); # 给全部字段添加数据
+insert into  mytable (id, name2) values (3, 'Amaz1ng3'),(4, 'amaz1'),(5, 'aaa'); # 批量添加数据
+insert into  mytable (值1，值2, ...),(值1，值2, ...),(值1，值2, ...);
+```
+表中删除数据
+```mysql
+delete from mytable [where 条件]; #删除表中所有数据内容
+truncate [table] mytable; # 删除表再重新构建这个表
+```
 ##
 # 函数
 
