@@ -176,12 +176,77 @@ select * from mytable where name like '__';
 select * from mytable where id like '%x';
 ```
 ### 聚合函数
+将一列数据作为一个整体,进行**纵向**计算(null值不参与计算)
 
+语法：select 聚合函数(字段列表) from 表名;
+|函数|功能|
+|----|----|
+|count|统计数量|
+|max|最大值|
+|min|最小值|
+|avg|平均值|
+|sum|求和|
+```mysql
+-- 统计表中成员数量
+select count(*) from mytable;
+-- 统计杭州地区员工年龄之和
+select sum(age) from mytable where workaddress = '杭州';
+```
+### 分组查询
+```
+语法： select 字段列表 from 表名 [where 条件] group by 分组字段名 [having 分组后过滤条件];
+where是分组之前进行过滤的 不满足where条件的 不参与分组 having是分组之后对结果进行过滤
+where不能对聚合函数进行判断 having可以
+执行顺序：where->聚合函数->having 分组之后查询的字段一般为聚合函数和分组字段 查询其他字段无意义
+```
+```mysql
+-- 根据性别分组 统计男女员工数量
+select gender, count(*) from mytable group by gender;
+-- 根据性别分组 统计男女员工平均年龄
+select gender, avg(age) from mytable group by gender;
+-- 根据工作地点分组 查询年龄小于45岁的员工 获取员工数量大于3的工作地址
+select address,cout(*)from mytable where age < 45 group by address having count(*) > 3;
+select address,cout(*) add_cnt from mytable where age < 45 group by address having add_cnt > 3;
+```
+### 排序查询
+语法： select 字段列表 from 表名 order by 字段1 排序方式1(ASC默认的升序), 字段2 排序方式2(DESC降序),...; 多字段排序 先按第一个排序方式排序
+```mysql
+select * from mytable order by id desc;
+```
+### 分页查询
+```
+语法：select 字段列表 from 表名 limit 起始索引, 查询记录数量;
+起始索引从0开始 0可以省略 起始索引 = (查询页码(1开始) - 1) * 每页显示记录个数
+```
 ## DCL
+### 用户管理
 ```mysql
 
 ```
+### 权限控制
 # 函数
+## 字符串函数
+
+## 数值函数
+
+## 日期函数
+
+## 流程函数
+
+## 聚合函数
+
+## 窗口/开窗函数
+### 序号函数
+
+### 分布函数
+
+### 前后函数
+
+### 头尾函数
+
+### 开窗聚合函数
+
+### 其他函数NTH_VALUE、NTILE
 
 # 约束
 
@@ -189,6 +254,3 @@ select * from mytable where id like '%x';
 
 # 事务
 
-# 存储引擎 
-
-# 索引
