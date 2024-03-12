@@ -111,11 +111,6 @@ alter table mytable modify ID bigint; # 修改表中数据类型为bigint
 alter table mytable change id indx int [comment][约束]; #修改字段名和字段类型
 ```
 ## DML
-查看表中数据
-```mysql
-select *from mytable; # 返回mytable表中的所有数据
-select ID from mytable; # 返回mytable表中ID部分的数据
-```
 表中插入数据
 ```mysql
 insert into mytable (id,name) values (1,'Amaz1ng'); # 给指定字段添加数据
@@ -125,10 +120,67 @@ insert into  mytable (值1，值2, ...),(值1，值2, ...),(值1，值2, ...);
 ```
 表中删除数据
 ```mysql
-delete from mytable [where 条件]; #删除表中所有数据内容
+delete from mytable [where 条件]; #删除表中所有数据内容 不能删除某一个字段的值(可以使用update将其设为null)
 truncate [table] mytable; # 删除表再重新构建这个表
 ```
-##
+表中修改数据
+```mysql
+update mytable set name2 = 'amaz1ng4' [where id = 4]; #  没有where条件 则会修改整张表的所有数据
+```
+## DQL
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/2c88c85b-9866-406a-ac8f-93a9ac672000)
+
+### 基础查询
+查看表中多个字段数据
+```mysql
+select *from mytable; # 返回mytable表中的所有数据
+select ID, name from mytable; # 返回mytable表中ID部分、name部分的数据
+```
+别名显示
+```mysql
+select name2 as '姓名',id '索引' from mytable; # as 可以省略 给表中字段设置别名
+select * from mytable as t; # 给表设置别名
+```
+显示过滤某个字段重复的数据
+```mysql
+select distinct id from mytable; # 过滤id中重复记录
+```
+显示运算查询
+```mysql
+select name2,prince + 10 new_price from mytable; # 显示new_prince价格+10后的name2 
+```
+### where条件查询
+|操作符|描述|	
+|----|-----|
+|=	|等号|
+|<>, !=|不等于|
+|>	|大于号|
+|<	|小于号|
+|>=	|大于等于号|
+|<=	|小于等于号|
+|and, &&| 并|
+|or, \|\| | 或 |
+|not, ! |非|
+|is null | 为null|
+|like 占位符|模糊匹配(_匹配单个字符,%匹配任意个字符)|
+|in(...)|in列表中的值，多选1|
+|between..and..|在闭区间之内|
+```mysql
+-- 查询有身份证号的员工
+select * from mytable where id is not null;
+-- 查询年龄等于18或20或40 的员工
+select * from mytable where age = 18 or age = 20 or age = 40;
+-- 查询名字为两个字的员工
+select * from mytable where name like '__';
+-- 查询身份证号最后一位是X的员工
+select * from mytable where id like '%x';
+```
+### 聚合函数
+
+## DCL
+```mysql
+
+```
 # 函数
 
 # 约束
