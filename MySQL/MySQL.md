@@ -265,119 +265,31 @@ select 函数(参数)
 |函数	|描述	|
 |------|---------|
 |ASCII(s)	|返回字符串 s 的第一个字符的 ASCII 码|
-|CHAR_LENGTH(s)	|返回字符串 s 的字符数|
-|CHARACTER_LENGTH(s)|返回字符串 s 的字符数 等同于 CHAR_LENGTH(s)|
+|CHAR_LENGTH(s)	/ CHARACTER_LENGTH(s)|返回字符串 s 的字符数|
 |CONCAT(s1,s2...sn)|字符串 s1,s2 等多个字符串合并为一个字符串|
 |CONCAT_WS(x, s1,s2...sn)|	同 CONCAT(s1,s2,...) 函数，但是每个字符串之间要加上 x，x 可以是分隔符|	
-FIELD(s,s1,s2...)	返回第一个字符串 s 在字符串列表(s1,s2...)中的位置	
-返回字符串 c 在列表值中的位置：
+|FIELD(s,s1,s2...)|	返回第一个字符串 s 在字符串列表(s1,s2...)中的位置|
+|FIND_IN_SET(s1,s2)|返回在字符串s2中与s1匹配的字符串的位置|	
+|FORMAT(x,n)|函数可以将数字 x 进行格式化 "#,###.##", 将 x 保留到小数点后 n 位 最后一位四舍五入|
+|INSERT(s1,x,len,s2)|字符串 s2 替换 s1 的 x 位置开始长度为 len 的字符串|	
+|LOCATE(s1,s)|从字符串 s 中获取 s1 的开始位置	|
+|LCASE(s) / LOWER(s)|	将字符串转换为小写|
+|UCASE(s) / UPPER(s)|	将字符串转换为大写|	
+|LEFT(s,n)	|返回字符串 s 的前 n 个字符|
+|RIGHT(s,n)	|返回字符串 s 的后 n 个字符|
+|LPAD(s1,len,s2)|	在字符串 s1 的开始处填充字符串 s2，使字符串长度达到 len	|
+|RPAD(s1,len,s2)|	在字符串 s1 的结尾处添加字符串 s2，使字符串的长度达到 len	|
+|LTRIM(s)	|去掉字符串 s 开始处的空格|
+|RTRIM(s)	|去掉字符串 s 结尾处的空格|
+|TRIM(s)	|去掉字符串 s 开始和结尾处的空格|
+|SPACE(n)	|返回 n 个空格	|
+|MID(s,n,len) / SUBSTRING(s,n,len) / SUBSTR(s, start, length)|从字符串 s 的 n 位置截取长度为 len 的子字符串|
+|POSITION(s1 IN s)|从字符串 s 中获取 s1 的开始位置	|
+|REPEAT(s,n)|将字符串 s 重复 n 次|
+|REPLACE(s,s1,s2)|将字符串 s2 替代字符串 s 中的子串 s1|
+|REVERSE(s)	|将字符串s的顺序反过来	|
+|STRCMP(s1,s2)|	比较字符串 s1 和 s2，如果 s1 与 s2 相等返回 0 ，如果 s1>s2 返回 1，如果 s1<s2 返回 -1	|
 
-SELECT FIELD("c", "a", "b", "c", "d", "e");
-FIND_IN_SET(s1,s2)	返回在字符串s2中与s1匹配的字符串的位置	
-返回字符串 c 在指定字符串中的位置：
-
-SELECT FIND_IN_SET("c", "a,b,c,d,e");
-FORMAT(x,n)	函数可以将数字 x 进行格式化 "#,###.##", 将 x 保留到小数点后 n 位，最后一位四舍五入。	
-格式化数字 "#,###.##" 形式：
-
-SELECT FORMAT(250500.5634, 2);     -- 输出 250,500.56
-INSERT(s1,x,len,s2)	字符串 s2 替换 s1 的 x 位置开始长度为 len 的字符串	
-从字符串第一个位置开始的 6 个字符替换为 runoob：
-
-SELECT INSERT("google.com", 1, 6, "runoob");  -- 输出：runoob.com
-LOCATE(s1,s)	从字符串 s 中获取 s1 的开始位置	
-获取 b 在字符串 abc 中的位置：
-
-SELECT LOCATE('st','myteststring');  -- 5
-返回字符串 abc 中 b 的位置：
-
-SELECT LOCATE('b', 'abc') -- 2
-LCASE(s)	将字符串 s 的所有字母变成小写字母	
-字符串 RUNOOB 转换为小写：
-
-SELECT LCASE('RUNOOB') -- runoob
-LEFT(s,n)	返回字符串 s 的前 n 个字符	
-返回字符串 runoob 中的前两个字符：
-
-SELECT LEFT('runoob',2) -- ru
-LOWER(s)	将字符串 s 的所有字母变成小写字母	
-字符串 RUNOOB 转换为小写：
-
-SELECT LOWER('RUNOOB') -- runoob
-LPAD(s1,len,s2)	在字符串 s1 的开始处填充字符串 s2，使字符串长度达到 len	
-将字符串 xx 填充到 abc 字符串的开始处：
-
-SELECT LPAD('abc',5,'xx') -- xxabc
-LTRIM(s)	去掉字符串 s 开始处的空格	
-去掉字符串 RUNOOB开始处的空格：
-
-SELECT LTRIM("    RUNOOB") AS LeftTrimmedString;-- RUNOOB
-MID(s,n,len)	从字符串 s 的 n 位置截取长度为 len 的子字符串，同 SUBSTRING(s,n,len)	
-从字符串 RUNOOB 中的第 2 个位置截取 3个 字符：
-
-SELECT MID("RUNOOB", 2, 3) AS ExtractString; -- UNO
-POSITION(s1 IN s)	从字符串 s 中获取 s1 的开始位置	
-返回字符串 abc 中 b 的位置：
-
-SELECT POSITION('b' in 'abc') -- 2
-REPEAT(s,n)	将字符串 s 重复 n 次	
-将字符串 runoob 重复三次：
-
-SELECT REPEAT('runoob',3) -- runoobrunoobrunoob
-REPLACE(s,s1,s2)	将字符串 s2 替代字符串 s 中的字符串 s1	
-将字符串 abc 中的字符 a 替换为字符 x：
-
-SELECT REPLACE('abc','a','x') --xbc
-REVERSE(s)	将字符串s的顺序反过来	
-将字符串 abc 的顺序反过来：
-
-SELECT REVERSE('abc') -- cba
-RIGHT(s,n)	返回字符串 s 的后 n 个字符	
-返回字符串 runoob 的后两个字符：
-
-SELECT RIGHT('runoob',2) -- ob
-RPAD(s1,len,s2)	在字符串 s1 的结尾处添加字符串 s2，使字符串的长度达到 len	
-将字符串 xx 填充到 abc 字符串的结尾处：
-
-SELECT RPAD('abc',5,'xx') -- abcxx
-RTRIM(s)	去掉字符串 s 结尾处的空格	
-去掉字符串 RUNOOB 的末尾空格：
-
-SELECT RTRIM("RUNOOB     ") AS RightTrimmedString;   -- RUNOOB
-SPACE(n)	返回 n 个空格	
-返回 10 个空格：
-
-SELECT SPACE(10);
-STRCMP(s1,s2)	比较字符串 s1 和 s2，如果 s1 与 s2 相等返回 0 ，如果 s1>s2 返回 1，如果 s1<s2 返回 -1	
-比较字符串：
-
-SELECT STRCMP("runoob", "runoob");  -- 0
-SUBSTR(s, start, length)	从字符串 s 的 start 位置截取长度为 length 的子字符串	
-从字符串 RUNOOB 中的第 2 个位置截取 3个 字符：
-
-SELECT SUBSTR("RUNOOB", 2, 3) AS ExtractString; -- UNO
-SUBSTRING(s, start, length)	从字符串 s 的 start 位置截取长度为 length 的子字符串，等同于 SUBSTR(s, start, length)	
-从字符串 RUNOOB 中的第 2 个位置截取 3个 字符：
-
-SELECT SUBSTRING("RUNOOB", 2, 3) AS ExtractString; -- UNO
-SUBSTRING_INDEX(s, delimiter, number)	返回从字符串 s 的第 number 个出现的分隔符 delimiter 之后的子串。
-如果 number 是正数，返回第 number 个字符左边的字符串。
-如果 number 是负数，返回第(number 的绝对值(从右边数))个字符右边的字符串。	
-SELECT SUBSTRING_INDEX('a*b','*',1) -- a
-SELECT SUBSTRING_INDEX('a*b','*',-1)    -- b
-SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('a*b*c*d*e','*',3),'*',-1)    -- c
-TRIM(s)	去掉字符串 s 开始和结尾处的空格	
-去掉字符串 RUNOOB 的首尾空格：
-
-SELECT TRIM('    RUNOOB    ') AS TrimmedString;
-UCASE(s)	将字符串转换为大写	
-将字符串 runoob 转换为大写：
-
-SELECT UCASE("runoob"); -- RUNOOB
-UPPER(s)	将字符串转换为大写	
-将字符串 runoob 转换为大写：
-
-SELECT UPPER("runoob"); -- RUNOOB
 ## 数值函数
 
 ## 日期函数
