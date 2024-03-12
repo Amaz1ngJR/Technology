@@ -57,7 +57,7 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);//取出系统中有效的任意IP地�
 size = sizeof(addr)
 bind(fd, (struct  sockaddr*)&addr, size);//成功返回0 失败-1
 ```
-socker模型创建流程图
+socket模型创建流程图
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/78bb5008-527f-43bf-980e-ef4ab2fb93b5)
 ```
