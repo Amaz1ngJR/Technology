@@ -476,12 +476,12 @@ select * from mytable2 where age > 50;
 ```mysql
 -- 标量 子查询
 select * from mytable1 where eid = (select id from mytable2 where name = '郑州');
--- 列 子查询
-
--- 行 子查询
-
--- 表 子查询
-
+-- 列(一列、多行) 子查询
+select * from mytable1 where salary > any(select salary from mytable2 where name = '研发部');
+-- 行(一行、多列) 子查询
+select * from mytable1 where (salary, eid) = (select salary, eid from mytable2 where name = '张三');
+-- 表(多行多列) 子查询
+select a.*, b.* from (select * from mytable where data > '2024-01-01')a left join mytable2 b on a.eid = b.id;
 ```
 
 # 事务
