@@ -299,9 +299,25 @@ select 函数(参数)
 |greatest(a,b,...)|求列表中的最大值|
 |least(a,b,...)|求列表中的最小值|
 ## 日期函数
-
+|函数|功能描述|
+|----|-------|
+|CURDATE() / CURRENT_DATE()|返回当前日期|	
+|CURRENT_TIME|	返回当前时间|	
+|NOW()|	返回当前日期和时间|	
+|DATE_ADD(d，INTERVAL expr type)|计算起始日期 d 加上一个时间段后的日期，type 值可以是：MICROSECOND SECOND MINUTE ...|
+|DATEDIFF(d1,d2)	|计算日期 d1->d2 之间相隔的天数|
+|DAY(d)	|返回日期值 d 的日期部分	|
+|DAYNAME(d)	|返回日期 d 是星期几|
+|DAYOFMONTH(d)|	计算日期 d 是本月的第几天|
+|YEAR(d)|返回年份|	
 ## 流程函数
-
+|函数|功能描述|
+|----|-------|
+|IF(expr,v1,v2)	|如果表达式 expr 成立，返回结果 v1；否则，返回结果 v2|
+|IFNULL(v1,v2)	|如果 v1 的值不为 NULL，则返回 v1，否则返回 v2|
+|NULLIF(expr1, expr2)|比较两个字符串，如果字符串 expr1 与 expr2 相等 返回 NULL，否则返回 expr1|
+|ISNULL(expression)	|判断表达式是否为 NULL|
+|CASE expression WHEN condition1 THEN result1 ... ELSE result END|CASE 表示函数开始，END 表示函数结束。如果 condition1 成立，则返回 result1, 当全部不成立则返回 result|
 ## 聚合函数
 
 ## 窗口/开窗函数
@@ -318,6 +334,109 @@ select 函数(参数)
 ### 其他函数NTH_VALUE、NTILE
 
 # 约束
+约束是作用于表中字段上的 可以在创建表/修改表的时候添加约束 用于限制表中的数据 保证数据的正确、有效性和完整性
+
+|关键字|约束|描述|
+|-----|----|-----|
+|NOT NULL|非空约束|限制该字段的数据不能为null|
+|UNIQUE|唯一约束|保证该字段的所有数据都是唯一、不重复的|
+|PRIMARY KEY / auto_increment| 主键约束|确保某列（或两个列多个列的结合）有唯一非空标识 每个表只能有一个主键|
+|FOREIGN KEY | 外键约束|保证一个表中的数据匹配另一个表中的值的参照完整性|
+|CHECK |检查约束|保证列中的值符合指定的条件|
+|DEFAULT|默认约束|规定没有给列赋值时的默认值|
+```mysql
+create table uesr (
+    id int primary key auto_increment comment '主键',
+    name varchar(10) not null unique comment '姓名',
+    age in check (age > 0 && age <= 120) comment '年龄'
+)
+```
+```mysql
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+```
+## 外键约束
+外键用来让两张表的数据之间建立连接 从而保证数据的一致性和完整性
+```mysql
+-- 添加外键
+CREATE INDEX idx_mytable2_id ON mytable2(id); #在mytable2表中有一个索引 用于支持id列的外键约束
+alter table mytable add constraint fk_mytable_mytable2 foreign key (id) references mytable2(id);
+alter table 表名 add constraint 外键名 foreign key (外键字段名) references 主表(主表列名);
+-- 删除外键
+alter table mytable drop foreign key fk_mytable_mytable2;
+alter table 表名 drop foreign key 外键名;
+```
+## 主键约束
+```mysql
+-- 创建单列主键
+create table temp(
+    id int primary key [auto_increment]#在定义字段的同时指定主键
+)[auto_increment = 100]; #指定自增字段的初始值为100默认是1
+alter table temp auto_increment = 200; #创完表后也可以修改自增字段的初始值
+# delete数据之后自动增长从断点开始 truncate数据之后自动增长从默认起始值开始
+create table temp(
+    id int,
+    constraint pk primary key (id) # 定义完字段后再指定主键 [constraint 约束名]
+);
+-- 创建联合主键
+create table temp(
+    id int,
+    name varchar(10),
+    salary double,
+    primary key (id,name) # (字段1，...)多列只要不是完全一样就行
+);
+alter table temp add primary key (id); # 创建完表后也可以添加单列主键、联合主键
+-- 删除主键(指定表名即可)
+alter table temp drop primary key;
+```
+## 非空、唯一、默认、零填充约束
+```mysql
+-- 创建非空约束
+create table temp(
+    id int,
+    name varchar(10) not null ,
+    address varchar(20) not null # 创建表的时候指定非空约束
+);
+alter table temp modify name varchar(10) not null; # 创完表后也可以修改
+-- 删除非空约束
+alter table temp modify name varchar(10);
+
+-- 创建唯一约束
+create table temp(
+    id int,
+    name varchar(10) unique ,
+    address varchar(20) unique # 创建表的时候指定唯一约束
+);
+alter table temp add constraint uni_name unique(name); # 创完表后也可以修改
+-- 删除唯一约束
+alter table temp drop index <唯一约束名>;
+
+-- 创建默认约束
+create table temp(
+    id int,
+    name varchar(10),
+    address varchar(20) default '北京' # 创建表的时候指定默认约束
+);
+alter table temp modify address varchar(20) default '杭州'; # 创完表后也可以修改
+-- 删除默认约束
+alter table temp modify address varchar(20) default null;
+
+-- 创建零填充约束
+create table temp(
+    id int zerofill# 创建表的时候指定零填充约束
+);
+-- 删除零填充约束
+alter table temp modify id int;
+```
 
 # 多表查询
 
