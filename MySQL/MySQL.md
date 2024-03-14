@@ -483,6 +483,44 @@ select * from mytable1 where (salary, eid) = (select salary, eid from mytable2 w
 -- 表(多行多列) 子查询
 select a.*, b.* from (select * from mytable where data > '2024-01-01')a left join mytable2 b on a.eid = b.id;
 ```
-
 # 事务
+事务是一组操作的集合 是一个不可分割的工作单位 这组操作要么同时成功 要么同时失败
+```mysql
+-- 查看事务提交方式
+select @@autocommit;
+set @@autocommit = 0; # 关闭自动提交 1是自动提交
+-- 提交事务
+commit;
+-- 回滚事务
+rollback;
+-- 开启事务
+start transaction | begin;
+```
+```mysql
+-- 开始转账事务
+START TRANSACTION;
+-- 扣除账户1金额
+UPDATE accounts SET balance = balance - 100.00 WHERE account_id = 1;
+-- 增加账户2金额
+UPDATE accounts SET balance = balance + 100.00 WHERE account_id = 2;
+-- 提交事务
+COMMIT;
+-- 如果转账过程中出现错误，需要回滚事务
+-- START TRANSACTION;
+-- ROLLBACK;
+```
+## 事务的四大特性ACID
+|原子性(Atomicity)|事务中的所有操作要么全部成功执行 要么全部失败回滚|
+|----|----|
+|一致性(Consistency)|事务开始之前和结束之后 数据库必须保持一致性状态|
+|隔离性(Isolation)|数据库系统中多个事务并发执行时 每个事务的执行都独立于其他事务|
+|持久性(Durability)|事务提交后对数据库的改变是永久性的|
+## 并发事务问题
+
+## 事务隔离级别
+
+
+
+
+
 
