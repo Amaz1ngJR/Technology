@@ -1150,7 +1150,7 @@ auto pairHash = [](const auto& p) {
 auto pairEqual = [](const auto& lhs, const auto& rhs) {
 	return lhs.first == rhs.first && lhs.second == rhs.second;
 };
-std::unordered_map<std::pair<double, double>, int, decltype(pairHash), decltype(pairEqual)> um(10, pairHash, pairEqual);
+std::unordered_map<std::pair<double, double>, int, decltype(pairHash), decltype(pairEqual)> um(10, pairHash, pairEqual);//10为初始化桶数 为预期元素数量的 1.0 到 1.5 倍
 ```
 ### **STL函数对象(仿函数)
 
