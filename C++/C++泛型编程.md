@@ -1141,6 +1141,16 @@ struct PairEqual {
 	}
 };
 unordered_map<pair<double, double>, int, PairHash, PairEqual>um;
+
+auto pairHash = [](const auto& p) {
+	auto hash1 = std::hash<decltype(p.first)>{}(p.first);
+	auto hash2 = std::hash<decltype(p.second)>{}(p.second);
+	return hash1 ^ hash2;
+};
+auto pairEqual = [](const auto& lhs, const auto& rhs) {
+	return lhs.first == rhs.first && lhs.second == rhs.second;
+};
+std::unordered_map<std::pair<double, double>, int, decltype(pairHash), decltype(pairEqual)> um(10, pairHash, pairEqual);
 ```
 ### **STL函数对象(仿函数)
 
