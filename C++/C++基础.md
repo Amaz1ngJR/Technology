@@ -691,7 +691,7 @@ int *demo() {
 
 ## *智能指针
 
-普通指针需要程序员来释放内存，使用智能指针#include<memory>来管理指针的释放
+普通指针需要程序员来释放内存，使用智能指针#include< memory >来管理指针的释放
 智能指针是类模板，不是指针 在栈上创建智能指针对象，将普通指针交给智能指针对象，智能指针对象过期时，调用析构函数释放普通指针的内存。
 智能指针有四类：auto_ptr(C++17已弃用)、unique_ptr 、shared_ptr、weak_ptr
 一般使用unique_ptr，shared_ptr、weak_ptr用于多线程。
