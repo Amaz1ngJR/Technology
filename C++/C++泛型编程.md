@@ -1124,7 +1124,24 @@ void demo() {
 	s1.count(1);//对于map 查找的是key 也只能是0/1 
 }
 ```
-
+```c++
+//unordered_map
+struct PairHash {
+	template <class T1, class T2>
+	std::size_t operator () (const std::pair<T1, T2>& p) const {
+		auto hash1 = std::hash<T1>{}(p.first);
+		auto hash2 = std::hash<T2>{}(p.second);
+		return hash1 ^ hash2;
+	}
+};
+struct PairEqual {
+	template <class T1, class T2>
+	bool operator () (const std::pair<T1, T2>& lhs, const std::pair<T1, T2>& rhs) const {
+		return lhs.first == rhs.first && lhs.second == rhs.second;
+	}
+};
+unordered_map<pair<double, double>, int, PairHash, PairEqual>um;
+```
 ### **STL函数对象(仿函数)
 
 重载函数调用操作符的类。其对象常称为函数对象
