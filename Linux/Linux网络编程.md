@@ -684,11 +684,15 @@ int main() {
 epoll是select/poll的增强版本 它能够显著提高程序在大量并发连接中只有少量活跃的情况下系统CPU利用率
 因为它会复用文件描述符集合来传递结果 而不用开发者每次等待事件之前都必须重新准备要被监视的文件描述符集合
 另外在获取事件的时候 它无须遍历整个被监视的描述符集 只要遍历那些被内核IO事件异步唤醒而加入Ready队列的描述符集合就行了
+
+不能跨平台
 ```
 ```
 Epoll事件有两种模型： 考虑情景：一个写满2KB的管道 调用epoll_wait会返回rfd表示可以读了，但是只读1KB数据再次调用epoll_wait
 Edge Triggered(ET) 边缘触发：只有数据到来才触发 不管缓冲区中是否还有数据（情景中epoll_wait不返回fd） event.events = EPOLLIN | EPOLLET;
-ET是高速工作方式 只支持非阻塞socket
+ET是高速工作方式 只支持非阻塞socket(配合忙轮询读) :int flag = fcntl(cfd, F_GETFL); flag |= O_NONBLOCK; fcntl(cfd, F_SETFL, flag);
 Level Triggered(LT) 水平触发(默认)：只要有数据就会触发 （情景中epoll_wait返回fd）event.events = EPOLLIN;
 ```
-
+## epoll反应堆
+epoll反应堆： epoll ET模式 + 非阻塞 + void *ptr
+## 线程池
