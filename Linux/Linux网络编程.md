@@ -687,7 +687,6 @@ int main() {
 ```
 ## epoll反应堆
 epoll反应堆： epoll ET模式 + 非阻塞、轮询 + void *ptr
-### ET、LT模型
 ```
 Epoll事件有两种模型： 考虑情景：一个写满2KB的管道 调用epoll_wait会返回rfd表示可以读了，但是只读1KB数据再次调用epoll_wait
 Edge Triggered(ET) 边缘触发：只有数据到来才触发 不管缓冲区中是否还有数据（情景中epoll_wait不返回fd） event.events = EPOLLIN | EPOLLET;
