@@ -876,3 +876,245 @@ int main() {
 }
 ```
 ## 线程池
+```c++
+#include <iostream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <ctype.h>
+#include <arpa/inet.h>
+#include <sys/types.h>   
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <string.h>
+
+//-----STL
+#include <vector>
+
+constexpr uint16_t SERV_PORT = 9527;
+constexpr uint16_t MAXLINE = 8192;
+constexpr uint16_t MAX_EVENTS = 1024;
+constexpr uint16_t OPEN_MAX = 5000;
+constexpr uint16_t MIN_WAIT_TASK_NUM = 30;
+constexpr uint16_t DEFAULT_THREAD_VARY = 10;
+
+void sys_err(const char* str) {
+	perror(str);
+	exit(1);
+}
+
+struct threadpool_task_t{
+    void *(*function)(void *); //函数指针 回调函数
+    void *arg;//上面函数的参数
+};//各子线程任务结构体
+
+void *threadpool_thread(void *threadpool);
+void *adjust_thread(void *threadpool);
+class ThreadPool
+{ // 线程池
+public:
+    int min_thr_num, max_thr_num; // 线程池中最小、最大线程个数
+    int live_thr_num;//当前存活线程个数
+    int busy_thr_num;//忙状态线程个数
+    int wait_exit_thr_num;//要销毁的线程个数
+
+    int queue_front;
+    int queue_rear;
+    int queue_size;
+    int queue_max_size;
+
+    bool shutdown; //线程池的使用状态
+    
+    pthread_mutex_t lock;          // 用于锁住本结构体
+    pthread_mutex_t thread_counter;//记录忙状态线程个数的锁 --busy_thr_num
+    pthread_cond_t queue_not_full;//当队满时 添加任务的线程阻塞
+    pthread_cond_t queue_not_empty;//队不空的时候 通知等待任务的线程
+    pthread_t adjust_tid;//存管理线程tid
+
+    std::vector<pthread_t> threads;          // 存放线程池中每个线程的tid
+    std::vector<struct threadpool_task_t> task_queue; // 任务队列 (数组首地址)
+
+    ThreadPool(int min_thr_num,int max_thr_num,int queue_max_size):
+    min_thr_num(min_thr_num),max_thr_num(max_thr_num),queue_max_size(queue_max_size)
+    ,queue_front(0),queue_size(0),queue_rear(0),shutdown(false),live_thr_num(min_thr_num),
+    busy_thr_num(0),wait_exit_thr_num(0){
+        threads.resize(max_thr_num);
+        task_queue.resize(queue_max_size);
+
+        pthread_mutex_init(&lock, nullptr);
+        pthread_mutex_init(&thread_counter, nullptr);
+        pthread_cond_init(&queue_not_full, nullptr);
+        pthread_cond_init(&queue_not_empty, nullptr);
+
+        for (int i = 0; i < min_thr_num;++i){//启动min_thr_num个线程
+            pthread_create(&threads[i], nullptr, threadpool_thread, (void *)this);
+        }
+        pthread_create(&adjust_tid, nullptr, adjust_thread, (void *)this);//创建管理线程
+    }
+};
+
+void *threadpool_thread(void *threadpool)
+{ // 线程池中各个工作线程
+    ThreadPool *pool = (ThreadPool *)threadpool;
+    threadpool_task_t task;
+
+    while (1)
+    {
+        pthread_mutex_lock(&pool->lock); // 给整个结构体加锁
+        while (pool->queue_size == 0 && !pool->shutdown)
+        {                                                           // 没有任务
+            pthread_cond_wait(&pool->queue_not_empty, &pool->lock); // 阻塞条件变量上
+            // 清除指定数目的空闲线程
+            if (pool->wait_exit_thr_num > 0)
+            {
+                pool->wait_exit_thr_num--;
+                if (pool->live_thr_num > pool->min_thr_num)
+                { // 如果线程池中线程数大于最小值时可以结束
+                    pool->live_thr_num--;
+                    pthread_mutex_unlock(&pool->lock);
+                    pthread_exit(nullptr);
+                }
+            }
+        }
+        // 如果指定了true 要关闭线程池中每个线程 自行退出处理 销毁线程池
+        if (pool->shutdown)
+        {
+            pthread_mutex_unlock(&pool->lock);
+            std::cout << "thread" << pthread_self() << "is exiting" << std::endl;
+            pthread_detach(pthread_self());
+            pthread_exit(nullptr);
+        }
+        task.function = pool->task_queue[pool->queue_front].function;
+        task.arg = pool->task_queue[pool->queue_front].arg;
+        pool->queue_front = (pool->queue_front + 1) % pool->queue_max_size;
+        pool->queue_size--;
+        // 通知可以有新的任务添加进来
+        pthread_cond_broadcast(&pool->queue_not_full);
+        // 任务取出后 立即将线程池锁 释放
+        pthread_mutex_unlock(&pool->lock);
+        // 执行任务
+        pthread_mutex_lock(&pool->thread_counter); // 忙状态线程数 变量锁
+        ++pool->busy_thr_num;
+        pthread_mutex_unlock(&pool->thread_counter);
+        (*(task.function))(task.arg); // 执行回调函数
+        // 任务结束处理
+        pthread_mutex_lock(&pool->thread_counter);
+        --pool->busy_thr_num;
+        pthread_mutex_unlock(&pool->thread_counter);
+    }
+    pthread_exit(nullptr);
+    }
+
+void *adjust_thread(void *threadpool){
+    ThreadPool *pool = (ThreadPool *)threadpool;
+    while(!pool->shutdown){
+        sleep(10);//定时 对线程池管理
+        pthread_mutex_lock(&pool->lock);
+        int queue_size = pool->queue_size;
+        int live_thr_num = pool->live_thr_num;
+        pthread_mutex_unlock(&pool->lock);
+
+        pthread_mutex_lock(&pool->thread_counter);
+        int busy_thr_num = pool->busy_thr_num;
+        pthread_mutex_unlock(&pool->thread_counter);
+
+        //任务数大于最小线程池个数 存活的线程数少于最大线程个数时 创建新线程
+        if(queue_size>=MIN_WAIT_TASK_NUM&&live_thr_num<pool->max_thr_num){
+            pthread_mutex_lock(&pool->lock);
+            int add =0;
+            for (int i = 0; i < pool->max_thr_num && add < DEFAULT_THREAD_VARY 
+            && pool->live_thr_num < pool->max_thr_num;++i){
+                ++add;
+                ++pool->live_thr_num;
+            }
+            pthread_mutex_unlock(&pool->lock);
+        }
+        //当忙线程*2 小于存活的线程数 且存活的线程数 大于 最小线程数时 销毁多余的空闲线程
+        if((busy_thr_num*2)<live_thr_num&&live_thr_num>pool->min_thr_num){
+            pthread_mutex_lock(&pool->lock);
+            pool->wait_exit_thr_num = DEFAULT_THREAD_VARY;
+            pthread_mutex_unlock(&pool->lock);
+            for (int i = 0; i < DEFAULT_THREAD_VARY;++i)
+                pthread_cond_signal(&pool->queue_not_empty);
+        }
+    }
+    return nullptr;
+}
+
+int threadpool_add(ThreadPool *pool,void*(*function)(void*arg),void*arg){
+    pthread_mutex_lock(&pool->lock);
+    while((pool->queue_size==pool->queue_max_size)&&!pool->shutdown)//队列已满 
+        pthread_cond_wait(&pool->queue_not_full, &pool->lock);//调wait阻塞
+    if(pool->shutdown){
+        pthread_cond_broadcast(&pool->queue_not_empty);
+        pthread_mutex_unlock(&pool->lock);
+        return 0;
+    }
+    if(pool->task_queue[pool->queue_rear].arg!=nullptr)//清空 工作线程调用的回调函数的参数
+        pool->task_queue[pool->queue_rear].arg = nullptr;
+
+    //添加任务到任务队列中
+    pool->task_queue[pool->queue_rear].function = function;
+    pool->task_queue[pool->queue_rear].arg = arg;
+    pool->queue_rear = (pool->queue_rear + 1) % pool->queue_max_size;//模拟环形
+    pool->queue_size++;
+
+    //添加完任务后 队列不为空 唤醒线程池中等待处理任务的线程
+    pthread_cond_signal(&pool->queue_not_empty);
+    pthread_mutex_unlock(&pool->lock);
+    return 0;
+}
+
+int threadpool_free(ThreadPool *pool){
+    if(!pool)return -1;
+    if(!pool->task_queue.empty())
+        pool->task_queue.clear();
+    if (!pool->threads.empty())
+    {
+        pool->threads.clear();
+        pthread_mutex_lock(&pool->lock);
+        pthread_mutex_destroy(&pool->lock);
+        pthread_mutex_lock(&pool->thread_counter);
+        pthread_mutex_destroy(&pool->thread_counter);
+        pthread_cond_destroy(&pool->queue_not_empty);
+        pthread_cond_destroy(&pool->queue_not_full);
+    }
+    delete (pool);
+    pool = nullptr;
+    return 0;
+}
+
+int threadpool_destroy (ThreadPool * pool){
+    if(!pool)return -1;
+    pool->shutdown = true;
+    //先销毁管理线程
+    pthread_join(pool->adjust_tid, nullptr);
+    for (int i = 0; i < pool->live_thr_num;++i)
+        //通知所有空闲线程
+        pthread_cond_broadcast(&pool->queue_not_empty);
+    for (int i = 0; i < pool->live_thr_num;++i)
+        pthread_join(pool->threads[i], nullptr);
+    threadpool_free(pool);
+    return 0;
+}
+
+void* process(void*arg){
+    printf("thread process");
+    sleep(2);
+    return nullptr;
+}
+int main(){
+    ThreadPool *thp = new ThreadPool(3, 100, 100);//创建线程池 线程数量为3-100 队列最大为100
+    printf("pool inited");
+
+    int num[20];
+    for (int i = 0; i < 20;++i){
+        num[i] = i;
+        std::cout << "add task " << i << std::endl;
+        threadpool_add(thp, process, (void *)&num[i]);//向线程池添加任务
+    }
+    sleep(10);//等待子线程完成任务
+    threadpool_destroy(thp);
+    return 0;
+}
+```
