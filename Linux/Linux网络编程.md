@@ -45,6 +45,10 @@ struct sockaddr_in {
 struct in_addr {
     uint32_t       s_addr;     /* 网络字节序的IP地址 */
 };
+struct sockaddr_un {
+    sa_family_t    sun_family; 
+    char sun_path[UNIX_PATH_MAX];
+};
 ```
 bind中使用
 ```c++
@@ -75,7 +79,8 @@ accpet();//以套接字A作为参数阻塞监听客户端连接 当有客户端�
 socket();//产生一个套接字C 得到一个fd2句柄
 connect();//绑定C的IP和端口并与另一个套接字连接
 ```
-## socket函数
+## 网络socket
+函数原型
 ```c++
 #include <sys/types.h> //包含在#include <unistd.h>
 #include <sys/socket.h>
@@ -105,7 +110,7 @@ int setsockopt(int sockfd, int level, int optname,
 int opt = 1;
 setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR/SO_REUSEPORT, (void *)&opt, sizeof(opt));
 ```
-**具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】**
+**网络套接字具体实现服务器与客户端(1对1)【客户端输入小写字母 服务器将其转换成大写字母】**
 
 服务器端
 ```c++
@@ -190,6 +195,18 @@ int main() {
 	return 0;
 }
 ```
+## 本地套接字
+```
+int socket(int domain, int type, int protocol);domain: AF_INET --> AF_UNIX/AF_LOCAL
+socket地址结构 sockaddr_in serv_addr --> sockaddr_un serv_addr
+serv_addr.sin_family = AF_INET; --> serv_addr.sun_family = AF_UNIX;
+serv_addr.sin_port = htons(SERV_PORT); serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+--> strcpy(srv_addr.sun_path, "srv.socket");
+
+bind(lfd, (struct  sockaddr*)&serv_addr, sizeof(serv_addr));
+--> int len = 2 + strlen("srv.socket");bind(lfd, (struct  sockaddr*)&serv_addr, len);
+```
+
 # 高并发服务器
 
 ## 多进程并发服务器
@@ -1118,3 +1135,4 @@ int main(){
     return 0;
 }
 ```
+ 
