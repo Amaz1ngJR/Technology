@@ -102,6 +102,9 @@ ar rcs libmylib.a file1.o file2.o
     g++ code.c lib库名.a -o code 
 ```
 ### 创建动态库 lib_.so
+-o文件 main函数的地址为0 其他普通函数的地址都是相对于main函数的地址的偏移量 链接阶段确定main函数地址
+
+调用的动态库函数地址是@plt 当确定动态库地址后 会进行地址回填
 ```bash
 1.将.c生成.o文件（生成与位置无关的代码 参数 -fPIC）所有地址后面带有@plt（延迟绑定）
 	gcc -c add.c -o add.o -fPIC
