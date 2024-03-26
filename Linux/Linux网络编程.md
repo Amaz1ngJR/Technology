@@ -1020,7 +1020,7 @@ void *threadpool_thread(void *threadpool)
         pthread_mutex_unlock(&pool->thread_counter);
     }
     pthread_exit(nullptr);
-    }
+}
 
 void *adjust_thread(void *threadpool){
     ThreadPool *pool = (ThreadPool *)threadpool;
