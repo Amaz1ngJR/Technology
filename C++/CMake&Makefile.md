@@ -167,17 +167,17 @@ $(obj): %.o: %.c
 ```
 ## *最终的makefile
 ```makefile
-myArgs = -Wall -g   #参数
+myArgs = -Wall -g -lpthread  #参数
 .PHONY:clean ALL    #伪目标
 #两个函数
-src = $(wildcard *.c)  #找到当前目录下所有.c文件 赋值给src
-obj = $(patsubst %.c,%.o,$(src))   #将参数3( $(src) )里所有包含参数1(%.c)的文件替换成参数3(%.o)
-ALL:exe
+src = $(wildcard *.cpp)  #找到当前目录下所有.cpp文件 赋值给src
+obj = $(patsubst %.cpp,%.o,$(src))   #将参数3( $(src) )里所有包含参数1(%.cpp)的文件替换成参数3(%.o)
+ALL:demo
 
-exe:$(obj)
+demo:$(obj)
 	g++ $(myArgs) $^ -o $@
-$(obj): %.o: %.c
+$(obj): %.o: %.cpp
 	g++ -c $< -o $@ $(myArgs)
 clean:  #使用clean :先使用make clean -n 模拟删除(提示删除内容) 再make clean
-	-rm -rf $(obj) exe   
+	-rm -rf $(obj) demo   
 ```
