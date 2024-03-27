@@ -262,10 +262,14 @@ auto z = new auto(9); // int*
 auto x1 = 5, x2 = 5.0, x3='r';//错误，必须是初始化为同一类型
 ```
 ### *关键字
-#### const和constexpr
-```c++
-const修饰只读变量
-constexpr修饰常量
+#### const、constexpr与define
+const与define的区别
+```
+const修饰只读变量 constexpr修饰常量
+1. define是在编译预处理阶段进行简单的文本替换 不能调试 const是在编译阶段确定其值 可以调试
+2. define定义的宏没有数据类型 不会进行安全检查 const是有类型的 进行类型判断
+3. define定义的宏在程序中使用多少就进行多少次替换 内存中有多个备份 占用的是代码段的内存
+const定义的常量占用静态存储区空间 程序运行过程只有一份 
 ```
 用constexpr或enum替换#define常量
 ```c++
