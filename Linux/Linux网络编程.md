@@ -702,7 +702,7 @@ int main() {
 	return 0;
 }
 ```
-## epoll反应堆
+## epoll反应堆(Reactor模型)
 epoll反应堆： epoll ET模式 + 非阻塞、轮询 + void *ptr
 ```
 Epoll事件有两种模型： 考虑情景：一个写满2KB的管道 调用epoll_wait会返回rfd表示可以读了，但是只读1KB数据再次调用epoll_wait
