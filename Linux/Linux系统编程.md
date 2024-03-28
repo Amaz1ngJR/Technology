@@ -1663,7 +1663,7 @@ int main(int argc, char* argv[]) {
 ```c++
 #include <pthread.h>//以下5个函数 成功返回0 失败返回错误号
 
-int pthread_mutex_lock(pthread_mutex_t *mutex);//创建锁
+int pthread_mutex_lock(pthread_mutex_t *mutex);//创建锁 给mutex加锁 如果已上锁 会阻塞直到加上锁
 int pthread_mutex_init(pthread_mutex_t *restrict mutex,
    const pthread_mutexattr_t *restrict attr);//初始化锁mutex的属性attr
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//静态初始化
