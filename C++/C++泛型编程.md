@@ -1418,6 +1418,17 @@ void demo() {
 	for (const int& num : numbers) std::cout << num << " ";
 }
 ```
+##### lexicographical_compare
+比较两个容器v1、v2的字典序 如果v1小于v2返回true
+```c++
+void demo() {
+	vector<int>a = { 1,3,4,5,6 };
+	vector<int>b = { 1,3,4,4,6 };
+	if (lexicographical_compare(begin(a), end(a), begin(b), end(b)))
+		cout << "a的字典序小于b" << endl;
+	else cout << "b的字典序小于a" << endl; //执行这个语句
+}
+```
 #### ***常用查找算法
 
 ##### find
