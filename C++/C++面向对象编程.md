@@ -1109,9 +1109,13 @@ public:
 	virtual void speak() {//虚函数 地址晚绑定 在运行阶段确定函数地址
 		cout << "动物在说话" << endl;
 	}
+	~Animal() {
+		cout << "Animal析构函数调用" << endl;
+	}
 };
 //派生类
 class Cat : public Animal {
+public:
 	void _speak() {//普通函数
 		cout << "猫在说话" << endl;
 	}
@@ -1119,6 +1123,9 @@ class Cat : public Animal {
 	//子类重写虚函数
 	void speak() {//虚函数
 		cout << "猫在说话" << endl;
+	}
+	~Cat() {
+		cout << "Cat析构函数调用" << endl;
 	}
 };
 
@@ -1130,7 +1137,7 @@ void doSpeak(Animal& animal) { //Animal &animal = cat;父类的引用执行子�
 }
 void demo() {
 	Cat cat;
-	doSpeak(cat);
+	doSpeak(cat);//先调用子类析构函数再调用父类析构函数
 }
 ```
 
