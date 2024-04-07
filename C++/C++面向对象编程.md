@@ -1251,7 +1251,7 @@ class Grandson1 :Son1 {
 	void fun2() override; //虚函数即使被重写了 依然是虚函数
 };
 class Grandson2 : Son2 {
-	void fun20 override; //错误! 不允许重写final后的的虚函数
+	void fun2() override; //错误! 不允许重写final后的的虚函数
 };
 class Grandson3 :Grandson2 {
 	void fun2() override;//!不允许重写final后的的虚函教
