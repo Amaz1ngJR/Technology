@@ -777,7 +777,7 @@ SheepTuo2::$vbtable@Tuo2@://虚基类表
 vbi:       class  offset o.vbptr  o.vbte fVtorDisp
           Animal       8       0       4 0            
 ```
-使用虚继承设计一个不能被基础的类Test
+使用虚继承设计一个不能被继承的类Test
 ```c++
 class Test;
 class Base {//创建一个基类 将构造函数和析构函数的属性设为私有
