@@ -454,14 +454,28 @@ float f = static_cast<float>(i);//静态将int类型转换成float
 #### 动态转换dynamic_cast
 
 ```c++
-class Base{
-	virtual ~Base() {}  // 声明一个虚(析构)函数
+class base {
+public:
+	virtual ~base() {}  // 声明一个虚(析构)函数
 };
-class Son :public Base {};
+class Son :public base {
+public:
+	int a;
+	Son() {
+		this->a = 10;
+		cout << "Son" << endl;
+	}
+	~Son() {
+		cout << "~Son" << endl;
+	}
+};
 void demo() {
-	Base* base_ptr = new Base;
+	base* base_ptr = new Son;
 	//将基类指针或引用转换成派生类指针或引用(多态下)
 	Son* son_ptr = dynamic_cast<Son*>(base_ptr);
+	if (!son_ptr)cout << "null" << endl;
+	cout << "a = " << son_ptr->a << endl;
+	delete son_ptr;
 	//动态转换进行运行时类型检查，如果不能进行转换则返回空指针或引发异常
 }
 ```
