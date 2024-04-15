@@ -217,6 +217,128 @@ void demo() {
 3.滥用单例将带来一些负面问题，如为了节省资源将数据库连接池对象设计为单例类，可能会导致共享连接池对象的程序过多
 而出现连接池溢出；如果实例化对象长时间不被利用，系统就会认为是垃圾而被回收，这将导致对象状态的丢失。
 ```
+懒汉式（线程不安全）
+```c++
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        if (instance_ == nullptr) {
+            instance_ = new Singleton();
+        }
+        return *instance_;
+    }
+
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+private:
+    Singleton() = default;
+    ~Singleton() = default;
+
+    static Singleton* instance_;
+};
+
+Singleton* Singleton::instance_ = nullptr;
+```
+双检锁/双重校验锁（DCL，线程安全）
+```c++
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        if (instance_ == nullptr) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (instance_ == nullptr) {
+                instance_ = new Singleton();
+            }
+        }
+        return *instance_;
+    }
+
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+private:
+    Singleton() = default;
+    ~Singleton() = default;
+
+    static Singleton* instance_;
+    static std::mutex mutex_;
+};
+
+Singleton* Singleton::instance_ = nullptr;
+std::mutex Singleton::mutex_;
+```
+C++11以后的版本
+```c++
+#include <mutex>
+#include <iostream>
+
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        std::call_once(initInstanceFlag_, &Singleton::createInstance);
+        return *instance_;
+    }
+
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+private:
+    Singleton() = default;
+
+    ~Singleton() = default;
+
+    static void createInstance() {
+        instance_.reset(new Singleton());
+    }
+
+    static std::unique_ptr<Singleton> instance_;
+    static std::once_flag initInstanceFlag_;
+};
+
+std::unique_ptr<Singleton> Singleton::instance_{};
+std::once_flag Singleton::initInstanceFlag_{};
+
+int main() {
+    auto& singleton1 = Singleton::getInstance();
+    auto& singleton2 = Singleton::getInstance();
+
+    // 假设 Singleton 类有一个输出标识的方法
+    singleton1.identify();
+    singleton2.identify();
+
+    return 0;
+}
+```
+利用静态局部变量的初始化来保证线程安全的版本
+```c++
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        static Singleton instance;
+        return instance;
+    }
+
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+private:
+    Singleton() = default;
+
+    ~Singleton() = default;
+};
+
+int main() {
+    auto& singleton1 = Singleton::getInstance();
+    auto& singleton2 = Singleton::getInstance();
+
+    // 假设 Singleton 类有一个输出标识的方法
+    singleton1.identify();
+    singleton2.identify();
+
+    return 0;
+}
+```
 # 结构型模式
 ## 外观模式（门面模式）
 是指外部与子系统的通信必须通过一个统一的外观对象进行，为子系统中的一组接口提供一个一致的界面，定义一个高层接口，这个接口使得这一子系统更加容易使用
