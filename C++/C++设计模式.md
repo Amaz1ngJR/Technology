@@ -3,13 +3,204 @@
 ## 工厂模式
 简单工厂模式（Simple Factory Pattern）：
 简单工厂模式通过一个工厂类来创建对象，客户端只需要通过工厂类来获取对象，而不需要直接实例化对象。简单工厂模式适用于创建对象的逻辑相对简单的情况，但缺点是当需要添加新的产品时，需要修改工厂类的代码。
+```c++
+// 定义产品接口
+class Product {
+public:
+	virtual ~Product() = default; //虚析构
+	virtual void use() const = 0; // 具体产品的使用方法 常成员函数
+};
 
+// 具体产品A
+class ProductA : public Product {
+public:
+	void use() const override {
+		std::cout << "Using product A" << std::endl;
+	}
+};
+
+// 具体产品B
+class ProductB : public Product {
+public:
+	void use() const override {
+		std::cout << "Using product B" << std::endl;
+	}
+};
+
+// 工厂类（简单工厂）
+class SimpleFactory {
+public:
+	static std::unique_ptr<Product> createProduct(const std::string& type) {
+		if (type == "A") 
+			return std::make_unique<ProductA>();
+		else if (type == "B") 
+			return std::make_unique<ProductB>();
+		else throw ("Invalid product type");
+	}
+};
+
+void demo() {
+	auto product = SimpleFactory::createProduct("A");
+	product->use();
+
+	product = SimpleFactory::createProduct("B");
+	product->use();
+}
+```
 工厂方法模式（Factory Method Pattern）：
 工厂方法模式定义了一个抽象的工厂接口，具体的产品创建逻辑由子类工厂来实现。每个具体的子类工厂负责创建特定的产品，客户端通过调用工厂方法来获取对象。工厂方法模式遵循了开闭原则，但需要客户端选择适合的具体工厂类。
+```c++
+// 产品接口
+class Product {
+public:
+	virtual ~Product() = default;
+	virtual void use() const = 0;
+};
 
+// 具体产品A
+class ProductA : public Product {
+public:
+	void use() const override {
+		std::cout << "Using product A" << std::endl;
+	}
+};
+
+// 具体产品B
+class ProductB : public Product {
+public:
+	void use() const override {
+		std::cout << "Using product B" << std::endl;
+	}
+};
+
+// 抽象工厂接口
+class Factory {
+public:
+	virtual ~Factory() = default;
+	virtual std::unique_ptr<Product> createProduct() const = 0;
+};
+
+// 具体工厂A
+class FactoryA : public Factory {
+public:
+	std::unique_ptr<Product> createProduct() const override {
+		return std::make_unique<ProductA>();
+	}
+};
+
+// 具体工厂B
+class FactoryB : public Factory {
+public:
+	std::unique_ptr<Product> createProduct() const override {
+		return std::make_unique<ProductB>();
+	}
+};
+
+void demo() {
+	FactoryA factoryA;
+	auto productA = factoryA.createProduct();
+	productA->use();
+
+	FactoryB factoryB;
+	auto productB = factoryB.createProduct();
+	productB->use();
+}
+```
 抽象工厂模式（Abstract Factory Pattern）：
 抽象工厂模式提供了一个接口，用于创建一系列相关或依赖对象的家族，而不需要指定具体的类。客户端通过使用抽象工厂接口来创建对象，从而可以创建一组相关的产品。抽象工厂模式提供了更高层次的抽象，但增加了系统的复杂性。
+```c++
+// 产品接口族：颜色
+class Color {
+public:
+	virtual ~Color() = default;
+	virtual void apply() const = 0;
+};
 
+// 具体产品：红色
+class Red : public Color {
+public:
+	void apply() const override {
+		std::cout << "Applying red color" << std::endl;
+	}
+};
+
+// 具体产品：蓝色
+class Blue : public Color {
+public:
+	void apply() const override {
+		std::cout << "Applying blue color" << std::endl;
+	}
+};
+
+// 产品接口族：形状
+class Shape {
+public:
+	virtual ~Shape() = default;
+	virtual void draw() const = 0;
+};
+
+// 具体产品：圆形
+class Circle : public Shape {
+public:
+	void draw() const override {
+		std::cout << "Drawing a circle" << std::endl;
+	}
+};
+
+// 具体产品：正方形
+class Square : public Shape {
+public:
+	void draw() const override {
+		std::cout << "Drawing a square" << std::endl;
+	}
+};
+
+// 抽象工厂接口
+class AbstractFactory {
+public:
+	virtual ~AbstractFactory() = default;
+	virtual std::unique_ptr<Color> createColor() const = 0;
+	virtual std::unique_ptr<Shape> createShape() const = 0;
+};
+
+// 具体工厂：红色与圆形
+class RedCircleFactory : public AbstractFactory {
+public:
+	std::unique_ptr<Color> createColor() const override {
+		return std::make_unique<Red>();
+	}
+
+	std::unique_ptr<Shape> createShape() const override {
+		return std::make_unique<Circle>();
+	}
+};
+
+// 具体工厂：蓝色与正方形
+class BlueSquareFactory : public AbstractFactory {
+public:
+	std::unique_ptr<Color> createColor() const override {
+		return std::make_unique<Blue>();
+	}
+
+	std::unique_ptr<Shape> createShape() const override {
+		return std::make_unique<Square>();
+	}
+};
+
+void demo() {
+	RedCircleFactory redCircleFactory;
+	auto red = redCircleFactory.createColor();
+	red->apply();
+	auto circle = redCircleFactory.createShape();
+	circle->draw();
+
+	BlueSquareFactory blueSquareFactory;
+	auto blue = blueSquareFactory.createColor();
+	blue->apply();
+	auto square = blueSquareFactory.createShape();
+	square->draw();
+}
+```
 ## 单例模式(懒汉式、饿汉式)
 一个类只创建一个唯一的对象，即一次创建多次使用
 
