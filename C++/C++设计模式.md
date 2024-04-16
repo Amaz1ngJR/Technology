@@ -221,48 +221,44 @@ void demo() {
 ```c++
 class Singleton {
 public:
-    static Singleton& getInstance() {
-        if (instance_ == nullptr) {
-            instance_ = new Singleton();
-        }
-        return *instance_;
-    }
-
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
-
+	static Singleton& getInstance() {
+		if (instance_ == nullptr) 
+			instance_ = new Singleton();
+		return *instance_;
+	}
+	//移除拷贝构造和拷贝赋值
+	Singleton(const Singleton&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
 private:
-    Singleton() = default;
-    ~Singleton() = default;
-
-    static Singleton* instance_;
+	Singleton() = default;
+	~Singleton() = default;
+	static Singleton* instance_;//静态成员 类内声明
 };
-
-Singleton* Singleton::instance_ = nullptr;
+Singleton* Singleton::instance_ = nullptr;//静态成员 类外初始化
 ```
 双检锁/双重校验锁（DCL，线程安全）
 ```c++
+#include <mutex>
 class Singleton {
 public:
-    static Singleton& getInstance() {
-        if (instance_ == nullptr) {
-            std::lock_guard<std::mutex> lock(mutex_);
-            if (instance_ == nullptr) {
-                instance_ = new Singleton();
-            }
-        }
-        return *instance_;
-    }
+	static Singleton& getInstance() {
+		if (instance_ == nullptr) {
+			std::lock_guard<std::mutex> lock(mutex_);
+			if (instance_ == nullptr) 
+				instance_ = new Singleton();
+		}
+		return *instance_;
+	}
 
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
+	Singleton(const Singleton&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
 
 private:
-    Singleton() = default;
-    ~Singleton() = default;
+	Singleton() = default;
+	~Singleton() = default;
 
-    static Singleton* instance_;
-    static std::mutex mutex_;
+	static Singleton* instance_;
+	static std::mutex mutex_;
 };
 
 Singleton* Singleton::instance_ = nullptr;
@@ -271,72 +267,51 @@ std::mutex Singleton::mutex_;
 C++11以后的版本
 ```c++
 #include <mutex>
-#include <iostream>
 
 class Singleton {
 public:
-    static Singleton& getInstance() {
-        std::call_once(initInstanceFlag_, &Singleton::createInstance);
-        return *instance_;
-    }
-
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
-
+	static Singleton& getInstance() {
+		std::call_once(initInstanceFlag_, &Singleton::createInstance);
+		return *instance_;
+	}
+	Singleton(const Singleton&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
 private:
-    Singleton() = default;
-
-    ~Singleton() = default;
-
-    static void createInstance() {
-        instance_.reset(new Singleton());
-    }
-
-    static std::unique_ptr<Singleton> instance_;
-    static std::once_flag initInstanceFlag_;
+	Singleton() = default;
+	~Singleton() = default;
+	static void createInstance() {
+		instance_.reset(new Singleton());
+	}
+	static std::unique_ptr<Singleton> instance_;
+	static std::once_flag initInstanceFlag_;
 };
 
 std::unique_ptr<Singleton> Singleton::instance_{};
 std::once_flag Singleton::initInstanceFlag_{};
-
-int main() {
-    auto& singleton1 = Singleton::getInstance();
-    auto& singleton2 = Singleton::getInstance();
-
-    // 假设 Singleton 类有一个输出标识的方法
-    singleton1.identify();
-    singleton2.identify();
-
-    return 0;
-}
 ```
 利用静态局部变量的初始化来保证线程安全的版本
 ```c++
 class Singleton {
 public:
-    static Singleton& getInstance() {
-        static Singleton instance;
-        return instance;
-    }
-
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
+	static Singleton& getInstance() {
+		static Singleton instance;
+		return instance;
+	}
+	Singleton(const Singleton&) = delete;
+	Singleton& operator=(const Singleton&) = delete;
 
 private:
-    Singleton() = default;
-
-    ~Singleton() = default;
+	Singleton() = default;
+	~Singleton() = default;
 };
 
-int main() {
-    auto& singleton1 = Singleton::getInstance();
-    auto& singleton2 = Singleton::getInstance();
+void demo() {
+	auto& singleton1 = Singleton::getInstance();
+	auto& singleton2 = Singleton::getInstance();
 
-    // 假设 Singleton 类有一个输出标识的方法
-    singleton1.identify();
-    singleton2.identify();
-
-    return 0;
+	// 假设 Singleton 类有一个输出标识的方法
+	singleton1.identify();
+	singleton2.identify();
 }
 ```
 # 结构型模式
