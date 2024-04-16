@@ -330,4 +330,90 @@ void demo() {
 2.如果设计不仔细，可能会成为一个庞大和复杂的类，难以维护
 ```
 # 行为型模式
-## 
+## 观察者模式
+定义对象间一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新
+
+优点
+```
+1.松散耦合：观察者模式提供了一种松散耦合的设计，使得当一个对象的状态发生变化时，它不需要知道其他对象是如何使用这些信息的。是的系统更容易扩展和维护
+2.动态关联：观察者模式允许在运行时动态地添加或删除观察者，而无需修改主题或其他观察者的代码
+3.抽象解耦：由于主题和观察者之间仅通过抽象接口进行通信，因此他们之间的耦合是抽象的，而不是具体的
+```
+缺点
+```
+1.可能导致意外的更新，如果一个观察者在接收到通知后执行了一些操作，这些操作又导致了主题状态的变化，那么就可能会导致意外的更新
+2.可能导致性能问题，如果有大量的观察者需要更新，那么通知所有观察者可能会导致性能问题
+3.可能增加复杂性，如果没有正确实现，观察者模式可能会增加系统的复杂性
+```
+```c++
+// 观察者接口
+class Observer {
+public:
+	virtual ~Observer() = default;
+	virtual void update(const std::string& message) = 0;
+};
+
+// 具体观察者A
+class ObserverA : public Observer {
+public:
+	void update(const std::string& message) override {
+		std::cout << "Observer A received message: " << message << std::endl;
+	}
+};
+
+// 具体观察者B
+class ObserverB : public Observer {
+public:
+	void update(const std::string& message) override {
+		std::cout << "Observer B received message: " << message << std::endl;
+	}
+};
+
+// 主题接口
+class Subject {
+public:
+	virtual ~Subject() = default;
+
+	void attach(Observer* observer) {
+		observers_.push_back(observer);
+	}
+
+	void detach(Observer* observer) {
+		observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end());
+	}
+
+	virtual void notifyObservers(const std::string& message) = 0;
+
+protected:
+	std::vector<Observer*> observers_;
+};
+
+// 具体主题
+class ConcreteSubject : public Subject {
+public:
+	void changeState(const std::string& newState) {
+		state_ = newState;
+		notifyObservers(state_);
+	}
+
+	void notifyObservers(const std::string& message) override {
+		for (auto observer : observers_) {
+			observer->update(message);
+		}
+	}
+
+private:
+	std::string state_;
+};
+
+void demo() {
+	ConcreteSubject subject;
+	ObserverA observerA;
+	ObserverB observerB;
+
+	subject.attach(&observerA);
+	subject.attach(&observerB);
+
+	subject.changeState("New state");
+}
+```
