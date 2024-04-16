@@ -335,7 +335,7 @@ void demo() {
 
 优点
 ```
-1.松散耦合：观察者模式提供了一种松散耦合的设计，使得当一个对象的状态发生变化时，它不需要知道其他对象是如何使用这些信息的。是的系统更容易扩展和维护
+1.松散耦合：观察者模式提供了一种松散耦合的设计，使得当一个对象的状态发生变化时，它不需要知道其他对象是如何使用这些信息的。使得系统更容易扩展和维护
 2.动态关联：观察者模式允许在运行时动态地添加或删除观察者，而无需修改主题或其他观察者的代码
 3.抽象解耦：由于主题和观察者之间仅通过抽象接口进行通信，因此他们之间的耦合是抽象的，而不是具体的
 ```
@@ -352,7 +352,6 @@ public:
 	virtual ~Observer() = default;
 	virtual void update(const std::string& message) = 0;
 };
-
 // 具体观察者A
 class ObserverA : public Observer {
 public:
@@ -360,7 +359,6 @@ public:
 		std::cout << "Observer A received message: " << message << std::endl;
 	}
 };
-
 // 具体观察者B
 class ObserverB : public Observer {
 public:
@@ -368,7 +366,6 @@ public:
 		std::cout << "Observer B received message: " << message << std::endl;
 	}
 };
-
 // 主题接口
 class Subject {
 public:
@@ -387,7 +384,6 @@ public:
 protected:
 	std::vector<Observer*> observers_;
 };
-
 // 具体主题
 class ConcreteSubject : public Subject {
 public:
@@ -405,7 +401,6 @@ public:
 private:
 	std::string state_;
 };
-
 void demo() {
 	ConcreteSubject subject;
 	ObserverA observerA;
