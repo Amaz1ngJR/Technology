@@ -67,8 +67,7 @@ TCP网络编程
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/78bb5008-527f-43bf-980e-ef4ab2fb93b5)
 UDP网络编程 
 
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/c61cedcc-c02f-4b1c-9fed-bcdc9000c9be)
-
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/9e56df27-d6f8-47ec-9399-650a386a5757)
 ```
 服务器段除了一个套接字用于和客户端通信外 还有一个套接字用于监听 故整个客户端/服务器有三个套接字
 ```
