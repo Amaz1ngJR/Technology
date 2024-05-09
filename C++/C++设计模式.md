@@ -252,7 +252,7 @@ public:
 	Singleton(const Singleton&) = delete;
 	Singleton& operator=(const Singleton&) = delete;
 private:
-	Singleton() = default;
+	Singleton() = default;//设为私有只能通过get_sig()创建类对象
 	~Singleton() = default;
 	static Singleton* instance_;//静态成员 类内声明
 };
