@@ -45,8 +45,10 @@ public:
 	}
 };
 void demo() {
-	Person p;//实例化对象p
+	Person p;//在栈上实例化对象p
+	Person* ptr = new Person();//在堆上创建对象
 	p.setName("Amaz1ng");
+	ptr->setName("Amaz1ng");
 	cout << p.m_name;
 }
 ```
@@ -188,11 +190,11 @@ C++编译器会对每个空对象（class Person{};）也分配一个字节1B空
 class Person {
 public:
 	//成员变量和成员函数分开存储
-	int m_a; //非静态成员变量 属于类的对象上
-	static int m_b; //静态成员变量 不属于类对象上
+	int m_a; //非静态成员变量 属于类的对象上 存在堆区或者栈区 取决于对象的创建区域
+	static int m_b; //静态成员变量 不属于类对象上 存放在静态存储区
 
-	void func1() {} //非静态成员函数 不属于类对象上
-	static void func2() {}//静态成员函数 不属于类对象上
+	void func1() {} //非静态成员函数 不属于类对象上 存储在代码区
+	static void func2() {}//静态成员函数 不属于类对象上 存储在代码区
 };
 ```
 
