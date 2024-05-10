@@ -1127,7 +1127,7 @@ void demo() {
 }
 ```
 ```c++
-//unordered_map
+//unordered_map动态扩容 默认采用std::hash作为哈希函数 使用链地址法解决哈希冲突
 struct PairHash {
 	template <class T1, class T2>
 	std::size_t operator () (const std::pair<T1, T2>& p) const {
