@@ -11,7 +11,10 @@ mac下
 ```zsh
 创建虚拟环境          /usr/bin/python3 -m venv evenv(环境名)
 进/出虚拟环境         source evenv(环境名)/bin/activate / deactivate
+
+adb forward tcp:19000 tcp:19000 
 ```
+
 # 镜像
 ```bash
 -i https://pypi.tuna.tsinghua.edu.cn/simple
