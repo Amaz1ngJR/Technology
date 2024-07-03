@@ -10,7 +10,7 @@ conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cud
 mac下
 ```zsh
 创建虚拟环境          /usr/bin/python3 -m venv evenv(环境名)
-进/出虚拟环境         source venv/bin/activate / deactivate
+进/出虚拟环境         source evenv(环境名)/bin/activate / deactivate
 ```
 # 镜像
 ```bash
