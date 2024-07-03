@@ -7,6 +7,11 @@
 复制虚拟环境      conda create --name new_name --clone old_name
 conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cuda=11.7 -c pytorch -c nvidia
 ```
+mac下
+```zsh
+创建虚拟环境          /usr/bin/python3 -m venv evenv(环境名)
+进/出虚拟环境         source venv/bin/activate / deactivate
+```
 # 镜像
 ```bash
 -i https://pypi.tuna.tsinghua.edu.cn/simple
