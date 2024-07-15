@@ -330,7 +330,7 @@ public:
 
 int main() {
     A a;
-    std::cout << a.drawBody << " " << a.m_a << " " << a.m_b << " 1 " << a.s << std::endl;
+    std::cout << a.drawBody << " " << a.m_a << " " << a.m_b << " " << a.s << std::endl;
     B b;
     std::cout << b.drawBody << " " << b.m_a << " " << b.m_b << " " << b.s << std::endl;
 #define PRINT(type, var, value) std::cout << #type " " << #var << " = " << value << std::endl;
