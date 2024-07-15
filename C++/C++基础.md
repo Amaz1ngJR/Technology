@@ -328,8 +328,7 @@ public:
 };
 #undef _INIT_
 
-int main()
-{
+int main() {
     A a;
     std::cout << a.drawBody << " " << a.m_a << " " << a.m_b << " 1 " << a.s << std::endl;
     B b;
