@@ -302,7 +302,44 @@ private:
 	int a[Number];
 };
 ```
+宏的独特用处
+```cpp
+#include <iostream>
+#include <string>
 
+class A {//当增删改查一个类下的成员变量的时候，防止有些变量遗漏， 方面后续管理
+public:
+    bool drawBody = true;
+    int m_a = 10;
+    float m_b = 3.14;
+    std::string s = "hello";
+};
+//定义一个宏管理类中成员变量
+#define DEBUG_FUNC(X)       \
+    X(bool, drawBody, true) \
+    X(int, m_a, 10)         \
+    X(float, m_b, 3.14)     \
+    X(std::string, s, "hello")
+//定义宏给成员变量赋值cpp11
+#define _INIT_(type, var, value) type var = value;
+class B {
+public:
+    DEBUG_FUNC(_INIT_)
+};
+#undef _INIT_
+
+int main()
+{
+    A a;
+    std::cout << a.drawBody << " " << a.m_a << " " << a.m_b << " 1 " << a.s << std::endl;
+    B b;
+    std::cout << b.drawBody << " " << b.m_a << " " << b.m_b << " " << b.s << std::endl;
+#define PRINT(type, var, value) std::cout << #type " " << #var << " = " << value << std::endl;
+    DEBUG_FUNC(PRINT)
+#undef PRINT
+    return 0;
+}
+```
 #### static
 
 **static** 存储类指示编译器在程序的生命周期内保持局部变量的存在 而不需要在每次它进入和离开作用域时进行创建和销毁 因此 使用 static 修饰局部变量可以在函数调用之间保持局部变量的值
