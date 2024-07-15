@@ -8,12 +8,7 @@ https://compiler-explorer.com/ 反汇编
 
 ```c++
 void demo() {
-	char number0 = '0';
-	char number9 = '9';
-	char a = 'a';
-	char z = 'z';
-	char A = 'A';
-	char Z = 'Z';
+	char number0 = '0', number9 = '9', a = 'a', z = 'z', A = 'A', Z = 'Z';
 	cout << "0= " << int(number0) << " 9= " << int(number9) << " a= " << int(a)
 		<< " z= " << int(z) << " A= " << int(A) << " Z= " << int(Z) << endl;
 }
