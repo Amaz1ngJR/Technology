@@ -25,20 +25,10 @@ void demo() { //#include <cctype> c语言#include<ctype.h>
 	for (char &c : str) {
 		c = std::tolower(c);//大写变小写
 		c = std::toupper(c);//小写变大写
+		//判断字符是否是数字或字母
+		if(isalnum(c)) std::cout << "是数字或数字" << std::endl;
 	}
 	std::cout << str << std::endl;
-}
-```
-判断字符是否是数字或字母
-```c++
-void demo() { //#include <cctype>
-	char myChar = 'A';
-
-	if (isalnum(myChar)) {
-		std::cout << myChar << " 是字母或数字" << std::endl;
-	} else {
-		std::cout << myChar << " 不是字母或数字" << std::endl;
-	}
 }
 ```
 转义字符
