@@ -26,7 +26,7 @@ void demo() { //#include <cctype> c语言#include<ctype.h>
 		c = std::tolower(c);//大写变小写
 		c = std::toupper(c);//小写变大写
 		//判断字符是否是数字或字母
-		if(isalnum(c)) std::cout << "是数字或数字" << std::endl;
+		if(isalnum(c)) std::cout << "是数字或字母" << std::endl;
 	}
 	std::cout << str << std::endl;
 }
