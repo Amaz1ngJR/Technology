@@ -5,7 +5,7 @@ mac下直接 brew install lua 运行：lua demo.lua
 |数据类型|描述|
 |----|-----|
 |nil	|这个最简单，只有值nil属于该类，表示一个无效值（在条件表达式中相当于false,nil 作比较时应该加上双引号）|
-|boolean	|包含两个值：false和true, false 和 nil 看作是 false，其他的都为 true，数字 0 也是 true,不等于是 ~= ,与或非对应and,or,not,返回结果不一定是ture或false,可以返回条件中的值，print(0 > 10 and "yes" or "no")|
+|boolean	|包含两个值：false和true, false 和 nil 看作是 false，其他的都为 true，数字 0 也是 true|
 |number|	表示双精度类型的实浮点数|
 |string	|字符串由一对双引号或单引号来表示,可以用[ [ 字符串内容 ] ] |
 |function|	由 C 或 Lua 编写的函数|
@@ -36,6 +36,13 @@ s3 = s1..s2   --字符串连接符号不是+而是..
 print(s)
 print(s3)
 print(#s3)  --返回字符串的长度
+```
+```lua
+s = string.char(0x30, 0x31, 0x32, 0x33)
+print(s)
+n = string.byte(s, 2)
+m = 0x31
+print(n, m)
 ```
 ## 类型转换
 ```lua
@@ -121,4 +128,41 @@ a = 1
 b = 2
 print(_G["a"], _G.b)
 print(_G.table.insert)
+```
+# 条件与分支
+不等于是 ~= ,与或非对应and,or,not,返回结果不一定是ture或false,可以返回条件中的值，
+```lua
+print(0 > 10 and "yes" or "no")
+
+if 0 then
+        print("0 is true")
+end
+
+if 1 > 10 then
+        print("1 > 10")
+elseif 1 < 10 then
+        print("1 < 10")
+else
+        print("no")
+end
+```
+for循环
+```lua
+for  i = 1, 10 do
+        print(i) --i仅在for循环中有意义
+end
+for  i = 1, 10, 2 do  --添加步长
+        if i == 5 then break end
+        i = 1 --这里修改i实际上说又创建了一个局部变量i，并不会修改循环中的i（循环中的i不可修改）
+        print(i) --i仅在for循环中有意义
+end
+```
+while/repeat循环
+```lua
+local n = 10
+while n > 1 do
+        if n == 5 then break end
+        print(n)
+        n = n - 1
+end
 ```
