@@ -980,19 +980,20 @@ void demo() {
 
 shared_ptr也可像普通指针那样，当指向一个类继承体系的基类对象时，也具有多态性质，如同使用裸指针管理基类对象和派生类对象那样。
 
-shared_ptr 不是绝对安全，如果程序中调用exit()退出，全局的shared_ptr可以自动释放，但局部的shared_ptr无法释放。
-
 shared_ptr 提供了支持数组的具体化版本。数组版本的shared_ptr ，重载了操作符[]，操作符[]返回的是引用，可以作为左值使用。
 
-shared_ptr的线程安全性:
+**共享指针的安全性问题**
+```
+shared_ptr 不是绝对安全，如果程序中调用exit()退出，全局的shared_ptr可以自动释放，但局部的shared_ptr无法释放。
 
 shared_ptr的引用计数本身是线程安全（引用计数是原子操作)。
 
-多个线程同时读同一个shared_ptr对象是线程安全的。
-如果是多个线程对同一个shared_ptr对象进行读和写，则需要加锁。
-多线程读写shared_ptr所指向的同一个对象，不管是相同的 shared_ptr对象，还是不同的shared_ptr对象，也需要加锁保护。如果unique_ptr能解决问题，就不要用shared_ptr。unique_ptr的效率更高，占用的资源更
-少。
+多个线程同时读同一个shared_ptr对象是线程安全的,如果是多个线程对同一个shared_ptr对象进行读和写，则需要加锁
+(c20之前则需要加锁，c20之后可以用原子智能指针std::atomic<std::shared_ptr>来解决此问题)
 
+多线程读写shared_ptr所指向的同一个对象，不管是相同的 shared_ptr对象，还是不同的shared_ptr对象，也需要加锁保护。
+如果unique_ptr能解决问题，就不要用shared_ptr。unique_ptr的效率更高，占用的资源更少。
+```
 ### **弱指针 weak_ptr
 
 ```c++
