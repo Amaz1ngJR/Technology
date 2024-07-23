@@ -196,7 +196,13 @@ while n > 1 do
 end
 ```
 # require多文件调用
-require运行指定文件，只运行一次，文件名不带拓展名，目录层用.分开
+require运行指定文件，只运行一次，文件名不带拓展名，目录层用.分开,从package.path中查找
 ```lua
-
+test.lua文件下：
+print("hello")
+return "done"
+lua.lua主文件下:
+local res = require("test")
+print(res)
 ```
+# 元表（面向对象）
