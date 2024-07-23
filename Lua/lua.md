@@ -198,11 +198,11 @@ end
 # require多文件调用
 require运行指定文件，只运行一次，文件名不带拓展名，目录层用.分开,从package.path中查找
 ```lua
-test.lua文件下：
+--test.lua文件下：
 print("hello")
 return "done"
-lua.lua主文件下:
-local res = require("test")
+--lua.lua主文件下:
+local res = require("test") --调用test.lua文件 获取返回值到res中
 print(res)
 ```
 # 元表（面向对象）
