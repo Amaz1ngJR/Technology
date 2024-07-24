@@ -206,3 +206,130 @@ local res = require("test") --调用test.lua文件 获取返回值到res中
 print(res)
 ```
 # 元表（面向对象）
+```lua
+t = {a = 1}
+mt = {
+    __add = function(t, v)
+        return t.a + v
+    end,
+}
+setmetatable(t, mt)
+--写成一行 
+t = setmetatable({a = 1}, {              
+    __add = function(t, v)
+        return t.a + v
+    end,
+}) -- 写成一行 
+print(t + 1)
+```
+## 元方法
+
+|元方法|描述｜
+|----|----------|
+|__add	|对应的运算符 '+'.|
+|__sub	|对应的运算符 '-'.|
+|__mul	|对应的运算符 '*'.|
+|__div	|对应的运算符 '/'.|
+|__mod	|对应的运算符 '%'.|
+|__pow  |次方|
+|__unm	|取反|
+|__idiv |向下取整|
+|__concat|连接 '..'.|
+|__eq	|对应的运算符 '=='.|
+|__lt	|对应的运算符 '<'.|
+|__le	|对应的运算符 '<='.|
+|__band|按位与 '&' |
+|__bor|按位或 '|' |
+|__bxor|按位异或'~'|
+|__bnot|按位非'!'|
+|__shl|左移|
+|__shr|右移|
+|_len|取长度'#'|
+**__index**
+
+索引table [ key ] 当table不是表或表table中不存在key关键字时触发，去元表(里面是表)里面找，或者返回元表(里面是函数)里的值
+```lua
+t = setmetatable({}, { 
+    __index = function(a)
+        return 123
+    end
+})
+t2 = setmetatable({}, { 
+    __index = {
+        abc = 123,
+        def = 456,
+    }
+})
+print(t[1])
+print(t2[1])
+print(t2['abc'])
+print(t2['def'])
+```
+Lua 查找一个表元素时的规则，其实就是如下 3 个步骤:
+
+1.在表中查找，如果找到，返回该元素，找不到则继续
+
+2.判断该表是否有元表，如果没有元表，返回 nil，有元表则继续
+
+3.判断元表有没有 __index 方法，如果 __index 方法为 nil，则返回 nil；如果 __index 方法是一个表，则重复 1、2、3；如果 __index 方法是一个函数，则返回该函数的返回值
+**__newindex**
+索引赋值table[key] = value,赋值时当table不是表或表table中不存在key触发
+```lua
+t = setmetatable({}, { 
+    __newindex = function(t, k, v)
+        rawset(t, k, v)
+    end
+})
+
+t['abc'] = 111
+print(t['abc'])
+```
+
+**面向对象**
+
+语法糖
+```lua
+t = {
+    a = 0,
+    add = function(tab, sum)
+        tab.a = tab.a + sum
+    end
+}
+t:add(10) -- t.add(t, 10)
+print(t['a'])
+```
+面向对象
+```lua
+bag = {}
+bagmt = {
+    put = function(t, item)
+        table.insert(t.items, item)
+    end,
+    take = function(t)
+        return table.remove(t.items, item)
+    end,
+    list = function(t)
+        return table.concat(t.items, ", ")
+    end,
+    clear = function(t)
+        t.items = {}
+    end
+}
+
+bagmt['__index'] = bagmt
+function bag.new() --构造函数
+    local t = {
+        items = {}
+    }
+    setmetatable(t, bagmt)
+    return t
+end
+
+local b = bag.new()
+b:put("apple")
+b:put("apple1")
+print(b:list())
+print(b:take())
+b:clear()
+print(b:list())
+```
