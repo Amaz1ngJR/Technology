@@ -284,7 +284,20 @@ t = setmetatable({}, {
 t['abc'] = 111
 print(t['abc'])
 ```
+**__call**
+将一个表作为函数调用时，Lua会查找该表是否定义了`__call`元方法。如果找到了`__call`元方法，Lua将调用该元方法，并将表自身作为第一个参数传递给元方法
+```lua
+local myTable = {}
 
+-- 定义__call元方法
+function myTable:__call(...)
+  print("表被调用了！")
+  print("传入的参数是:", ...)
+end
+
+-- 将表作为函数调用
+myTable("参数1", "参数2")
+```
 ## 面向对象
 
 语法糖
