@@ -207,7 +207,7 @@ int main()
         obj.m_s = "Hello World"
         print(obj.m_s)
         print(obj:My_Print("Hello Lua"))
-        obj.m_c = 404
+        obj.m_c = 404 -- const 不能修改，抛出错误   
         )lua"))
     {
         std::cerr << "Error executing Lua code: " << lua_tostring(L, -1) << std::endl;
