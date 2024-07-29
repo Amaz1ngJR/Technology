@@ -3,6 +3,7 @@
 #include <lua.hpp>
 #include "test.h"
 
+// ------------------  一个需要注册到lua虚拟机中的cpp类 --------------
 class MyTest
 {
 public:
@@ -34,6 +35,7 @@ public:
     }
 };
 
+// ------------------ 胶水代码 ------------------------
 struct MyTestWrapper
 { // 用于包装 MyTest 对象的 userdata 结构体
     MyTest *ptr;
@@ -193,7 +195,7 @@ int main()
     luaopen_MyTest(L); // 注册 MyTest 类
 
     // luaL_dofile(L, "lua.lua");
-
+    //--------- lua虚拟机中调用cpp--------
     if (luaL_dostring(L, R"lua(
         local obj = MyTest.new(10, 3.14, 5)
         local obj2 = MyTest.new()
