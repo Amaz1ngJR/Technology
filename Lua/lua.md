@@ -275,6 +275,7 @@ Lua 查找一个表元素时的规则，其实就是如下 3 个步骤:
 3.判断元表有没有 __index 方法，如果 __index 方法为 nil，则返回 nil；如果 __index 方法是一个表，则重复 1、2、3；如果 __index 方法是一个函数，则返回该函数的返回值
 
 **__newindex**
+
 索引赋值table[key] = value,赋值时当table不是表或表table中不存在key触发
 ```lua
 t = setmetatable({}, { 
@@ -287,6 +288,7 @@ t['abc'] = 111
 print(t['abc'])
 ```
 **__call**
+
 将一个表作为函数调用时，Lua会查找该表是否定义了`__call`元方法。如果找到了`__call`元方法，Lua将调用该元方法，并将表自身作为第一个参数传递给元方法
 ```lua
 local myTable = {}
