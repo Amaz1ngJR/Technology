@@ -276,7 +276,9 @@ Lua 查找一个表元素时的规则，其实就是如下 3 个步骤:
 
 **__newindex**
 
-索引赋值table[key] = value,赋值时当table不是表或表table中不存在key触发
+table[key] = value语句，赋值时当table不是表或表table中不存在key触发，先去检查table中有没有__newindex元方法，
+
+如果有，执行元方法。如果没有__newindex就直接添加属性key为value了
 ```lua
 t = setmetatable({}, { 
     __newindex = function(t, k, v)
@@ -286,6 +288,32 @@ t = setmetatable({}, {
 
 t['abc'] = 111
 print(t['abc'])
+```
+__newindex为方法
+```lua
+t = {}
+b = {} --元表
+b['__newindex'] = function()
+    print('调用了__newindex元方法')
+end
+
+setmetatable(t, b) --注释和解注释这行代码
+
+t.age = 20
+
+print(t.age)
+```
+__newindex为表
+```lua
+t = {}
+b = {} --元表
+c = {} --表
+b['__newindex'] = c
+setmetatable(t, b) 
+t.age = 20
+
+print(t.age)
+print(c.age)
 ```
 **__call**
 
@@ -315,38 +343,48 @@ t = {
 t:add(10) -- t.add(t, 10)
 print(t['a'])
 ```
-面向对象
+
+### 继承和多态的实现
 ```lua
-bag = {}
-bagmt = {
-    put = function(t, item)
-        table.insert(t.items, item)
-    end,
-    take = function(t)
-        return table.remove(t.items, item)
-    end,
-    list = function(t)
-        return table.concat(t.items, ", ")
-    end,
-    clear = function(t)
-        t.items = {}
+-- 父类 
+base = {
+    base_print = function(self, arg_str)
+        print(self.name..arg_str)
     end
 }
 
-bagmt['__index'] = bagmt
-function bag.new() --构造函数
-    local t = {
-        items = {}
-    }
-    setmetatable(t, bagmt)
-    return t
+function base:say_name()
+    --冒号 : 调用方法时，Lua 会自动将调用表达式左侧的对象作为第一个参数传递给方法
+    -- 方法的第一个参数通常被称为 self，代表调用该方法的对象 self 当参数为空的时候是一个隐式参数
+    print(self.name)
 end
 
-local b = bag.new()
-b:put("apple")
-b:put("apple1")
-print(b:list())
-print(b:take())
-b:clear()
-print(b:list())
+function base.say_age(object, arg_str)
+    --使用点 . 调用方法时，方法被视为一个普通的 Lua 函数，需要显式地传递所有参数，包括对象本身
+    print(arg_str..object.age)
+end
+
+-- 子类
+son = {}
+
+-- son.__index = base-- 设置元表索引 可以理解成son继承了base
+-- son['__index'] = base
+
+function son.new(Name,Age)
+    local obj = {}
+    -- setmetatable(obj,son)-- 设置元表son可以拿到son到继承base里的属性
+    setmetatable(obj,{__index = base})
+    obj.name = Name     --表中添加属性name
+    obj.age = Age       --表中添加属性age
+    return obj
+end
+
+local p = son.new('aaa',10)
+local p2 = son.new('bbb',20)
+p:say_name() --使用:调用方法默认self为p
+p.say_age(p,'年龄是') --使用.调用方法
+p:say_age('年龄是')  --使用：调用方法可以省略self
+p:base_print('展示多态')
+p2:base_print('展示多态')
 ```
+
