@@ -47,9 +47,8 @@ int MyTest_constructor(lua_State *L)
     int numArgs = lua_gettop(L); // 获取参数的数量以重载，但是对于参数类型顺序不同而发生的重载不能处理
     if (numArgs == 0)
     {
-        MyTest *obj = new MyTest();
         MyTestWrapper *w = (MyTestWrapper *)lua_newuserdata(L, sizeof(MyTestWrapper)); // 创建了一个新的 Lua 用户数据对象并返回，同时将对象推入栈顶
-        w->ptr = obj;
+        w->ptr = new MyTest();
         luaL_getmetatable(L, "MyTest"); // 从 Lua 状态机中获取名为 MyTest 的 metatable，成功会将它推入栈顶
         lua_setmetatable(L, -2);        // 将刚入栈顶栈顶元表设置为栈顶下第二个元素，即当前对象，的元表
     }
@@ -58,10 +57,9 @@ int MyTest_constructor(lua_State *L)
         int a = luaL_checkinteger(L, 1);
         float b = luaL_checknumber(L, 2);
         int c = luaL_checkinteger(L, 3);
-
-        MyTest *obj = new MyTest(a, b, c);
+        
         MyTestWrapper *w = (MyTestWrapper *)lua_newuserdata(L, sizeof(MyTestWrapper));
-        w->ptr = obj;
+        w->ptr = new MyTest(a, b, c);
         luaL_getmetatable(L, "MyTest");
         lua_setmetatable(L, -2);
     }
