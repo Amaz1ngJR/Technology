@@ -123,7 +123,7 @@ ar rcs libmylib.a file1.o file2.o
 链接器：     工作于链接阶段 工作时需要-l和-L
 动态链接器： 工作于程序运行阶段 工作时需要提供动态库所在目录位置
 解决：需要将动态库加到环境变量LD_LIBRARY_PATH中并导出(参考环境变量部分)：
-1.export LD_LIBRARY_PATH=./lib(临时设置)  
+1.export LD_LIBRARY_PATH=./lib(临时设置)  ps(export LD_PRELOAD=...用来hook)
 2.vi ~/.bashrc ->添加export LD_LIBRARY_PATH=./lib ->重启终端或者..bashrc或者source .bashrc(永久设置)
 3.添加绝对路径到sudo vi /etc/ld.so.conf,并执行sudo ldconfig(永久设置)
 4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
