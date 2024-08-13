@@ -75,6 +75,14 @@ run argv[1] argv[2]       //调试时命令行传参
 (gdb)i watch            //显示观察点
 (gdb)q/quit             //退出gdb
 ```
+分离调试信息
+```
+objcopy --only-keep-debug libmymalloc.so libmymalloc.so.debug
+```
+关联调试信息
+```
+objcopy --add-gnu-debuglink=libmymalloc.so.debug libmymalloc.so
+```
 ### 对父子进程的gdb调试
 使用gdb调试的时候 gdb只能跟踪一个进程 可以在fork函数调用之前 通过指令设置gdb调试工具跟踪父进程(默认)或子进程
 ```bash
