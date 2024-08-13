@@ -41,7 +41,7 @@ G++是GCC的C++编译器前端
 ```bash
 gdb hello
 (gdb)l/list                 //显示代码
-(gdb)b/break 3            //在行号为3处设置断点 也可根据函数名
+(gdb)b/break 3            //在行号为3处设置断点 也可根据函数名 b other.cpp:22 (对other文件的第22行打断点)
 (gdb)c/continue           //继续执行断点后续指令
 (gdb)r/run                //运行程序 如果出现段错误 会报出
 run argv[1] argv[2]       //调试时命令行传参
