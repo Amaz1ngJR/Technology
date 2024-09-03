@@ -68,3 +68,36 @@ git remote rm origin
 ```bash
 git push -u origin_name main
 ```
+## Command line instructions
+Git global setup
+```
+git config --global user.name "batmanyan"
+git config --global user.email "batmanyan@tencent.com"
+```
+Create a new repository
+```
+git clone git@git.woa.com:batmanyan/Http_Debug_Client.git
+cd Http_Debug_Client
+git switch --create master
+touch README.md
+git add README.md
+git commit -m "add README"
+git push --set-upstream origin master
+```
+Push existing folder.
+```
+cd existing_folder
+git init --initial-branch=master
+git remote add origin git@git.woa.com:batmanyan/Http_Debug_Client.git
+git add .
+git commit -m "Initial commit"
+git push --set-upstream origin master
+```
+Push existing Git repository.
+```
+cd existing_folder
+git remote rename origin old-origin
+git remote add origin git@git.woa.com:batmanyan/Http_Debug_Client.git
+git push --set-upstream origin --all
+git push --set-upstream origin --tags
+```
