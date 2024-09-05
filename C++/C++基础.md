@@ -2,6 +2,8 @@
 
 [反汇编](https://compiler-explorer.com/)
 
+[linux c 编程 一站式学习](https://www.bookstack.cn/read/linux-c/menu.md)
+
 # C++
 
 ## *字符
