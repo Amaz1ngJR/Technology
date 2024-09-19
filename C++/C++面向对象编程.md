@@ -380,6 +380,49 @@ public:
 	Empty() = default;//启用默认构造函数
 };
 ```
+**禁用在堆/栈上创建对象**
+```
+//禁用在堆上创建对象
+class NoHeap {
+public:
+	void* operator new(size_t) throw(std::bad_alloc);
+	void operator delete(void*) throw();
+};
+
+void* NoHeap::operator new(size_t size) {
+	// This function could throw an exception or perform some other action.
+	throw std::bad_alloc();
+}
+
+void NoHeap::operator delete(void*) throw() {
+	// Do nothing, or throw an exception if you want to prevent deletion too.
+}
+
+class NoHeap {
+private:
+	void* operator new(size_t) {}
+	void operator delete(void*) {}
+public:
+
+};
+//禁用在栈上创建对象
+class NoStack {
+private:
+	NoStack() {} // Private constructor to prevent stack allocation.
+	~NoStack() {}
+public:
+	static NoStack& getInstance(); // Singleton pattern for example.
+	void   destroy() {
+		cout << "destroy of CHeapOnly!" << endl;
+		delete   this;//调用保护的析构函数   
+	}
+};
+NoStack& NoStack::getInstance() {
+	static NoStack instance;
+	return instance;
+}
+```
+
 #### ***拷贝构造
 
 ##### 拷贝构造的调用时机
