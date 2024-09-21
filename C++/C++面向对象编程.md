@@ -381,7 +381,7 @@ public:
 };
 ```
 **禁用在堆/栈上创建对象**
-```
+```cpp
 //禁用在堆上创建对象
 class NoHeap {
 public:
