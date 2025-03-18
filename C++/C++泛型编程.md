@@ -1042,8 +1042,8 @@ void demo() {
 //优先队列所有操作
 void demo() {
 	vector<int>nums;
-	priority_queue<int> q, q1;//默认大根堆底层容器为vector
-	priority_queue<int, vector<int>, std::greater<int>> q2;//改成小根堆
+	priority_queue<int> q, q1;//默认大根堆底层容器为vector top是最大的
+	priority_queue<int, vector<int>, std::greater<int>> q2;//改成小根堆 top是最小的
 	priority_queue<int, std::deque<int>>q3;//底层容器改为双端数组
 	priority_queue<int>q4(nums.begin(), nums.end());//从容器中构造优先队列
 	q1.swap(q);
