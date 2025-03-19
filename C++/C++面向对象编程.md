@@ -1275,6 +1275,55 @@ Cat::speak this adjustor: 0
 
 当父类的指针或者引用指向子类对象的时候Animal &animal = cat;，发生多态
 
+虚函数表和虚基类表是两种表，下面一个例子既涉及到虚继承由涉及到虚函数
+```c++
+class Animal {
+public:
+	int m_age;
+	virtual void speek() {
+
+	}
+	void test() {
+
+	}
+};
+class Sheep1 :public Animal {};
+class Tuo1 :public Animal {};
+class SheepTuo1 :public Sheep1, public Tuo1 {};
+//虚继承
+class Sheep2 :virtual public Animal {};
+class Tuo2 :virtual public Animal {};
+class SheepTuo2 :public Sheep2, public Tuo2 {};
+```
+```c++
+class SheepTuo2 size(16):
+        +---
+ 0      | +--- (base class Sheep2)
+ 0      | | {vbptr}
+        | +---
+ 4      | +--- (base class Tuo2)
+ 4      | | {vbptr}
+        | +---
+        +---
+        +--- (virtual base Animal)
+ 8      | {vfptr}
+12      | m_age
+        +---
+
+SheepTuo2::$vbtable@Sheep2@:
+ 0      | 0
+ 1      | 8 (SheepTuo2d(Sheep2+0)Animal)
+
+SheepTuo2::$vbtable@Tuo2@:
+ 0      | 0
+ 1      | 4 (SheepTuo2d(Tuo2+0)Animal)
+
+SheepTuo2::$vftable@:
+        | -8
+ 0      | &Animal::speek
+vbi:       class  offset o.vbptr  o.vbte fVtorDisp
+          Animal       8       0       4 0
+```
 #### ***override与final C++11
 
 使用override来说明派生类中的虚函数。让编译器帮我们检测这个被override标记的函数有没有覆盖已存在的虚函数。防止程序员在重写虚函数的时候，不小心写错了形参列表，导致没有覆盖掉虚函数；将虚函数标记为final后，不允许这个类的后续的直接或者间接的派生类再覆盖这个虚函数。
