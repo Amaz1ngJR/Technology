@@ -1253,6 +1253,7 @@ void demo() {
 ```
 
 ## *内存管理
+![image](https://github.com/user-attachments/assets/b8f13d5b-c657-48c0-a44d-04cd0bab95a4)
 
 ### **内存四区
 
