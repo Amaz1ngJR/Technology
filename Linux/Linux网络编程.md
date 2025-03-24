@@ -63,6 +63,7 @@ bind(fd, (struct  sockaddr*)&addr, size);//成功返回0 失败-1
 ```
 socket模型创建流程图
 TCP网络编程
+![image](https://github.com/user-attachments/assets/3e0a5c04-e9bc-4d62-8102-66e229986d33)
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/78bb5008-527f-43bf-980e-ef4ab2fb93b5)
 UDP网络编程 
