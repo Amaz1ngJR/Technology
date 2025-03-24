@@ -62,10 +62,11 @@ size = sizeof(addr)
 bind(fd, (struct  sockaddr*)&addr, size);//成功返回0 失败-1
 ```
 socket模型创建流程图
+
 TCP网络编程
-![image](https://github.com/user-attachments/assets/3e0a5c04-e9bc-4d62-8102-66e229986d33)
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/78bb5008-527f-43bf-980e-ef4ab2fb93b5)
+
 UDP网络编程 
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/9e56df27-d6f8-47ec-9399-650a386a5757)
@@ -85,6 +86,9 @@ socket();//产生一个套接字C 得到一个fd2句柄
 connect();//绑定C的IP和端口并与另一个套接字连接
 ```
 ## 网络socket
+
+![image](https://github.com/user-attachments/assets/75211e78-74d3-45af-bcf4-ebd456b5796a)
+
 函数原型
 ```c++
 #include <sys/types.h> //包含在#include <unistd.h>
