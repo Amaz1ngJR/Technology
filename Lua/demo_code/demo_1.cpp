@@ -226,7 +226,7 @@ int main() {
     // 打开 Lua 基础库
     sol_state.open_libraries(sol::lib::base);
 
-    // 注册 MyTest 类到 Lua
+    // 胶水代码
     sol::usertype<MyTest> usertype_mytest = sol_state.new_usertype<MyTest>(
         "MyTest",
         // 注册构造函数！！！
