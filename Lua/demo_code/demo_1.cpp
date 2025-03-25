@@ -225,7 +225,6 @@ int main() {
     sol::state sol_state;
     // 打开 Lua 基础库
     sol_state.open_libraries(sol::lib::base);
-
     // 胶水代码
     sol::usertype<MyTest> usertype_mytest = sol_state.new_usertype<MyTest>(
         "MyTest",
@@ -242,8 +241,6 @@ int main() {
         "My_Print", &MyTest::My_Print,
         "getA", &MyTest::getA
     );
-
-
     // 定义 Lua 脚本
     const char* lua_script = R"lua(
         local obj = MyTest.new(10, 3.14, 5) -- 调用带参数的构造函数
