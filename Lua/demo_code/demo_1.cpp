@@ -185,6 +185,7 @@ int luaopen_MyTest(lua_State *L)
 
     return 1;
 }
+
 int main()
 {
     lua_State *L = luaL_newstate(); // 创建 Lua 状态机
@@ -215,5 +216,35 @@ int main()
     }
 
     lua_close(L); // 关闭 Lua 状态机
+    return 0;
+}
+
+//---------------使用sol2将c++代码注册到lua中
+int main() {
+     // 创建 sol 状态
+    sol::state sol_state;
+    // 打开 Lua 基础库
+    sol_state.open_libraries(sol::lib::base);
+
+    // 注册 MyTest 类到 Lua
+    sol::usertype<MyTest> usertype_mytest = sol_state.new_usertype<MyTest>(
+        "MyTest",
+        // 注册构造函数！！！
+        sol::constructors<MyTest(), MyTest(int, float, int)>(),
+        // 注册成员变量
+        "m_a", &MyTest::m_a,
+        "m_b", &MyTest::m_b,
+        "m_c", &MyTest::m_c,
+        "m_s", &MyTest::m_s,
+        // 注册静态成员变量
+        "m_d", &MyTest::m_d,
+        // 注册成员函数
+        "My_Print", &MyTest::My_Print,
+        "getA", &MyTest::getA
+    );
+
+    // 加载并执行 Lua 脚本文件
+    sol_state.script_file("../a.lua");
+
     return 0;
 }
