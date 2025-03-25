@@ -243,8 +243,26 @@ int main() {
         "getA", &MyTest::getA
     );
 
+
+    // 定义 Lua 脚本
+    const char* lua_script = R"lua(
+        local obj = MyTest.new(10, 3.14, 5) -- 调用带参数的构造函数
+        local obj2 = MyTest.new()           -- 调用无参构造函数
+        print("obj:getA():", obj:getA())    -- 调用成员函数
+        print("obj.m_b:", obj.m_b)          -- 访问成员变量
+        print("obj.m_c:", obj.m_c)          -- 访问常量成员变量
+        print("obj2.m_c:", obj2.m_c)        -- 访问另一个对象的常量成员变量
+        obj.m_a = 100                       -- 修改成员变量
+        print("obj.m_a after modification:", obj.m_a)
+        obj.m_s = "Hello World"             -- 修改字符串成员变量
+        print("obj.m_s:", obj.m_s)
+        print("obj:My_Print('Hello Lua'):", obj:My_Print("Hello Lua")) -- 调用成员函数并打印返回值
+    
+        obj.m_c = 404 -- 尝试修改常量成员变量，会抛出错误
+    )lua";
     // 加载并执行 Lua 脚本文件
-    sol_state.script_file("../a.lua");
+    //sol_state.script_file("../a.lua");
+    sol_state.script(lua_script);
 
     return 0;
 }
