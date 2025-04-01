@@ -1249,10 +1249,14 @@ std::function是C++标准库中的一个类模板，用于包装可以调用的�
 
 ```c++
 void demo() {
-	std::function<int(int, int)>dfs =
+	std::function<int(int, int)> dfs =
 		[&](int a, int b)->int {
-		dfs(a-1, b-2);//递归调用dfs
+		dfs(a - 1, b - 2);//递归调用dfs
 	};
+	//function有额外的堆分配 刷题时有时候会导致超时，可以改用
+	auto dfs = [&](this auto&& dfs, int i, int j)->int {
+		dfs(a - 1, b - 1);//递归调用
+	} 
 }
 ```
 
