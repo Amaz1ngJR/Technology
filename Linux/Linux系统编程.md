@@ -1673,7 +1673,6 @@ int main(int argc, char* argv[]) {
 	if(ret)sys_err(ret);
 }
 ```
-
 ### 线程和进程控制原语对比
 |     |   线程控制原语    |  进程控制原语     |
 | --- | ------------------ | --------------- |
@@ -1857,7 +1856,7 @@ int pthread_cond_signal(pthread_cond_t *cond);//条件满足后 通知阻塞在�
 int pthread_cond_broadcast(pthread_cond_t *cond);//条件满足后 通知阻塞在该条件变量cond的所有线程
 int pthread_cond_destroy(pthread_cond_t *cond);//销毁信号量
 ```
-条件变量的生产者多消费者模型
+#### 条件变量的生产者多消费者模型
 ```c++
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//定义初始化一个互斥锁
 pthread_cond_t has_data = PTHREAD_COND_INITIALIZER;//定义初始化一个条件变量
@@ -1930,7 +1929,7 @@ int sem_trywait(sem_t *sem);
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
 int sem_post(sem_t *sem);//先++判断信号量是否小于0 小于0则阻塞
 ```
-信号量实现生产者消费者
+#### 信号量实现生产者消费者
 ```c++
 const int NUM = 5;
 int queue[NUM];//全局数组实现环形队列
@@ -1979,5 +1978,64 @@ int main(){
 	sem_destroy(&product_number);
 
 	return 0;
+}
+```
+### 多线程同步示例
+```c++
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+#define NUM_THREADS 3
+
+int current = 1; // 当前应该打印的数字
+pthread_mutex_t mutex;
+pthread_cond_t cond;
+
+void* print_num(void* arg) {
+    int thread_id = *(int*)arg;
+
+    pthread_mutex_lock(&mutex);
+    while (current != thread_id) {
+        pthread_cond_wait(&cond, &mutex); // 等待直到轮到该线程打印
+    }
+    
+    // 打印当前线程对应的数字
+    printf("%d\n", thread_id);
+
+    // 更新current值并通知其他线程
+    current = (current % NUM_THREADS) + 1;
+    pthread_cond_broadcast(&cond); // 唤醒所有等待的线程
+    
+    pthread_mutex_unlock(&mutex);
+    return NULL;
+}
+
+int main() {
+    pthread_t threads[NUM_THREADS];
+    int ids[NUM_THREADS] = {1, 2, 3};
+
+    // 初始化互斥锁和条件变量
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&cond, NULL);
+
+    // 创建线程
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        if (pthread_create(&threads[i], NULL, print_num, (void*)&ids[i])) {
+            perror("Thread creation failed");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // 等待所有线程完成
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // 销毁互斥锁和条件变量
+    pthread_mutex_destroy(&mutex);
+    pthread_cond_destroy(&cond);
+
+    return 0;
 }
 ```
