@@ -1016,6 +1016,7 @@ weak_ptr没有重->和*操作符，不能直接访问资源。
 4) reset();//将当前weak_ptr指针置为空
 5) swap();//交换。
 ```
+![image](https://github.com/user-attachments/assets/f9b15ed8-eb00-44dc-bb7a-b8fff11ce62e)
 ### 智能指针与裸指针的使用场景
 智能指针有着很多优点，比如能够自动释放资源，避免内存泄漏；异常安全（即使发生异常，资源也能正确释放）
 
