@@ -1000,7 +1000,43 @@ shared_ptr的引用计数本身是线程安全（引用计数是原子操作)。
 如果unique_ptr能解决问题，就不要用shared_ptr。unique_ptr的效率更高，占用的资源更少。
 ```
 ### **弱指针 weak_ptr
+用来解决共享指针循环引用的问题
+```c++
+#include <iostream>
+#include <memory>
 
+class B;
+
+class A {
+public:
+    std::shared_ptr<B> b_ptr;
+    ~A() { std::cout << "A destroyed\n"; }
+};
+
+class B {
+public:
+    std::shared_ptr<A> a_ptr;
+    ~B() { std::cout << "B destroyed\n"; }
+};
+
+void createCycle() {
+    auto a = std::make_shared<A>();
+    auto b = std::make_shared<B>();
+
+    // 创建循环引用
+    a->b_ptr = b;
+    b->a_ptr = a;
+
+    std::cout << "Still in scope, a.use_count(): " << a.use_count() << ", b.use_count(): " << b.use_count() << "\n";
+}
+
+int main() {
+    createCycle();
+    // 在createCycle函数结束后，虽然'a'和'b'超出了作用域，
+    // 但由于循环引用的存在，它们的引用计数都不会归零，因此不会被销毁。
+    std::cout << "hello world\n";
+}
+```
 ```c++
 weak_ptr没有重->和*操作符，不能直接访问资源。
 有以下成员函数:
