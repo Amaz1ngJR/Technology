@@ -11,3 +11,14 @@
 【STUN服务器上用来取外网地址的】
 
 ![image](https://github.com/user-attachments/assets/9feed772-0efd-42d5-ad66-b8282828c855)
+
+## WebRTC多对多通信
+
+### Mesh
+![image](https://github.com/user-attachments/assets/7f6a0efb-2ad9-4cb6-bfa4-4ea2af8b76bc)
+
+### MCU
+![image](https://github.com/user-attachments/assets/424a96cb-41a1-4b9d-bceb-90932a00fb79)
+
+### SFU
+![Uploading image.png…]()
