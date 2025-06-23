@@ -74,6 +74,16 @@ Git global setup
 git config --global user.name "batmanyan"
 git config --global user.email "batmanyan@tencent.com"
 ```
+添加代理
+```
+//http || https
+git config --global http.proxy （127.0.0.1:7890 换成自己的ip/端口号）
+git config --global https.proxy 127.0.0.1:7890
+
+//sock5代理
+git config --global http.proxy socks5 127.0.0.1:7891
+git config --global https.proxy socks5 127.0.0.1:7891
+```
 Create a new repository
 ```
 git clone git@git.woa.com:batmanyan/Http_Debug_Client.git
