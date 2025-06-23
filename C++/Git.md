@@ -74,30 +74,6 @@ Git global setup
 git config --global user.name "batmanyan"
 git config --global user.email "batmanyan@tencent.com"
 ```
-添加代理
-```
-//http || https
-git config --global http.proxy （127.0.0.1:7890 换成自己的ip/端口号）
-git config --global https.proxy 127.0.0.1:7890
-
-//sock5代理
-git config --global http.proxy socks5 127.0.0.1:7891
-git config --global https.proxy socks5 127.0.0.1:7891
-```
-查看代理
-```
-git config --global --get http.proxy
-git config --global --get https.proxy
-
-git config --global --get-all https.proxy
-```
-取消代理
-```
-git config --global --unset http.proxy
-git config --global --unset https.proxy
-
-git config --global --unset-all https.proxy
-```
 Create a new repository
 ```
 git clone git@git.woa.com:batmanyan/Http_Debug_Client.git
@@ -125,3 +101,51 @@ git remote add origin git@git.woa.com:batmanyan/Http_Debug_Client.git
 git push --set-upstream origin --all
 git push --set-upstream origin --tags
 ```
+
+## 代理与ssh（推荐）
+添加代理
+```
+//http || https
+git config --global http.proxy 127.0.0.1:7890
+git config --global https.proxy 127.0.0.1:7890
+
+//sock5代理
+git config --global http.proxy socks5 127.0.0.1:7891
+git config --global https.proxy socks5 127.0.0.1:7891
+```
+查看代理
+```
+git config --global --get http.proxy
+git config --global --get https.proxy
+
+git config --global --get-all https.proxy
+```
+取消代理
+```
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+git config --global --unset-all https.proxy
+```
+SSH方法
+输入 
+```
+ls -al ~/.ssh
+```
+查看是否存在已有的 SSH 密钥文件。常见的文件名包括 id_rsa, id_ecdsa, id_ed25519 等等
+
+生成新的SSH 密钥
+```
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+启动 SSH 代理并添加 SSH 私钥
+```
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519   # 或者你使用的其他私钥文件名
+```
+在终端输入
+```
+pbcopy < ~/.ssh/id_ed25519.pub
+```
+获取SSH 公钥，到github上设置（Settings -> SSH and GPG keys -> New SSH key）
+
