@@ -88,11 +88,15 @@ git config --global https.proxy socks5 127.0.0.1:7891
 ```
 git config --global --get http.proxy
 git config --global --get https.proxy
+
+git config --global --get-all https.proxy
 ```
 取消代理
 ```
 git config --global --unset http.proxy
 git config --global --unset https.proxy
+
+git config --global --unset-all https.proxy
 ```
 Create a new repository
 ```
