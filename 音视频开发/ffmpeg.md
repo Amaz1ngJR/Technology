@@ -1,3 +1,4 @@
+[教程](https://zhuanlan.zhihu.com/p/15849180981)
 ## homebrew安装ffmpeg
 ```
 brew install ffmpeg
