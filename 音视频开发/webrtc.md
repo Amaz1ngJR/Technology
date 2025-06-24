@@ -21,4 +21,8 @@
 ![image](https://github.com/user-attachments/assets/424a96cb-41a1-4b9d-bceb-90932a00fb79)
 
 ### SFU
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/56cb8945-5a07-4823-a973-13526aa7ad37)
+
+## WebRTC库 MediaSoup
+MediaSoup 使用选择性转发单元(SFU)架构，
+
