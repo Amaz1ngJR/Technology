@@ -68,7 +68,7 @@ get_video_frame(ost)
 负责获取一帧原始视频数据,返回值是一个指向 AVFrame 的指针
 
 write_frame(...)
-```
+```c++
 avcodec_send_frame(c, frame) //将原始帧（AVFrame）发送给编码器进行编码
 //循环调用 avcodec_receive_packet()
 while (ret >= 0) {
