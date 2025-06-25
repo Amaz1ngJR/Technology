@@ -63,7 +63,7 @@ FFmpeg 视频编码流程图
 ```
 对应的函数
 ```
-get_video_frame(ost)
+get_video_frame(OutputStream *ost) //用于生成一帧 YUV 格式的合成图像 准备原始帧
 ```
 负责获取一帧原始视频数据,返回值是一个指向 AVFrame 的指针
 
