@@ -806,6 +806,7 @@ void demo() {
 void demo() {
 	string str = "789123";
 	cout << str.substr(3, 3);//截取str下标3开始(包含3)的3个字符
+	cout << srt.subsrt(3);//截取str下标3开始（包含3）的后缀字符
 	//提取由空格分割的单词words
 	string words = "I have a big plan";
 	string word; vector<string> all;
@@ -886,7 +887,7 @@ void demo() {
 
 ```c++
 void demo() {
-	//将字符串转成数字
+	//将字符串转成数字(10进制， 转成2进制的话stoi(s, nullptr, 2) )
 	//如果字符串中没有数字的话，将会抛出"invalid_argument"的异常；
 	//如果字符串中的数字转换后超过int/float/double的范围，将会抛出"out_of_range"的异常
 	string pi = "-3.14";
