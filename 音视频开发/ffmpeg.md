@@ -131,8 +131,15 @@ int ret = avformat_alloc_output_context2(&ofmt_ctx, oformat, NULL, "output.ts");
 |image2	|图像序列（如 JPEG 序列）|
 
 创建完输出上下文 AVFormatContext后，往往需要
-```
+
 添加流 avformat_new_stream()
+```c++
+AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c);
+//s: 指向已经初始化好的 AVFormatContext 的指针，表示你想要添加新流的目标输出上下文。
+//c: 指向 AVCodec 结构体的指针，代表你想使用的编解码器。如果为 NULL，则不会自动设置编解码器上下文，你需要手动配置流的参数。
+```
+
+```
 设置编解码参数（codecpar）
 安全复制编码参数 avcodec_parameters_copy()
 使用 avio_open() 打开输出 IO 上下文（即连接到实际的文件或网络）
