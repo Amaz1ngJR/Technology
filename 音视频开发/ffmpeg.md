@@ -144,4 +144,62 @@ int ret = avformat_alloc_output_context2(&ofmt_ctx, oformat, NULL, "output.ts");
 ```
 
 ### writeHeader
+avio_open打开输出文件或网络流的 IO 层的一个函数调用
+```c++
+int avio_open(AVIOContext **s, const char *url, int flags);
+//s: 输出参数。FFmpeg 会分配一个 AVIOContext 并将其地址赋给 *s。这个上下文用于读写数据到目标文件或网络。
+//url:输出目标路径或 URL。可以是本地文件路径（如 "output.mp4"），也可以是网络地址（如 "rtmp://live.example.com/stream"）。
+//flags:打开模式标志位。最常见的是 AVIO_FLAG_WRITE（写模式） 或 AVIO_FLAG_READ（读模式）。
+
+avio_open(&m_ofmt_ctx->pb, m_url.c_str(), AVIO_FLAG_WRITE));
+```
+avformat_write_header写入输出文件或流的文件头信息
+```c++
+int avformat_write_header(AVFormatContext *s, AVDictionary **options);
+//s: 指向 AVFormatContext 的指针，包含了输出格式的所有信息，包括但不限于编解码器参数、时间基准、元数据等。
+//options: 一个指向字典的指针，可用于提供额外的选项给 muxer（复用器）。如果不需要传递任何选项，则可以传入 NULL
+
+avformat_write_header(m_ofmt_ctx, NULL);
+```
+
+### startTranscoding
+涉及到
+
+分配 packet	av_packet_alloc()
+```c++
+AVPacket *packet = av_packet_alloc();
+```
+读取 packet	av_read_frame()
+```c++
+int av_read_frame(AVFormatContext *s, AVPacket *pkt);
+//s:输入上下文，由 avformat_open_input() 创建并初始化。它包含了所有关于输入文件/流的信息。
+//pkt:输出参数，用于接收读取到的一帧数据（可以是音频或视频
+
+AVPacket packet;
+while (av_read_frame(m_ifmt_ctx, &packet) >= 0){...}
+```
+写入输出	av_interleaved_write_frame()
+
+与 av_write_frame() 相比，av_interleaved_write_frame() 能够确保音视频包按照正确的顺序（交错）写入输出文件，这对于多媒体容器格式非常重要，因为它们通常要求音频和视频数据交错存储以确保同步播放。
+```c++
+int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt);
+//s: 指向已经初始化好的 AVFormatContext 的指针，包含了所有关于输出文件或流的信息。
+//pkt: 指向要写入的 AVPacket。这个数据包可以是音频、视频或其他类型的数据包。如果 pkt 为 NULL，则会刷新内部缓冲区中的任何延迟数据包（例如某些格式可能需要在末尾写入额外的数据）
+
+
+```
+清理 packet	av_packet_unref() / av_packet_free()
+```c++
+av_packet_unref(&packet);
+```
+|AVPacket |结构体常用字段|
+|-------|-----------|
+|字段	|含义|
+|data	|指向压缩数据的指针（H.264/AAC 等）|
+|size	|数据长度|
+|stream_index	|表示这个 packet 属于哪个流（如视频流是 0，音频流是 1）|
+|pts	|显示时间戳（Presentation TimeStamp）|
+|dts	|解码时间戳（Decoding TimeStamp）|
+|duration	|帧持续时间（单位：time_base）|
+|pos	|在文件中的偏移位置（可选）|
 
