@@ -230,8 +230,8 @@ AVStream *in_stream
 ```
 ```c++
 typedef struct AVRational{
-    int num; ///< Numerator
-    int den; ///< Denominator
+    int num; ///< Numerator 分子
+    int den; ///< Denominator 分母
 } AVRational;
 //如AVRational frame_rate = {30, 1}; 表示fps = 30
 ```
