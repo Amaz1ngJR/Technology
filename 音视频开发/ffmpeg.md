@@ -228,6 +228,13 @@ packet.pts = av_rescale_q_rnd(packet.pts,
 ```c++
 AVStream *in_stream
 ```
+```c++
+typedef struct AVRational{
+    int num; ///< Numerator
+    int den; ///< Denominator
+} AVRational;
+//如AVRational frame_rate = {30, 1}; 表示fps = 30
+```
 1. r_frame_rate
    
 这是一个 AVRational 类型的值，通常最准确地反映了实际帧率。
