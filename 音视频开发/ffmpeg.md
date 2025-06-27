@@ -209,4 +209,52 @@ av_packet_unref(&packet);
 |dts	|解码时间戳（Decoding TimeStamp）|
 |duration	|帧持续时间（单位：time_base）|
 |pos	|在文件中的偏移位置（可选）|
+### 时间戳与帧率
+将 packet 的显示时间戳（pts）从输入流的时间基转为输出流的时间基。
+```c++
+packet.pts = av_rescale_q_rnd(packet.pts,
+                              in_stream->time_base,
+                              out_stream->time_base,
+                              AVRounding(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+//packet.pts：原始 PTS 时间戳
+//in_stream->time_base：输入流的时间基（如 {1, 90000}）
+//out_stream->time_base：输出流的时间基（如 {1, 48000}）
+//AVRounding(...)：舍入方式，这里是组合模式：
+//AV_ROUND_NEAR_INF：向最近的整数舍入
+//AV_ROUND_PASS_MINMAX：确保不会溢出最小/最大值
+```
 
+帧率相关
+```c++
+AVStream *in_stream
+```
+1. r_frame_rate
+   
+这是一个 AVRational 类型的值，通常最准确地反映了实际帧率。
+
+它表示的是平均帧率。
+```c++
+// 获取实际帧率
+AVRational r_frame_rate = in_stream->r_frame_rate;
+if (r_frame_rate.den > 0 && r_frame_rate.num > 0) {
+    double frame_rate = av_q2d(r_frame_rate); // 将 AVRational 转换为 double
+    printf("Real Frame Rate: %f fps\n", frame_rate);
+} else {
+    printf("Could not determine real frame rate.\n");
+}
+```
+2. avg_frame_rate
+   
+同样是 AVRational 类型，有时可能比 r_frame_rate 更准确，尤其是在 VFR（Variable Frame Rate）视频中。
+
+表示的是平均帧率。
+```c++
+// 获取平均帧率
+AVRational avg_frame_rate = in_stream->avg_frame_rate;
+if (avg_frame_rate.den > 0 && avg_frame_rate.num > 0) {
+    double frame_rate = av_q2d(avg_frame_rate); // 将 AVRational 转换为 double
+    printf("Average Frame Rate: %f fps\n", frame_rate);
+} else {
+    printf("Could not determine average frame rate.\n");
+}
+```
