@@ -1,4 +1,5 @@
 [教程1](https://zhuanlan.zhihu.com/p/15849180981)
+[教程2](https://blog.csdn.net/leixiaohua1020/article/details/14214859)
 [音视频开发的学习资源](https://github.com/xhunmon/VABlog?tab=readme-ov-file)
 ## homebrew安装ffmpeg
 ```
