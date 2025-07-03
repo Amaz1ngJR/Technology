@@ -476,6 +476,14 @@ cat -v filename                 //显示非打印字符 用^表示
 cat filename | tail             //显示文件末尾 默认情况下显示最后10行
 cat new_content >> existing_file//将内容追加到文件
 ```
+## tail 查看文件尾部的内容 跟踪文件更新
+```bash
+tail filename        //显示文件末尾的内容 默认显示文件末尾的最后 10 行
+tail file1 file2     //同时显示多个文件的末尾内容
+tail -n 2 filename   //显示最后2行文件末尾内容 可省略n 直接 tail -2 filename
+tail -c 2 filename   //显示文件末尾2字节的内容
+tail -f filename     //实时监视文件的变化
+```
 ## grep 从文件中通过关键字过滤文件行
 ```bash
 grep -i "pattern" file.txt             //忽略大小写
@@ -518,15 +526,7 @@ echo $a  //$符号被用于取“变量”的值 配合echo可以通过echo $变
 echo pwd    //输出pwd
 echo `pwd`  //将被反引号`包围的内容视为命令去执行
 ```
-## tail 查看文件尾部的内容 跟踪文件更新
-```bash
-tail filename        //显示文件末尾的内容 默认显示文件末尾的最后 10 行
-tail file1 file2     //同时显示多个文件的末尾内容
-tail -n 2 filename   //显示最后2行文件末尾内容 可省略n 直接 tail -2 filename
-tail -c 2 filename   //显示文件末尾2字节的内容
-tail -f filename     //实时监视文件的变化
 
-```
 ## which/find 查找
 ```bash
 which 命令1      //查找命令1的程序文件存放的位置
