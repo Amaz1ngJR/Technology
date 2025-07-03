@@ -198,7 +198,19 @@ sar -n DEV num1 num2  //-n:查看网络 DEV：查看网络接口 num1：刷新�
 ```
 
 ## 下载、压缩、服务
-### 软件下载安装
+### 软件下载安装x
+mac上
+```
+brew install x
+```
+Linux上
+```
+sudo apt update
+sudo apt install x
+apt install x
+```
+
+
 CentOS:yum 和Ubuntu:apt 完全一致 需要root权限或者sudo 需要联网
 ```bash
 yum [-y] [install | remove | search] 软件名称
