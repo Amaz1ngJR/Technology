@@ -1,5 +1,6 @@
 
 # ZLM的使用
+## 推流与拉流
 运行ZLMediaKit，使用FFmpeg推送H.264文件
 ```
 ffmpeg -re -i yourfile.h264 -c:v copy -f flv rtmp://localhost/live/streamName
