@@ -503,7 +503,7 @@ echo `pwd`  //将被反引号`包围的内容视为命令去执行
 ```bash
 tail filename        //显示文件末尾的内容 默认显示文件末尾的最后 10 行
 tail file1 file2     //同时显示多个文件的末尾内容
-tail -n 2 filename   //显示第2行的文件末尾内容
+tail -n 2 filename   //显示最后2行文件末尾内容 可省略n 直接 tail -2 filename
 tail -c 2 filename   //显示文件末尾2字节的内容
 tail -f filename     //实时监视文件的变化
 
