@@ -5,8 +5,7 @@
 ```
 ffmpeg -re -i yourfile.h264 -c:v copy -f flv rtmp://localhost/live/streamName
 
-ffmpeg -re -stream_loop -1 -i /data/yjr/Code/media_transcoder/videos/video.h264 \
--c:v copy -f flv rtmp://localhost/live/myvideos.h264
+ffmpeg -re -stream_loop -1 -i /data/yjr/Code/media_transcoder/videos/video.h264 -c:v copy -f flv rtmp://localhost/live/myvideos.h264
 
 -re 表示按照输入文件的帧率读取数据。
 -i yourfile.h264 指定你的输入文件。 /data/yjr/Code/media_transcoder/videos/video.h264
