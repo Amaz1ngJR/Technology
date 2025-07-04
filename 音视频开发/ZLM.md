@@ -1,5 +1,20 @@
 
 # ZLM的使用
+```
+curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1'        【拉流】
+curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=weidian&key=__defaultVhost__%2Fonvif%2Ftestsp' 【删除流】
+
+curl --location '127.0.0.1:9092/index/api/getMediaList?secret=weidian&vhost=__defaultVhost__'  【查询ZLM上保存的流】
+curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&schema=rtsp&vhost=__defaultVhost__&app=onvif&stream=testsp&dst_url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestup' 【转推流】
+```
+```
+TCP *:1554 (LISTEN)    RTSP
+TCP *:1935 (LISTEN) 		RTMP
+TCP *:9092 (LISTEN)    9092是httpapi的接口
+TCP *:1443 (LISTEN). 	 HTTPS
+TCP *:10000 (LISTEN)	RTP
+```
+
 ## 推流与拉流
 运行ZLMediaKit，使用FFmpeg推送H.264文件
 ```
@@ -21,4 +36,5 @@ ffplay rtmp://localhost/live/streamName
 如果你配置了HTTP-FLV模块，可以通过类似 http://localhost/index/hls/streamName.flv 的URL在支持的播放器中播放
 
 对于HLS流，如果已启用该功能，则可以通过 http://localhost/live/streamName/playlist.m3u8 的URL播放
+
 
