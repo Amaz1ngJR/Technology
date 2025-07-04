@@ -1,18 +1,40 @@
 
 # ZLM的使用
 ```
-curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1'        【拉流】
-curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=weidian&key=__defaultVhost__%2Fonvif%2Ftestsp' 【删除流】
+#以守护进程模式启动
+cd /data/yjr/Code/ZLMediaKit/release/linux/Release
+./MediaServer -d &
+```
+```
+TCP *:1554 (LISTEN)      RTSP
+TCP *:1935 (LISTEN) 		 RTMP
+TCP *:9092 (LISTEN)      httpapi的接口
+TCP *:1443 (LISTEN) 	   HTTPS
+TCP *:10000 (LISTEN)	   RTP
+```
+### 获取拉流代理
+```
+{{ZLMediaKit_URL}}/index/api/addStreamProxy?secret={{ZLMediaKit_secret}}&vhost={{defaultVhost}}&app=live&stream=test&url=rtmp://live.hkstv.hk.lxdns.com/live/hks2
 
-curl --location '127.0.0.1:9092/index/api/getMediaList?secret=weidian&vhost=__defaultVhost__'  【查询ZLM上保存的流】
-curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&schema=rtsp&vhost=__defaultVhost__&app=onvif&stream=testsp&dst_url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestup' 【转推流】
+curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1' 
 ```
+### 关闭删除拉流代理
 ```
-TCP *:1554 (LISTEN)    RTSP
-TCP *:1935 (LISTEN) 		RTMP
-TCP *:9092 (LISTEN)    9092是httpapi的接口
-TCP *:1443 (LISTEN). 	 HTTPS
-TCP *:10000 (LISTEN)	RTP
+{{ZLMediaKit_URL}}/index/api/delStreamProxy?secret={{ZLMediaKit_secret}}&key=__defaultVhost__/live/1
+
+curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=weidian&key=__defaultVhost__%2Fonvif%2Ftestsp' 
+```
+### 查询获取ZLM上保存的流
+```
+{{ZLMediaKit_URL}}/index/api/getMediaList?secret={{ZLMediaKit_secret}}
+
+curl --location '127.0.0.1:9092/index/api/getMediaList?secret=weidian&vhost=__defaultVhost__'  
+```
+### 添加推流代理
+```
+{{ZLMediaKit_URL}}/index/api/addStreamPusherProxy?secret={{ZLMediaKit_secret}}&schema=rtmp&vhost={{defaultVhost}}&app=live&stream=test&dst_url=rtmp://192.168.1.104/live/push
+
+curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&schema=rtsp&vhost=__defaultVhost__&app=onvif&stream=testsp&dst_url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestup'
 ```
 
 ## 推流与拉流
