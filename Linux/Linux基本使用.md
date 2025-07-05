@@ -113,14 +113,15 @@ systemctl start ntpd //启动
 systemctl enable ntpd //开机自启
 ```
 
-## IP地址与主机名
+## IP地址与主机名 ifconfig
 ```bash
 ping [-c num(检查次数)] ip或主机名  //检查指定的网络服务器是否联通
 nmap 被查看IP  //使用nmap(需要安装)查看一个IP地址的对外端口
 netstat -anp|grep 端口号  //查看指定端口的IP占用（安装net-tools）
 ```
 ```bash
-ifconfig //查看本机的ip地址
+ifconfig //查看本机的ip地址 window下为ipconfig 一般使用下面的命令
+ifconfig | grep "inet " | grep -v 127.0.0.1
 hostname //查看主机名
 hostnamectl set-hostname 主机名  //root下修改主机名
 ```
