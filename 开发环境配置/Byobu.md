@@ -13,6 +13,10 @@ brew install byobu //mac
 byobu-enable 表示Byobu窗口管理器将在每次文本登录时自动启动
 byobu-disable 表示Byobu窗口管理器将不再在登录时自动启动
 ```
+mac上打开
+```bash
+byobu
+```
 
 ```
 F1/F9 配置菜单
