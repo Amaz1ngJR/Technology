@@ -60,3 +60,5 @@ ffplay rtmp://localhost/live/streamName
 对于HLS流，如果已启用该功能，则可以通过 http://localhost/live/streamName/playlist.m3u8 的URL播放
 
 
+# 板端ZLM代码
+
