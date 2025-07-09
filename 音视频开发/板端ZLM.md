@@ -34,7 +34,7 @@ ffplay rtmp://localhost/live/streamName
 
 对于HLS流，如果已启用该功能，则可以通过 http://localhost/live/streamName/playlist.m3u8 的URL播放
 
-### 获取拉流代理 addStreamProxy
+### 添加拉流代理 addStreamProxy
 ```
 {{ZLMediaKit_URL}}/index/api/addStreamProxy?secret={{ZLMediaKit_secret}}&vhost={{defaultVhost}}&app=live&stream=test&url=rtmp://live.hkstv.hk.lxdns.com/live/hks2
 
@@ -68,19 +68,164 @@ curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&sc
 ### 看回放时下载视频用&合并上传 startMultiMp4Merge
 
 # 板端ZLM代码
+## 添加拉流代理 addStreamProxy
+WebApi.cpp
+```c++
+api_regist("/index/api/addStreamProxy", [](API_ARGS_MAP_ASYNC) {
+    CHECK_ARGS("vhost", "app", "stream", "url"); // 确保客户端传入了必须的参数字段
+
+    ProtocolOption option(allArgs);
+    auto retry_count = allArgs["retry_count"].empty()
+        ? -1
+        : allArgs["retry_count"].as<int>(); // 获取重试次数：retry_count，没有传 retry_count，则默认为 -1，表示无限重试
+        
+    webApiAddStreamProxy(
+        allArgs["vhost"], allArgs["app"], allArgs["stream"], allArgs["url"], retry_count, option, allArgs["rtp_type"], allArgs["timeout_sec"],
+        // 回调函数逻辑
+        [invoker, val, headerOut](const SockException &ex, const string &key) mutable {
+            if (ex) { // 有异常
+                val["code"] = API::OtherFailed;
+                val["msg"] = ex.what();
+            } else {
+                val["data"]["key"] = key;
+            }
+            invoker(200, headerOut, val.toStyledString());//invoker 是一个函数对象，通常用于发送 HTTP 响应
+        });
+});
+```
+```c++
+void webApiAddStreamProxy(const std::string &vhost, const std::string &app, const std::string &stream, const std::string &url, int retry_count,
+                    const mediakit::ProtocolOption &option, int rtp_type, float timeout_sec,
+                    const std::function<void(const toolkit::SockException &ex, const std::string &key)> &cb) {
+    auto key = getProxyKey(vhost, app, stream);//生成一个基于虚拟主机、应用名和流名的唯一标识符key 将用于在全局 map 中记录当前正在拉流的流代理
+    lock_guard<recursive_mutex> lck(s_proxyMapMtx);
+    if (s_proxyMap.find(key) != s_proxyMap.end()) { //已经在拉流了
+        cb(SockException(Err_other, "This stream already exists"), key);
+        return;
+    }
+    //添加拉流代理  创建 PlayerProxy 并保存到全局 map
+    auto player = std::make_shared<PlayerProxy>(vhost, app, stream, option, retry_count);
+    s_proxyMap[key] = player;
+
+    //指定RTP over TCP(播放rtsp时有效)
+    (*player)[Client::kRtpType] = rtp_type;
+
+    if (timeout_sec > 0.1) {//播放握手超时时间
+        (*player)[Client::kTimeoutMS] = timeout_sec * 1000;
+    }
+
+    //开始播放，设置播放一次性的回调函数，播放完成后会触发 将会自动重试若干次，默认一直重试
+    player->setPlayCallbackOnce([cb, key](const SockException &ex) {
+        cb(ex, key);
+    });
+
+    int reconnect_count = 0;//设置重连回调函数 当第 2 次、每 10 次重连时，尝试获取 URL 的 IP 地址，并广播一个事件（比如 IP 不可达）
+    player->setOnReconnect([app, stream, reconnect_count, key](const std::string &url, int retry)mutable {
+         reconnect_count = retry;
+         InfoL << "reconnect_count:" << std::to_string(reconnect_count);
+         if(reconnect_count == 2 || (reconnect_count != 0 && reconnect_count % 10 == 0)) {
+             std::string ip = IPAddress::getIP(url);
+            //  bool isIPReachable = IPAddress::isIPReachable(ip);
+            bool isIPReachable = false;
+            NOTICE_EMIT(BroadcastIPNotFoundArgs, Broadcast::KBroadcastIPNotFound, url, app, stream, ip, isIPReachable ? 1 : 2);
+         }
+    });
+    //设置连接成功回调
+    player->setOnConnect([reconnect_count](const TranslationInfo&) mutable{
+        reconnect_count = 0;
+        InfoL << "Connect cb:" << reconnect_count;
+    });
+
+    //被主动关闭拉流 设置断开连接回调（清理 map）
+    player->setOnClose([key](const SockException &ex) {
+        lock_guard<recursive_mutex> lck(s_proxyMapMtx);
+        s_proxyMap.erase(key);
+
+        InfoL << "Close cb";
+    });
+    player->play(url);//开始拉流
+}
+```
+## 添加推流代理 addStreamPusherProxy
+```c++
+WebApi.cpp
+static auto addStreamPusherProxy = [](const string &schema,
+                                      const string &vhost,
+                                      const string &app,
+                                      const string &stream,
+                                      const string &url,
+                                      int retry_count,
+                                      int rtp_type,
+                                      float timeout_sec,
+                                      const function<void(const SockException &ex, const string &key)> &cb) {
+    auto key = getPusherKey(schema, vhost, app, stream, url);
+    auto src = MediaSource::find(schema, vhost, app, stream);//尝试根据给定的参数查找对应的源流
+    if (!src) {
+        cb(SockException(Err_other, "can not find the source stream"), key);
+        return;
+    }
+    lock_guard<recursive_mutex> lck(s_proxyPusherMapMtx);
+    if (s_proxyPusherMap.find(key) != s_proxyPusherMap.end()) {//已经在推流了
+        // WarnL << "[ " <<app << "/" << stream << "] 已经在推流了";
+        cb(SockException(Err_success), key);
+        return;
+    }
+
+    //添加推流代理
+    auto pusher = std::make_shared<PusherProxy>(src, retry_count);
+    s_proxyPusherMap[key] = pusher;
+
+    //指定RTP over TCP(播放rtsp时有效)
+    (*pusher)[Client::kRtpType] = rtp_type;
+
+    if (timeout_sec > 0.1) {
+        //推流握手超时时间
+        (*pusher)[Client::kTimeoutMS] = timeout_sec * 1000;
+    }
+
+    //开始推流，如果推流失败或者推流中止，将会自动重试若干次，默认一直重试
+    pusher->setPushCallbackOnce([cb, key, url](const SockException &ex) {
+        if (ex) {
+            WarnL << "Push " << url << " failed, key: " << key << ", err: " << ex;
+            lock_guard<recursive_mutex> lck(s_proxyPusherMapMtx);
+            s_proxyPusherMap.erase(key);
+        }
+        cb(ex, key);
+    });
+
+    //被主动关闭推流
+    pusher->setOnClose([key, url](const SockException &ex) {
+        WarnL << "Push " << url << " failed, key: " << key << ", err: " << ex;
+        lock_guard<recursive_mutex> lck(s_proxyPusherMapMtx);
+        s_proxyPusherMap.erase(key);
+    });
+    pusher->publish(url);
+};
+```
 ## 查询获取ZLM上保存的流 getMediaList
 WebApi.cpp
 ```c++
 api_regist("/index/api/getMediaList",[](API_ARGS_MAP){
     //....
     //获取所有MediaSource列表
+    //每个 MediaSource 对象都会被传入到 lambda 回调中，并通过 makeMediaSourceJson(*media) 转换为 JSON 格式，然后添加进 val["data"] 这个 JSON 数组中。
     MediaSource::for_each_media([&](const MediaSource::Ptr &media) {
         val["data"].append(makeMediaSourceJson(*media));
-    }, allArgs["schema"], allArgs["vhost"], allArgs["app"], allArgs["stream"]);
+    }, allArgs["schema"],// 协议类型，如 rtmp、hls 等
+ allArgs["vhost"],// 虚拟主机名
+ allArgs["app"],// 应用名
+ allArgs["stream"]);// 流名称
+
+// 最终将 val 返回给客户端作为 HTTP 响应
 });
 ```
 MediaSource.cpp
 ```c++
+* @param cb        回调函数，每次找到匹配的 MediaSource 时调用它
+ * @param schema    协议类型过滤条件（如 "rtmp"）
+ * @param vhost     虚拟主机过滤条件
+ * @param app       应用名过滤条件
+ * @param stream    流名过滤条件
 void MediaSource::for_each_media(const function<void(const Ptr &src)> &cb,
                                  const string &schema,
                                  const string &vhost,
@@ -89,10 +234,29 @@ void MediaSource::for_each_media(const function<void(const Ptr &src)> &cb,
     deque<Ptr> src_list;
     {
         lock_guard<recursive_mutex> lock(s_media_source_mtx);
+        //在 s_media_source_map 中查找匹配的 MediaSource 并加入 src_list
         for_each_media_l(s_media_source_map, src_list, schema, vhost, app, stream);
     }
     for (auto &src : src_list) {
         cb(src);
+    }
+}
+```
+```c++
+ * @tparam MAP      Map 类型，例如 map<string, MediaSource::Ptr>
+ * @tparam LIST     列表类型，用于存储查找到的 MediaSource 指针
+ * @tparam First    当前层的筛选字段类型（如 string）
+template<typename MAP, typename LIST, typename First>
+static void for_each_media_l(const MAP &map, LIST &list, const First &first) {
+    if (first.empty()) {
+        for (auto &pr : map) {
+            emplace_back(list, pr.second);
+        }
+        return;
+    }
+    auto it = map.find(first);
+    if (it != map.end()) {
+        emplace_back(list, it->second);
     }
 }
 ```
