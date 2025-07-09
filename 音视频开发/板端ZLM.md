@@ -202,6 +202,8 @@ static auto addStreamPusherProxy = [](const string &schema,
     pusher->publish(url);
 };
 ```
+### 细节
+
 ## 查询获取ZLM上保存的流 getMediaList
 WebApi.cpp
 ```c++
