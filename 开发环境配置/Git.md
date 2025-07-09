@@ -37,6 +37,7 @@ git commit -m "Initial commit(提交信息)" #提交到所在的分支
 ```
 查看本地仓库分支
 ```bash
+git fetch --all  # 请求获取所有远程分支的最新信息
 git branch  #查看当前是哪个分支 默认是master
 git branch -r #查看所有远程分支
 git status
