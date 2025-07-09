@@ -69,3 +69,30 @@ curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&sc
 
 # 板端ZLM代码
 ## 查询获取ZLM上保存的流 getMediaList
+WebApi.cpp
+```c++
+api_regist("/index/api/getMediaList",[](API_ARGS_MAP){
+    //....
+    //获取所有MediaSource列表
+    MediaSource::for_each_media([&](const MediaSource::Ptr &media) {
+        val["data"].append(makeMediaSourceJson(*media));
+    }, allArgs["schema"], allArgs["vhost"], allArgs["app"], allArgs["stream"]);
+});
+```
+MediaSource.cpp
+```c++
+void MediaSource::for_each_media(const function<void(const Ptr &src)> &cb,
+                                 const string &schema,
+                                 const string &vhost,
+                                 const string &app,
+                                 const string &stream) {
+    deque<Ptr> src_list;
+    {
+        lock_guard<recursive_mutex> lock(s_media_source_mtx);
+        for_each_media_l(s_media_source_map, src_list, schema, vhost, app, stream);
+    }
+    for (auto &src : src_list) {
+        cb(src);
+    }
+}
+```
