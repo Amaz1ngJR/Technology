@@ -68,4 +68,4 @@ curl --location '127.0.0.1:9092/index/api/addStreamPusherProxy?secret=weidian&sc
 ### 看回放时下载视频用&合并上传 startMultiMp4Merge
 
 # 板端ZLM代码
-
+## 查询获取ZLM上保存的流 getMediaList
