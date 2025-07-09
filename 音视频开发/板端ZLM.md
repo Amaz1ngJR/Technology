@@ -203,6 +203,68 @@ static auto addStreamPusherProxy = [](const string &schema,
 };
 ```
 ### 细节
+PusherProxy.cpp 调用 MediaPusher::publish(dst_url);来推流
+```c++
+void PusherProxy::publish(const string &dst_url) {
+    std::weak_ptr<PusherProxy> weak_self = shared_from_this();
+    std::shared_ptr<int> failed_cnt(new int(0));
+
+    setOnPublished([weak_self, dst_url, failed_cnt](const SockException &err) {
+        auto strong_self = weak_self.lock();
+        if (!strong_self) {
+            return;
+        }
+
+        if (strong_self->_on_publish) {
+            strong_self->_on_publish(err);
+            strong_self->_on_publish = nullptr;
+        }
+
+        auto src = strong_self->_weak_src.lock();
+        if (!err) {
+            // 推流成功
+            strong_self->_live_ticker.resetTime();
+            strong_self->_live_status = 0;
+            *failed_cnt = 0;
+            InfoL << "Publish " << dst_url << " success";
+        } else if (src && (*failed_cnt < strong_self->_retry_count || strong_self->_retry_count < 0)) {
+            // 推流失败，延时重试推送
+            strong_self->_republish_count++;
+            strong_self->_live_status = 1;
+            strong_self->rePublish(dst_url, (*failed_cnt)++);
+        } else {
+            // 如果媒体源已经注销, 或达到了最大重试次数，回调关闭
+            strong_self->_on_close(err);
+        }
+    });
+
+    setOnShutdown([weak_self, dst_url, failed_cnt](const SockException &err) {
+        auto strong_self = weak_self.lock();
+        if (!strong_self) {
+            return;
+        }
+
+        if (*failed_cnt == 0) {
+            // 第一次重推更新时长
+            strong_self->_live_secs += strong_self->_live_ticker.elapsedTime() / 1000;
+            strong_self->_live_ticker.resetTime();
+            TraceL << " live secs " << strong_self->_live_secs;
+        }
+
+        auto src = strong_self->_weak_src.lock();
+        // 推流异常中断，延时重试播放
+        if (src && (*failed_cnt < strong_self->_retry_count || strong_self->_retry_count < 0)) {
+            strong_self->_republish_count++;
+            strong_self->rePublish(dst_url, (*failed_cnt)++);
+        } else {
+            // 如果媒体源已经注销, 或达到了最大重试次数，回调关闭
+            strong_self->_on_close(err);
+        }
+    });
+
+    MediaPusher::publish(dst_url);
+}
+```
 
 ## 查询获取ZLM上保存的流 getMediaList
 WebApi.cpp
