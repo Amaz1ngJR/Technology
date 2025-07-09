@@ -1,5 +1,10 @@
 
 ## 板端ZLM的使用
+日志位置
+```
+/home/www/logs/wd-zlmediakit/wd-zlmediakit.log
+/data/applogs/wd-zlmediakit/logs
+```
 ```
 #以守护进程模式启动
 cd /data/yjr/Code/ZLMediaKit/release/linux/Release
