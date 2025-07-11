@@ -497,3 +497,17 @@ Ctrl + U 删除这行命令
 Ctrl + 键盘左/右键 向左/右跳一个单词
 Ctrl + L = clear 清空终端内容
 ```
+## 传输文件 nc 
+使用nc
+
+先在在接收端运行
+```bash
+nc -l -p 12345 > receivedfile.txt
+```
+在发送端运行
+```bash
+nc [接收端的IP地址] 12345 < examplefile.txt
+//[接收端的IP地址] ifconfig | grep "inet " | grep -v 127.0.0.1
+```
+
+
