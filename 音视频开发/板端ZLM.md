@@ -331,4 +331,8 @@ static void for_each_media_l(const MAP &map, LIST &list, const First &first) {
 ```
 ## DiskSpaceManager
 
-## 
+## 跨天播放问题
+server/FileScanner_2.h下getFirstFile函数
+```c++
+
+```
