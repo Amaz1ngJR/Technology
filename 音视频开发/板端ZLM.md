@@ -45,8 +45,7 @@ ffplay rtmp://localhost/live/streamName
 
 curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1'
 
-curl --location '127.0.0.1:9092/index/api/addStreamProxy?
-secret=zlm&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp://admin:123456@172.24.12.34:55404/ch01_sub.264?dev=1&enable_audio=1'
+curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=zlm&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp://admin:123456@172.24.12.34:55404/ch01_sub.264?dev=1&enable_audio=1'
 ```
 ### 关闭删除拉流代理 delStreamProxy
 ```
@@ -343,6 +342,33 @@ server/MultiMp4Publish.cpp
 std::string path = mINI::Instance()[mediakit::Protocol::kMP4SavePath] + "/"+ mINI::Instance()[mediakit::Record::kAppName] + "/" + app + "/" + stream;
 ```
 ## startMultiMp4Publish
+server/MultiMp4Publish.cpp
+```c++
+MultiMp4Publish::GetCreate() 返回static std::shared_ptr<MultiMp4Publish> pMp4Publish;
+
+int MultiMp4Publish::Publish(std::string callId,std::string traceId, std::string startTime, std::string endTime, std::string speed, std::string app, std::string stream, std::string url, std::string& errMsg)
+{
+    //getPlayFileList(callId, startTime,endTime, speed, app, stream,url, errMsg);
+    std::string path = mINI::Instance()[mediakit::Protocol::kMP4SavePath] + "/"+ mINI::Instance()[mediakit::Record::kAppName] + "/" + app + "/" + stream;
+    FileScanner fileScanner;
+    toolkit::Ticker usedtime;
+    std::vector<MultiMediaSourceTuple> filePathVec = fileScanner.getPlayFileList(path, startTime, endTime);
+    DebugL << "traceId:" << traceId << ",getPlayFileList used time:" << usedtime.elapsedTime();
+    if(filePathVec.empty()){
+        errMsg = "未匹配到任何文件[时段:" + startTime + " _ " + endTime + ", 路径：" + path + "]";
+        WarnL << "callid:" << callId << ",traceId:" << traceId << ",err:" << errMsg << ",callid:" << callId;
+        return -1;
+    }
+    auto poller = EventPollerPool::Instance().getPoller();
+    if(atof(speed.c_str()) <= 0 || atof(speed.c_str()) >= 100) speed = "1.0";
+    if(createPusher(callId, poller, RTSP_SCHEMA, DEFAULT_VHOST, app, stream, filePathVec, url, atof(speed.c_str()),0)<0){
+        errMsg = "推流失败";
+        WarnL << "callid:" << callId << ",traceId:" << traceId << ",err:" << errMsg << ",callid:" << callId;
+        return -1;
+    }
+    return 0;
+}
+```
 
 ## 跨天播放问题 FileScanner_2
 server/FileScanner_2.h下getFirstFile函数
