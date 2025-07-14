@@ -347,5 +347,37 @@ std::string path = mINI::Instance()[mediakit::Protocol::kMP4SavePath] + "/"+ mIN
 ## 跨天播放问题
 server/FileScanner_2.h下getFirstFile函数
 ```c++
+    std::vector<std::string>  getFirstFile(std::string folder_path, const std::string start_time/* YY-MM-DD hh:mm:ss */,
+const std::string end_time/* YY-MM-DD hh:mm:ss */, uint64_t& offset);
 
+        // 特殊情况处理：播放时间早于当天首个文件且接近午夜
+        if (iPlayStartTime < iFirstFileStartTime && iPlayStartTime < string2second2("000200"))
+        {
+            /*
+                iPlayStartTime < string2second2("000200") 条件，保证下面情况不从前一天开始回放
+
+               |-------------------||       *                ^              O-------------------O |
+                     前一天        零点     点播时刻       当天00:02:00      第一个文件           最后一个文件
+             */
+            std::string yesterday = dateSub(playStartDate, 1); // 返回前一个日期
+            if (folder_map.find(yesterday) != folder_map.end())
+            {                                                                // 有前一天的录制文件，则匹配
+                std::string curFile = folder_map.at(yesterday).back();       // 取该日期下最后一个/最晚结束 文件
+                std::vector<std::string> infoss = split(curFile, re_vec[1]); // 使用正则表达式 "[-.]+" 分割文件名，例如 235900-000100.mp4 → [235900, 000100, mp4]
+                std::string yestodayLastFileEndTime = infoss[1];             // 第0个元素是开始时间，第1个是结束时间。
+                int iYestodayLastFileEndTime = string2second2(yestodayLastFileEndTime);
+                if (iPlayStartTime < iYestodayLastFileEndTime)
+                {                                                            // 播放的时间点在昨天的最后一个文件的时间段内
+                    std::string file_path = folder_path + "/" + yesterday + "/" + curFile;
+                    playFiles.push_back(file_path);
+                    std::vector<std::string> infos = split(curFile, re_vec[1]); //"[-.]+"
+                    std::string curFileStartTime = infos[0];
+
+                    int iCurFileStartTime = string2second2(curFileStartTime);
+                    offset = 24 * 60 * 60 - iCurFileStartTime; // 24*60*60 是一天的总秒数，减去文件开始时间，得到从“昨天”到“今天”要跳过的时长
+                    return playFiles;
+                }
+            }
+        }
+        //-----执行非跨天逻辑----
 ```
