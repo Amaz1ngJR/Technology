@@ -344,7 +344,7 @@ std::string path = mINI::Instance()[mediakit::Protocol::kMP4SavePath] + "/"+ mIN
 ```
 ## startMultiMp4Publish
 
-## 跨天播放问题
+## 跨天播放问题 FileScanner_2
 server/FileScanner_2.h下getFirstFile函数
 ```c++
     std::vector<std::string>  getFirstFile(std::string folder_path, const std::string start_time/* YY-MM-DD hh:mm:ss */,
