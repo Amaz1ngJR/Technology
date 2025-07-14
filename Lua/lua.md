@@ -2,6 +2,17 @@
 
 mac下直接 brew install lua 运行：lua demo.lua
 # 数据类型
+Lua 有 8 种基本类型
+```lua
+print(type("Hello"))   -- string
+print(type(10.3))      -- number
+print(type(print))    -- function
+print(type(true))      -- boolean
+print(type(nil))       -- nil
+print(type({}))       -- table
+print(type(io.stdin)) -- userdata
+print(type(coroutine.create(function() end))) -- thread
+```
 |数据类型|描述|
 |----|-----|
 |nil	|这个最简单，只有值nil属于该类，表示一个无效值（在条件表达式中相当于false,nil 作比较时应该加上双引号）|
