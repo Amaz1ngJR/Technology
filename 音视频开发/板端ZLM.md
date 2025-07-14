@@ -43,13 +43,18 @@ ffplay rtmp://localhost/live/streamName
 ```
 {{ZLMediaKit_URL}}/index/api/addStreamProxy?secret={{ZLMediaKit_secret}}&vhost={{defaultVhost}}&app=live&stream=test&url=rtmp://live.hkstv.hk.lxdns.com/live/hks2
 
-curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1' 
+curl --location '127.0.0.1:9092/index/api/addStreamProxy?secret=weidian&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp%3A%2F%2F172.24.12.19%3A1554%2Fonvif%2Ftestrtsp&enable_mp4=0&enable_audio=1&enable_fmp4=1'
+
+curl --location '127.0.0.1:9092/index/api/addStreamProxy?
+secret=zlm&vhost=__defaultVhost__&app=onvif&stream=testsp&url=rtsp://admin:123456@172.24.12.34:55404/ch01_sub.264?dev=1&enable_audio=1'
 ```
 ### 关闭删除拉流代理 delStreamProxy
 ```
 {{ZLMediaKit_URL}}/index/api/delStreamProxy?secret={{ZLMediaKit_secret}}&key=__defaultVhost__/live/1
 
-curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=weidian&key=__defaultVhost__%2Fonvif%2Ftestsp' 
+curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=weidian&key=__defaultVhost__%2Fonvif%2Ftestsp'
+
+curl --location '127.0.0.1:9092/index/api/delStreamProxy?secret=zlm&key=__defaultVhost__%2Fonvif%2Ftestsp' 
 ```
 ### 查询获取ZLM上保存的流 getMediaList
 ```
@@ -330,6 +335,14 @@ static void for_each_media_l(const MAP &map, LIST &list, const First &first) {
 }
 ```
 ## DiskSpaceManager
+```c++
+MultiMp4Publish::GetCreate()->Publish(callid,traceId, startTime, endTime, speed, app, stream, remoteAddress, errMsg)
+```
+server/MultiMp4Publish.cpp
+```c++
+std::string path = mINI::Instance()[mediakit::Protocol::kMP4SavePath] + "/"+ mINI::Instance()[mediakit::Record::kAppName] + "/" + app + "/" + stream;
+```
+## startMultiMp4Publish
 
 ## 跨天播放问题
 server/FileScanner_2.h下getFirstFile函数
