@@ -370,8 +370,21 @@ int MultiMp4Publish::Publish(std::string callId,std::string traceId, std::string
 }
 ```
 
-## 跨天播放问题 FileScanner_2
-server/FileScanner_2.h下getFirstFile函数
+## 跨天播放问题 seekMultiMp4Publish/FileScanner_2
+主要逻辑
+```c++
+//1.找到要视频文件 涉及FileScanner_2
+ReloadFiles(std::string callId, std::string traceId,std::string startTime, std::string endTime, std::string app, std::string stream, std::string speed,std::string& errMsg)
+//2.异步推流
+MultiMp4Publish::GetCreate()->Publish(callid,traceId, startTime, endTime, speed, app, stream, remoteAddress, errMsg)
+```
+server/FileScanner_2.h下寻找要播放的文件
+```c++
+通过getPlayFileList返回得到std::vector<MultiMediaSourceTuple> filePathVec
+    getPlayFileList调用getPlayFiles得到文件播放的偏移量bOffset, eOffset返回得到vector<std::string> files
+        getPlayFiles由调用getFirstFile和调用fillFile两个函数来获取其要返回的vector<std::string> files
+```
+getFirstFile部分代码
 ```c++
     std::vector<std::string>  getFirstFile(std::string folder_path, const std::string start_time/* YY-MM-DD hh:mm:ss */,
 const std::string end_time/* YY-MM-DD hh:mm:ss */, uint64_t& offset);
@@ -400,6 +413,7 @@ const std::string end_time/* YY-MM-DD hh:mm:ss */, uint64_t& offset);
                     std::string curFileStartTime = infos[0];
 
                     int iCurFileStartTime = string2second2(curFileStartTime);
+                    //--------------注意点！
                     offset = 24 * 60 * 60 - iCurFileStartTime; // 24*60*60 是一天的总秒数，减去文件开始时间，得到从“昨天”到“今天”要跳过的时长
                     return playFiles;
                 }
