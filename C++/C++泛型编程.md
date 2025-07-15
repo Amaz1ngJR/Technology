@@ -1077,7 +1077,7 @@ void demo() {
 	s1.swap(s2);//交换
 	if (!s1.empty())cout << s1.size();
 	//插入操作
-	//有一个插入的重载版本会返回一个pair<插入位置的迭代器,bool是否插入成功>
+	//set/unordered_set有一个插入的重载版本会返回一个pair<插入位置的迭代器,bool是否插入成功>
 	auto it = s1.insert(1).first; cout << *it<<" ==1";
 	if (s1.emplace(2).second)cout << "成功插入";
 	//删除操作
