@@ -5,6 +5,23 @@
 /home/www/logs/wd-zlmediakit/wd-zlmediakit.log
 /data/applogs/wd-zlmediakit/logs
 ```
+将日志打印出来
+```c++
+av_log_set_level(AV_LOG_WARNING);
+av_log_set_callback([](void *avcl, int level, const char *fmt, va_list vl)
+                    {
+    vprintf(fmt, vl);
+    // vfprintf(stderr, fmt, vl);
+    switch (level) {
+        case AV_LOG_PANIC:
+        case AV_LOG_FATAL:
+        case AV_LOG_ERROR:
+        case AV_LOG_WARNING:
+            break;
+        default:
+            return;
+    } });
+```
 ```
 #以守护进程模式启动
 cd /data/yjr/Code/ZLMediaKit/release/linux/Release
