@@ -23,8 +23,16 @@ print(type(coroutine.create(function() end))) -- thread
 |userdata	|表示任意存储在变量中的C数据结构|
 |thread	|表示执行的独立线路，用于执行协同程序|
 |table	|Lua 中的表（table）其实是一个"关联数组"（associative arrays），数组的索引可以是数字、字符串或表类型。在 Lua 里，table 的创建是通过"构造表达式"来完成，最简单构造表达式是{}，用来创建一个空表。|
-
-# 变量
+## 类型转换
+```lua
+a = tostring(10)
+b = tonumber("10")
+n = tonumber('abc') --转换失败的返回nil
+print(type(a))
+print(type(b))
+print(n)
+```
+## 变量
 Lua 变量有三种类型：全局变量、局部变量、表中的域。
 
 Lua 中的变量全是全局变量，哪怕是语句块或是函数里，除非用 local 显式声明为局部变量。
@@ -54,15 +62,6 @@ print(s)
 n = string.byte(s, 2)
 m = 0x31
 print(n, m)
-```
-## 类型转换
-```lua
-a = tostring(10)
-b = tonumber("10")
-n = tonumber('abc') --转换失败的返回nil
-print(type(a))
-print(type(b))
-print(n)
 ```
 
 # function
