@@ -417,9 +417,10 @@ const std::string end_time/* YY-MM-DD hh:mm:ss */, uint64_t& offset);
         //-----执行非跨天逻辑----
 ```
 # bug排查
-容器进出
+容器进出nerdctl/docker
 ```bash
 nerdctl ps --查看当前运行的容器列表
+docker ps --查看当前运行的容器列表
 nerdctl exec -it -容器名 bash
 exit //或者快捷键Ctrl + D 离开容器
 ```
