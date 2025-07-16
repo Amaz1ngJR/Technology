@@ -1,27 +1,5 @@
 
 ## 板端ZLM的使用
-日志位置
-```
-/home/www/logs/wd-zlmediakit/wd-zlmediakit.log
-/data/applogs/wd-zlmediakit/logs
-```
-将日志打印出来
-```c++
-av_log_set_level(AV_LOG_WARNING);
-av_log_set_callback([](void *avcl, int level, const char *fmt, va_list vl)
-                    {
-    vprintf(fmt, vl);
-    // vfprintf(stderr, fmt, vl);
-    switch (level) {
-        case AV_LOG_PANIC:
-        case AV_LOG_FATAL:
-        case AV_LOG_ERROR:
-        case AV_LOG_WARNING:
-            break;
-        default:
-            return;
-    } });
-```
 ```
 #以守护进程模式启动
 cd /data/yjr/Code/ZLMediaKit/release/linux/Release
@@ -437,4 +415,46 @@ const std::string end_time/* YY-MM-DD hh:mm:ss */, uint64_t& offset);
             }
         }
         //-----执行非跨天逻辑----
+```
+## bug排查
+容器进出
+```bash
+nerdctl ps --查看当前运行的容器列表
+nerdctl exec -it -容器名 bash
+exit //或者快捷键Ctrl + D 离开容器
+```
+容器内执行 测带宽命令
+```bash
+speedtest-go 
+```
+容器内才可以使用ffmpeg如
+```
+ffmpeg -loglevel debug -i 124125-124333.mp4 -c:v copy -c:a copy -f rtsp rtsp://zlm7.geili.cn:1554/wd24/orangepi-f663879ddf54b4a7
+```
+日志位置
+```
+/home/www/logs/wd-zlmediakit/wd-zlmediakit.log
+/data/applogs/wd-zlmediakit/logs
+```
+摄像头视频位置
+```
+/home/www/ZLMediaKit/release/linux/Release/www/record/onvif/
+/data/zlmrecord/onvif
+```
+将日志打印出来
+```c++
+av_log_set_level(AV_LOG_WARNING);
+av_log_set_callback([](void *avcl, int level, const char *fmt, va_list vl)
+                    {
+    vprintf(fmt, vl);
+    // vfprintf(stderr, fmt, vl);
+    switch (level) {
+        case AV_LOG_PANIC:
+        case AV_LOG_FATAL:
+        case AV_LOG_ERROR:
+        case AV_LOG_WARNING:
+            break;
+        default:
+            return;
+    } });
 ```
