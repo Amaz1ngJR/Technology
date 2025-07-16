@@ -208,6 +208,21 @@ static auto addStreamPusherProxy = [](const string &schema,
 ```
 ### 细节
 PusherProxy.cpp 调用 MediaPusher::publish(dst_url);来推流
+```
+开始推流 MediaPusher::publish(dst_url)
+   ↓
+推流完成（setOnPublished）
+   ├─ 成功 → 重置计时器，记录成功日志
+   └─ 失败 → 是否还能重试？
+       ├─ 是 → 重试 rePublish()
+       └─ 否 → 触发 _on_close()
+
+推流中断（setOnShutdown）
+   ├─ 首次中断 → 更新直播时长
+   └─ 是否还能重试？
+       ├─ 是 → 重试 rePublish()
+       └─ 否 → 触发 _on_close()
+```
 ```c++
 void PusherProxy::publish(const string &dst_url) {
     std::weak_ptr<PusherProxy> weak_self = shared_from_this();
