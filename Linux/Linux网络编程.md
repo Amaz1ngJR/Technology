@@ -1195,6 +1195,10 @@ iperf3 -s -p 5202
 ```bash
 iperf3 -c <server_ip> -p 5202
 ```
+确保防火墙允许外部访问端口，Linux下：
+```bash
+sudo ufw allow 5202/tcp
+```
 默认的 10 秒测试时间,使用 -t 参数自定义测试时间
 ```bash
 iperf3 -c <server_ip>  -p 5201 -t 30
