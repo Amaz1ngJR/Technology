@@ -131,6 +131,29 @@ function(key,val)--匿名函数
 end
 );
 ```
+# 文件I/O
+```lua
+-- 写入文件
+local file = io.open("test.txt", "w")
+file:write("Hello Lua!")
+file:close()
+
+-- 读取文件
+local file = io.open("test.txt", "r")
+local content = file:read("*a")
+print(content)
+file:close()
+```
+Lua 的文件读取 (file:read) 支持以下几种模式：
+```lua
+local file = io.open("test.txt", "r")
+local all_content = file:read("*a") -- 读取整个文件 "*a" 或 "a"
+file:seek("set") -- 重置文件指针到开头
+local line = file:read("*l") -- 读取下一行（跳过行尾换行符） "*l" 或 "l" (默认模式)
+local line_with_newline = file:read("*L") -- 读取下一行（保留行尾换行符） *L" 或 "L"
+local number = file:read("*n") -- 读取一个数字  "*n" 或 "n"
+local chars = file:read(5) -- 读取指定5个字符
+```
 # table
 ## 数字下标的表类似数组
 ```lua
