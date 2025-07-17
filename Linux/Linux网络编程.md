@@ -1176,4 +1176,42 @@ int main(){
     return 0;
 }
 ```
- 
+
+# 网络问题排查
+## 网络测试
+
+### speedtest
+
+### iperf3
+在服务器端启动 iperf3
+```bash
+iperf3 -s
+```
+默认情况下，iperf3 服务器会在 TCP 端口 5201 上监听连接.如果想指定不同的端口，可以使用 -p 参数
+```bash
+iperf3 -s -p 5202
+```
+客户端运行以下命令来开始带宽测试(TCP)：
+```bash
+iperf3 -c <server_ip> -p 5202
+```
+默认的 10 秒测试时间,使用 -t 参数自定义测试时间
+```bash
+iperf3 -c <server_ip>  -p 5201 -t 30
+```
+UDP:
+```bash
+iperf3 -c <server_ip> -u 
+```
+默认情况下，UDP测试会发送18Mbps的数据流。如果你想要改变这个速率，可以使用 -b 参数指定带宽
+```bash
+iperf3 -c <server_ip>  -u -b 10M
+```
+双向测试：如果你想同时测试上传和下载速度，可以在客户端使用 -d 参数：
+```bash
+iperf3 -c <server_ip> -d
+```
+并行流测试：使用 -P 参数指定并发流的数量以模拟多线程应用的情况： 创建4个并行的TCP连接进行测试
+```bash
+iperf3 -c <server_ip> -P 4
+```
