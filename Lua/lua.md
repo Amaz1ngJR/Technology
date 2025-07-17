@@ -45,6 +45,7 @@ c, d = 3, 4   --多重赋值
 ```
 
 # string
+## string拼接与查找段
 ```lua
 s = [[hello
 /world,aa
@@ -55,13 +56,24 @@ s3 = s1..s2   --字符串连接符号不是+而是..
 print(s)
 print(s3)
 print(#s3)  --返回字符串的长度
+local s = "Lua Programming"
+print(string.sub(s, 5, 8)) -- Prog下标5-8
+print(string.find(s, "Pro")) -- 5 7 下标5-7
 ```
+## 字符串与 ASCII/Unicode 码点之间的转换
 ```lua
-s = string.char(0x30, 0x31, 0x32, 0x33)
+s = string.char(0x30, 0x31, 0x32, 0x33) --将一系列数字转换为对应的字符并组合成字符串
 print(s)
-n = string.byte(s, 2)
+n = string.byte(s, 2) --获取字符串中指定位置的字符的 ASCII/Unicode 码点
+-- 0x30 = 48（'0'），0x31 = 49（'1'）
 m = 0x31
 print(n, m)
+```
+## 大小写转换
+```lua
+local s = "Lua Programming"
+print(string.upper(s))    -- LUA PROGRAMMING
+print(string.lower(s))    -- lua programming
 ```
 
 # function
@@ -155,19 +167,42 @@ local number = file:read("*n") -- 读取一个数字  "*n" 或 "n"
 local chars = file:read(5) -- 读取指定5个字符
 ```
 # table
+```lua
+-- 创建表
+local person = {
+    name = "Alice",
+    age = 25,
+    "first",  -- 相当于 [1] = "first"
+    "second"   -- 相当于 [2] = "second"
+}
+
+-- 访问表元素
+print(person.name)    -- Alice
+print(person["age"])  -- 25
+print(person[1])      -- first
+
+-- 修改表
+person.age = 26
+person["city"] = "Beijing"
+
+-- 遍历表
+for key, value in pairs(person) do
+    print(key, value)
+end
+```
 ## 数字下标的表类似数组
 ```lua
 --下标从1开始，里面可以同时存数字、字符串、数组、函数
 a = {1, "abc", {}, function() end}
-a[6] = 123
-print(a[2], a[6], a[5])
-print(#a)
+a[6] = 123 
+print(a[2], a[6], a[5])    -- abc     123     nil
+print(#a)                  -- 6
 table.insert(a, "666") --在数组末尾插入元素
-print(a[7],#a)
+print(a[7],#a)            -- 666  7
 table.insert(a, 2, '888') --在下标为2的地方插入元素，其后元素后移一个下标
-print(a[2], a[3], #a)
+print(a[2], a[3], #a)     -- 888 abc  8
 res = table.remove(a,2)  --下标为2的地方删除元素，并返回该元素，其后元素前移一个下标
-print(res, a[2], #a)
+print(res, a[2], #a)      -- 888 abc  7
 ```
 ## 字符串下标的表
 ```lua
@@ -179,9 +214,9 @@ a = {
         d = 1233,
         [",;"] = 123 
 }
-print(a["a"], a.b, a[",;"])
+print(a["a"], a.b, a[",;"]) -- 1 1234 123
 a["abc"] = "abcd"
-print(a["abc"], a.def)
+print(a["abc"], a.def) -- abcd nil
 ```
 ## 全局表_G
 lua中所有的全局变量都存放在全局表_G中 多文件调用可以使用
