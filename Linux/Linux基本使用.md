@@ -410,11 +410,19 @@ cat -v filename                 //显示非打印字符 用^表示
 cat filename | tail             //显示文件末尾 默认情况下显示最后10行
 cat new_content >> existing_file//将内容追加到文件
 ```
+## head 查看文件头部的内容
+```bash
+head file.txt           # 默认显示前10行
+head -n 20 file.txt     # 显示前20行
+head -n -10 file.txt    # 显示除最后10行外的前面部分
+
+```
 ## tail 查看文件尾部的内容 跟踪文件更新
 ```bash
-tail filename        //显示文件末尾的内容 默认显示文件末尾的最后 10 行
+tail filename        //默认显示文件末尾的最后 10 行
 tail file1 file2     //同时显示多个文件的末尾内容
 tail -n 2 filename   //显示最后2行文件末尾内容 可省略n 直接 tail -2 filename
+tail -n +2 filename  //从文件的第2行开始（包括第2行） 输出到文件末尾
 tail -c 2 filename   //显示文件末尾2字节的内容
 tail -f filename     //实时监视文件的变化
 ```
