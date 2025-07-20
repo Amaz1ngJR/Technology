@@ -846,6 +846,15 @@ void demo() {
 	//替换
 	str.replace(1, 3, "1A");//从下标1开始3个字符替换成"1A"
 	cout << str;
+
+	 // 检查是否以 "Ama" 开头
+	if (str.starts_with("Ama")) {
+		std::cout << "The string starts with 'Ama'\n";
+	}
+	// 检查是否以单个字符'A'开头
+	if (str.starts_with('A')) {
+		std::cout << "The string starts with 'A'\n";
+	}
 }
 ```
 
