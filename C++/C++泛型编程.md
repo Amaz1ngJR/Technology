@@ -847,7 +847,7 @@ void demo() {
 	str.replace(1, 3, "1A");//从下标1开始3个字符替换成"1A"
 	cout << str;
 
-	 // 检查是否以 "Ama" 开头
+	 // c++20 检查是否以 "Ama" 开头
 	if (str.starts_with("Ama")) {
 		std::cout << "The string starts with 'Ama'\n";
 	}
@@ -855,6 +855,12 @@ void demo() {
 	if (str.starts_with('A')) {
 		std::cout << "The string starts with 'A'\n";
 	}
+	//c++20之前的版本
+	/*bool starts_with(const std::string& str, const std::string& prefix) {
+		return str.find(prefix) == 0;
+		if (prefix.size() > str.size()) return false;
+	    	return str.substr(0, prefix.size()) == prefix;
+	}*/
 }
 ```
 
