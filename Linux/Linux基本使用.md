@@ -276,6 +276,23 @@ man 6 游戏
 man 7 宏包和协议等杂项
 man 8 只能由系统管理员运行的系统管理命令和守护进程
 ```
+
+## 网络传输文件
+### 传输文件 nc 
+
+先在在接收端运行
+```bash
+nc -l -p 12345 > receivedfile.txt
+nc -l 12345 > mydebug.txt
+```
+在发送端运行
+```bash
+nc [接收端的IP地址] 12345 < examplefile.txt
+
+//[接收端的IP地址] ifconfig | grep "inet " | grep -v 127.0.0.1
+```
+
+
 # *Linux基本指令
 
 ## ls 列出当前目录下的内容
@@ -508,17 +525,3 @@ Ctrl + U 删除这行命令
 Ctrl + 键盘左/右键 向左/右跳一个单词
 Ctrl + L = clear 清空终端内容
 ```
-## 传输文件 nc 
-使用nc
-
-先在在接收端运行
-```bash
-nc -l -p 12345 > receivedfile.txt
-```
-在发送端运行
-```bash
-nc [接收端的IP地址] 12345 < examplefile.txt
-//[接收端的IP地址] ifconfig | grep "inet " | grep -v 127.0.0.1
-```
-
-
