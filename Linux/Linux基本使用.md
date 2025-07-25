@@ -291,7 +291,40 @@ nc [接收端的IP地址] 12345 < examplefile.txt
 
 //[接收端的IP地址] ifconfig | grep "inet " | grep -v 127.0.0.1
 ```
+### 传输文件 lrzsz
+mac下
+```bash
+brew install lrzsz
+```
 
+安装触发器脚本
+```
+sudo curl -o /usr/local/bin/iterm2-send-zmodem.sh https://raw.githubusercontent.com/robberphex/iTerm2-zmodem/master/iterm2-send-zmodem.sh
+sudo curl -o /usr/local/bin/iterm2-recv-zmodem.sh https://raw.githubusercontent.com/robberphex/iTerm2-zmodem/master/iterm2-recv-zmodem.sh
+sudo chmod +x /usr/local/bin/iterm2-*.sh
+```
+mac上是lsz、lrz而不是sz、rz 创建软连接
+```
+sudo chmod +x /opt/homebrew/bin/lsz
+
+sudo ln -s /opt/homebrew/bin/lsz /usr/local/bin/sz
+sudo ln -s /opt/homebrew/bin/lrz /usr/local/bin/rz
+```
+按 command + , 打开配置item2--profile--Advanced--trigger--edit
+<img width="1173" height="528" alt="image" src="https://github.com/user-attachments/assets/168ff7ca-a2fc-460f-a139-df948eb41827" />
+配置如下
+
+```
+rz waiting to receive.\*\*B0100   ---------    /usr/local/bin/iterm2-send-zmodem.sh
+\*\*B00000000000000          --------------    /usr/local/bin/iterm2-recv-zmodem.sh
+```
+远程连接linux后（也要安装lrzsz）后
+```bash
+sz a.txt  --将该目录下的a.txt传到（mac终端会自动打开的选择文件夹中）
+```
+```bash
+rz --将mac终端会自动打开的选择文件传到linux上
+```
 
 # *Linux基本指令
 
