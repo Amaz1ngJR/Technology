@@ -278,7 +278,7 @@ man 8 只能由系统管理员运行的系统管理命令和守护进程
 ```
 
 ## 网络传输文件
-### 传输文件 nc 
+### 局域网内传输文件 nc 
 
 先在在接收端运行
 ```bash
@@ -291,7 +291,7 @@ nc [接收端的IP地址] 12345 < examplefile.txt
 
 //[接收端的IP地址] ifconfig | grep "inet " | grep -v 127.0.0.1
 ```
-### 传输文件 lrzsz
+### mac与服务器之间传输文件 lrzsz
 mac下
 ```bash
 brew install lrzsz
