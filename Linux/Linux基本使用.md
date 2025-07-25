@@ -313,6 +313,7 @@ sudo ln -s /opt/homebrew/bin/lrz /usr/local/bin/rz
 按 command + , 打开配置item2--profile--Advanced--trigger--edit
 <img width="1173" height="528" alt="image" src="https://github.com/user-attachments/assets/168ff7ca-a2fc-460f-a139-df948eb41827" />
 配置如下
+<img width="907" height="109" alt="image" src="https://github.com/user-attachments/assets/4235bb86-d409-48c1-9935-c6d0d7cafd64" />
 
 ```
 rz waiting to receive.\*\*B0100   ---------    /usr/local/bin/iterm2-send-zmodem.sh
