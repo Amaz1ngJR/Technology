@@ -1,3 +1,4 @@
+# Golang基础
 [在线编程](https://www.runoob.com/try/runcode.php?filename=helloworld&type=go)
 mac下 直接 brew install go 运行： go run demo.go 或者使用go build demo.go生成二进制文件demo ./demo
 
@@ -20,13 +21,15 @@ func main() {
 	var data = "2025-07-31"
 	var url = "num=%d&data =%s"
 	var res = fmt.Sprintf(url, number, data)
-	fmt.Printf(res)
+	print(res)
+	println()
 	fmt.Println("hello")
+	print("---")
 	fmt.Println(res)
 }
 ```
 ## 变量
-变量声明与初始化
+### 变量声明与初始化
 ```golang
 package main
 import "fmt"
@@ -46,7 +49,8 @@ func main() {
     fmt.Printf("%v %v %v %q\n", i, f, bl, s)
 }
 ```
-全局变量与局部变量
+### 全局变量与局部变量
+全局变量可以在整个包甚至外部包（被导出后）使用
 ```golang
 package main
 import "fmt"
@@ -91,3 +95,81 @@ a, b = b, a
 ```golang
 _, b = 5, 7
 ```
+### const 常量
+```golang
+package main
+import"fmt"
+func main() {
+	const LENGTH int = 10 //显式类型定义
+   	const WIDTH = 5  //隐式类型定义
+	const a, b, c = 1, false, "str" //多重赋值
+
+   	var area int
+   	area = LENGTH * WIDTH
+   	fmt.Printf("面积为 : %d", area)
+   	println()
+   	println(a, b, c)  
+}
+```
+常量还可以用作枚举：
+```golang
+package main
+
+import "unsafe"
+const (
+    a = "abc"
+    b = len(a)			// b = 3
+    c = unsafe.Sizeof(a)	// c = 16 unsafe.Sizeof 测量的是变量在内存中占用的“大小”
+				//Go 的字符串是一个 2个字段的结构体，unsafe.Sizeof 测的是这个结构体的大小，不是它指向的数据
+)
+
+func main(){
+    println(a, b, c)
+}
+```
+特殊常量iota
+```golang
+const (
+    a = iota
+    b = iota
+    c = iota
+)
+//or
+const (
+    a = iota
+    b 
+    c
+)
+```
+```golang
+package main
+
+import "fmt"
+
+func main() {
+	const (
+	    a = iota   //0
+	    b          //1
+	    c          //2
+	    d = "ha"   //独立值，iota += 1
+	    e          //"ha"   iota += 1
+	    f = 100    //iota +=1
+	    g          //100  iota +=1
+	    h = iota   //7,恢复计数
+	    i          //8
+	)
+	fmt.Println(a,b,c,d,e,f,g,h,i)
+
+	const (
+	    j=1<<iota
+	    k=3<<iota
+	    o
+	    p
+	)
+	println("j = ", j);
+	println("k = ", k);
+	println("o = ", o);
+	println("p = ", p);
+}
+```
+## 函数闭包（匿名函数）
