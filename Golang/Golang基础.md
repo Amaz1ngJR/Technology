@@ -2,6 +2,11 @@
 [在线编程](https://www.runoob.com/try/runcode.php?filename=helloworld&type=go)
 mac下 直接 brew install go 运行： go run demo.go 或者使用go build demo.go生成二进制文件demo ./demo
 
+网络代理
+使用 GOPROXY： 你可以设置 GOPROXY 环境变量来使用国内的 Go 模块代理，比如 goproxy.cn，它提供了一个更稳定的模块下载服务。
+```bash
+export GOPROXY=https://goproxy.cn,direct
+```
 常用命令
 ```bash
 go run: 运行Go程序
