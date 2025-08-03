@@ -178,6 +178,78 @@ func main() {
 }
 ```
 ## 函数闭包（匿名函数）
+Golang函数可以返回多个值
+```golang
+package main
+
+import "fmt"
+
+func swap(x, y string) (string, string) {
+   return y, x
+}
+
+func main() {
+   a, b := swap("World", "Hello")
+   fmt.Println(a, b)
+}
+```
+Go 语言支持匿名函数，可作为闭包
+```golang
+package main
+import "fmt"
+
+func getSequence() func() int {
+   i:=0
+   return func() int {
+      i+=1
+     return i  
+   }
+}
+
+func main(){
+   /* nextNumber 为一个函数 */
+   nextNumber := getSequence()  
+
+   /* 调用 nextNumber 函数，i 变量自增 1 并返回 */
+   fmt.Println(nextNumber())  	//------------1
+   fmt.Println(nextNumber())	//------------2
+   fmt.Println(nextNumber())	//------------3
+   
+   /* 创建新的函数 nextNumber1，并查看结果 */
+   nextNumber1 := getSequence()  
+   fmt.Println(nextNumber1())  	//------------1
+   fmt.Println(nextNumber1())  	//------------2
+}
+```
+```golang
+package main
+import "fmt"
+
+func main() {
+    // 定义一个匿名函数并将其赋值给变量add
+    // 在函数内部使用匿名函数
+    multiply := func(x, y int) int {
+        return x * y
+    }
+
+    product := multiply(4, 6)
+    fmt.Println("4 * 6 =", product)
+
+    // 将匿名函数作为参数传递给其他函数
+    calculate := func(operation func(int, int) int, x, y int) int {
+        return operation(x, y)
+    }
+
+    res := calculate(multiply, 2, 8)
+    fmt.Println("2 * 8 =", res)
+
+    // 也可以直接在函数调用中定义匿名函数
+    difference := calculate(func(a, b int) int {
+        return a - b
+    }, 10, 4)
+    fmt.Println("10 - 4 =", difference)
+}
+```
 
 ## time
 ```golang
