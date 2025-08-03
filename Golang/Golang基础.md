@@ -399,9 +399,18 @@ m["apple"] = 5
 // 获取 Map 的长度
 len := len(m)
 
-// 遍历 Map
+// 遍历 Map1
 for k, v := range m {
-    fmt.Printf("key=%s, value=%d\n", k, v)
+	fmt.Printf("key=%s, value=%d\n", k, v)
+}
+// 遍历 map1，只读取 key
+for key := range map1 {
+	fmt.Printf("key is: %d\n", key)
+}
+
+// 遍历 map1，只读取 value
+for _, value := range map1 {
+	fmt.Printf("value is: %f\n", value)
 }
 
 // 删除键值对
