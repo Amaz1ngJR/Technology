@@ -252,6 +252,7 @@ func main() {
 ```
 
 ## 数组
+Go 数组的长度不可改变
 ### 初始化
 Go 语言数组声明需要指定元素类型及元素个数,如
 ```golang
@@ -293,6 +294,35 @@ func main() {
 		println("i =", i, "x =", x)
 	}
 }
+```
+## 切片
+### 初始化
+```golang
+package main
+import "fmt"
+
+func printSlice(x []int){
+  	fmt.Printf("len=%d cap=%d slice=%v\n",len(x),cap(x),x)
+	if(x == nil){
+		fmt.Println("切片是空的")
+   }
+}
+
+func main() {
+	//声明一个未指定大小的数组来定义切片
+	var s1 []int
+	printSlice(s1)
+	//使用 make() 函数来创建切片var slice1 []type = make([]type, len)
+	var slice1 [] int = make([]int, 10)
+	printSlice(slice1)
+	//使用 make() 函数来创建切片var slice2 []type = make([]T, length, capacity)
+	var slice2 [] int = make([]int, 10, 20)
+	printSlice(slice2)
+	// 切片初始化 [] 表示是切片类型，{1,2,3} 初始化值依次是 1,2,3，其 cap=len=3。
+	s :=[] int {1,2,3 } 
+	printSlice(s)
+}
+
 ```
 ## 结构体
 ```golang
