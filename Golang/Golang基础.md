@@ -321,8 +321,91 @@ func main() {
 	// 切片初始化 [] 表示是切片类型，{1,2,3} 初始化值依次是 1,2,3，其 cap=len=3。
 	s :=[] int {1,2,3 } 
 	printSlice(s)
+
+	//切片的截取 使用数组或者切片来截取成新的切片
+	//s := arr[startIndex:endIndex] 上下限默认值为arr.begin, arr.end
+	//将 arr 中从下标 startIndex 到 endIndex-1 下的元素创建为一个新的切片。
+	arr := [3] int {1, 2, 3}
+	s = arr[0:2]
+	printSlice(s)
+}
+```
+### append() 和 copy()
+如果想增加切片的容量，我们必须创建一个新的更大的切片并把原分片的内容都拷贝过来
+```golang
+package main
+import "fmt"
+
+func printSlice(x []int){
+  	fmt.Printf("len=%d cap=%d slice=%v\n",len(x),cap(x),x)
+	if(x == nil){
+		fmt.Println("切片是空的")
+   }
 }
 
+func main() {
+	var numbers []int
+	printSlice(numbers)  		//len=0 cap=0 slice=[]
+	
+	/* 允许追加空切片 */
+	numbers = append(numbers, 0)
+	printSlice(numbers)		//len=1 cap=1 slice=[0]
+	
+	/* 向切片添加一个元素 */
+	numbers = append(numbers, 1)
+	printSlice(numbers)		//len=2 cap=2 slice=[0 1]
+	
+	/* 同时添加多个元素 */
+	numbers = append(numbers, 2,3,4)
+	printSlice(numbers)
+	
+	/* 创建切片 numbers1 是之前切片的两倍容量*/
+	numbers1 := make([]int, len(numbers), (cap(numbers))*2)
+	
+	/* 拷贝 numbers 的内容到 numbers1 */
+	copy(numbers1,numbers)
+	printSlice(numbers1)  
+}
+```
+## Map
+Map 是一种无序的键值对的集合,当 Map 中的键值对数量达到容量时，Map 会自动扩容
+### 定义
+```golang
+/* 使用 make 函数 */
+map_variable := make(map[KeyType]ValueType, initialCapacity)
+
+// 创建一个空的 Map
+m := make(map[string]int)
+
+// 创建一个初始容量为 10 的 Map
+m := make(map[string]int, 10)
+
+// 使用字面量创建 Map
+m := map[string]int{
+    "apple": 1,
+    "banana": 2,
+    "orange": 3,
+}
+```
+### 常用操作
+```golang
+// 获取键值对
+v1 := m["apple"]
+v2, ok := m["pear"]  // 如果键不存在，ok 的值为 false，v2 的值为该类型的零值
+
+// 修改键值对
+m["apple"] = 5
+
+// 获取 Map 的长度
+len := len(m)
+
+// 遍历 Map
+for k, v := range m {
+    fmt.Printf("key=%s, value=%d\n", k, v)
+}
+
+// 删除键值对
+delete(m, "banana")
 ```
 ## 结构体
 ```golang
