@@ -294,6 +294,142 @@ func main() {
 	}
 }
 ```
+## 结构体
+```golang
+package main
+import "fmt"
+
+type Person struct {
+	//属性
+    Name string
+	Age  int
+	//在 Go 中，结构体（struct）只用于定义数据字段（属性），
+	//不能在 struct 内部声明方法,方法是绑定到类型上的函数，不是结构体的成员
+}
+
+func main() {
+	a := Person{}
+	a.Name = "Amaz1ng"
+	b := Person{"abc", 18}
+	fmt.Println("a`s name = ", a.Name, "b`s name = ", b.sayName())
+}
+
+//方法必须独立定义，使用 (p Type) 作为接收者 
+func (p Person) sayName() string {
+  return p.Name
+}
+```
+## 面向对象编程
+```golang
+package main
+
+import "fmt"
+
+// ==================== 1. 定义接口（多态） ====================
+// Speaker 接口定义了“会说话”的行为
+type Speaker interface {
+    Speak() string
+}
+
+// Mover 接口定义了“会移动”的行为
+type Mover interface {
+    Move() string
+}
+
+// ==================== 2. 定义基础结构体（封装） ====================
+// Animal 是基础结构体，包含公共属性
+type Animal struct {
+    Name string
+    Age  int
+}
+
+// 构造函数：Go 没有构造函数，但可以用 NewXXX 函数模拟
+func NewAnimal(name string, age int) Animal {
+    return Animal{Name: name, Age: age}
+}
+
+// Animal 的通用方法
+func (a Animal) Info() string {
+    return fmt.Sprintf("Name: %s, Age: %d", a.Name, a.Age)
+}
+
+// ==================== 3. 定义具体类型（组合代替继承） ====================
+// Dog 结构体，嵌入 Animal（组合）
+type Dog struct {
+    Animal  // 匿名字段，实现“继承”
+    Breed   string
+}
+
+// Cat 结构体
+type Cat struct {
+    Animal
+    Color string
+}
+
+// ==================== 4. 为类型实现方法（行为） ====================
+// Dog 实现 Speak 方法
+func (d Dog) Speak() string {
+    return fmt.Sprintf("%s says: Woof! Woof!", d.Name)
+}
+
+// Dog 实现 Move 方法
+func (d Dog) Move() string {
+    return fmt.Sprintf("%s runs on four legs.", d.Name)
+}
+
+// Cat 实现 Speak 方法
+func (c Cat) Speak() string {
+    return fmt.Sprintf("%s says: Meow~", c.Name)
+}
+
+// Cat 实现 Move 方法
+func (c Cat) Move() string {
+    return fmt.Sprintf("%s sneaks silently.", c.Name)
+}
+
+// ==================== 5. 多态使用（接口） ====================
+func MakeItSpeak(s Speaker) {
+    fmt.Println(s.Speak())
+}
+
+func MakeItMove(m Mover) {
+    fmt.Println(m.Move())
+}
+
+// ==================== 主函数 ====================
+func main() {
+    // 创建 Dog 实例
+    dog := Dog{
+        Animal: NewAnimal("Buddy", 3),
+        Breed:  "Golden Retriever",
+    }
+
+    // 创建 Cat 实例
+    cat := Cat{
+        Animal: NewAnimal("Luna", 2),
+        Color:  "Black",
+    }
+
+    // 打印基本信息
+    fmt.Println("=== Animal Info ===")
+    fmt.Println(dog.Info()) // 继承 Animal 的方法
+    fmt.Println(cat.Info())
+
+    // 多态调用
+    fmt.Println("\n=== Speaking ===")
+    MakeItSpeak(dog) // 输出: Buddy says: Woof! Woof!
+    MakeItSpeak(cat) // 输出: Luna says: Meow~
+
+    fmt.Println("\n=== Moving ===")
+    MakeItMove(dog) // 输出: Buddy runs on four legs.
+    MakeItMove(cat) // 输出: Luna sneaks silently.
+
+    // 直接调用方法
+    fmt.Println("\n=== Direct Calls ===")
+    fmt.Println(dog.Speak())
+    fmt.Println(cat.Move())
+}
+```
 ## time
 ```golang
 package main
