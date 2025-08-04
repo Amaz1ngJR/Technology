@@ -177,8 +177,8 @@ func main() {
 	println("p = ", p);
 }
 ```
-## 变量类型转换
-将整型转化为浮点型
+### 变量类型转换
+#### 整型转化为浮点型
 ```golang
 package main
 import "fmt"
@@ -192,7 +192,7 @@ func main() {
    fmt.Printf("mean 的值为: %f\n",mean) // 3.400000
 }
 ```
-字符串转换成整型变量
+#### 字符串转换成整型变量
 ```golang
 package main
 import (
@@ -210,7 +210,7 @@ func main() {
     }
 }
 ```
-整形转字符串
+#### 整形转字符串
 ```golang
 package main
 import (
@@ -224,7 +224,7 @@ func main() {
     fmt.Printf("整数 %d  转换为字符串为：'%s'\n", num, str)
 }
 ```
-字符串转换为浮点数
+#### 字符串转换为浮点数
 ```golang
 package main
 import (
@@ -249,7 +249,7 @@ func main() {
 	}
 }
 ```
-浮点型转字符串
+#### 浮点型转字符串
 ```golang
 package main
 import (
