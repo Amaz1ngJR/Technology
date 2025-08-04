@@ -177,6 +177,92 @@ func main() {
 	println("p = ", p);
 }
 ```
+## 变量类型转换
+将整型转化为浮点型
+```golang
+package main
+import "fmt"
+
+func main() {
+   var sum int = 17
+   var count int = 5
+   var mean float32
+   
+   mean = float32(sum)/float32(count)
+   fmt.Printf("mean 的值为: %f\n",mean) // 3.400000
+}
+```
+字符串转换成整型变量
+```golang
+package main
+import (
+    "fmt"
+    "strconv"
+)
+
+func main() {
+    str := "123"
+    num, err := strconv.Atoi(str)
+    if err != nil {
+        fmt.Println("转换错误:", err)
+    } else {
+        fmt.Printf("字符串 '%s' 转换为整数为：%d\n", str, num)
+    }
+}
+```
+整形转字符串
+```golang
+package main
+import (
+    "fmt"
+    "strconv"
+)
+
+func main() {
+    num := 123
+    str := strconv.Itoa(num)
+    fmt.Printf("整数 %d  转换为字符串为：'%s'\n", num, str)
+}
+```
+字符串转换为浮点数
+```golang
+package main
+import (
+    "fmt"
+    "strconv"
+)
+
+func main() {
+    str := "3.14"
+    num, err := strconv.ParseFloat(str, 64)
+    if err != nil {
+        fmt.Println("转换错误:", err)
+    } else {
+        fmt.Printf("字符串 '%s' 转为64位浮点型为：%f\n", str, num)
+    }
+	// 转换为float32
+	f32, err := strconv.ParseFloat(str, 32)
+	if err != nil {
+		fmt.Println("转换错误:", err)
+	} else {
+		fmt.Printf("字符串 '%s' 转换为32位浮点数为：%f\n", str, float32(f32))
+	}
+}
+```
+浮点型转字符串
+```golang
+package main
+import (
+    "fmt"
+    "strconv"
+)
+
+func main() {
+    num := 3.14
+    str := strconv.FormatFloat(num, 'f', 3, 64)		//保留3位的64位浮点数
+    fmt.Printf("浮点数 %f 转为字符串为：'%s'\n", num, str)
+}
+```
 ## 函数闭包（匿名函数）
 Golang函数可以返回多个值
 ```golang
@@ -441,6 +527,7 @@ func (p Person) sayName() string {
   return p.Name
 }
 ```
+## 接口
 ## 面向对象编程
 ```golang
 package main
