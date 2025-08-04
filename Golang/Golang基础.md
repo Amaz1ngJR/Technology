@@ -653,28 +653,19 @@ func main() {
 ## time
 ```golang
 package main
-
 import "fmt"
 import "time"
+
 func main() {
    	start := time.Now()
 	startTimeStr := start.Format("2006-01-02 15:04:05.000")
-	fmt.Println(“开始计时：” + startTimeStr)
-	i := 1
-	for i < 10000000 {
-		i++
-	}
+	fmt.Println("开始计时：" + startTimeStr)
+	
+	time.Sleep(100 * time.Millisecond)
+	time.Sleep(1 * time.Second)
+	
 	duration := time.Since(start) // 计算耗时
 	durationMs := float64(duration.Milliseconds()) / 1000.0 // 转为 float，单位秒
-	fmt.Println(durationMs)
-	//模拟在日志中，反复计时
-	start = time.Now()
-	i = 1
-	for i < 100000000 {
-		i++
-	}
-	duration = time.Since(start) // 计算耗时
-	durationMs = float64(duration.Milliseconds()) / 1000.0 // 转为 float，单位秒
 	fmt.Println(durationMs)
 }
 ```
