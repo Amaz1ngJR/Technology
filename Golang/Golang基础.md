@@ -528,6 +528,12 @@ func (p Person) sayName() string {
 }
 ```
 ## 接口
+
+### 接口类型转换
+接口类型转换有两种情况：类型断言和类型转换
+#### 类型断言
+
+#### 类型转换
 ## 面向对象编程
 ```golang
 package main
@@ -639,6 +645,11 @@ func main() {
     fmt.Println(cat.Move())
 }
 ```
+## Go并发
+
+## Go文件处理
+
+## Go正则表达式
 ## time
 ```golang
 package main
