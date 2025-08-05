@@ -646,7 +646,423 @@ func main() {
 }
 ```
 ## Go并发
+Go 语言支持并发，通过 goroutines 和 channels 提供了一种简洁且高效的方式来实现并发
+### Goroutine
+goroutine 是轻量级线程,Go 中的并发执行单位,非阻塞的
+```golang
+package main
+import (
+        "fmt"
+        "time"
+)
 
+func sayHello() {
+        for i := 0; i < 5; i++ {
+                fmt.Println("Hello")
+                time.Sleep(100 * time.Millisecond)
+        }
+}
+
+func main() {
+        go sayHello() // 启动 Goroutine
+        for i := 0; i < 5; i++ {
+                fmt.Println("Main")
+                time.Sleep(100 * time.Millisecond)
+        }
+}
+```
+### Channel
+通道可用于两个 goroutine 之间通过传递一个指定类型的值来同步运行和通讯。
+使用 make 函数创建一个 channel，使用 <- 操作符发送和接收数据。如果未指定方向，则为双向通道
+```golang
+package main
+import "fmt"
+
+func sum(s []int, c chan int) {
+    sum := 0
+    for _, v := range s {
+        sum += v
+    }
+    c <- sum // 把 sum 发送到通道 c
+}
+
+func main() {
+    s := []int{7, 2, 8, -9, 4, 0}
+
+    c := make(chan int)//默认情况下，通道是不带缓冲区的。发送端发送数据，同时必须有接收端相应的接收数据。
+    go sum(s[:len(s)/2], c)
+    go sum(s[len(s)/2:], c)
+    x, y := <-c, <-c // 从通道 c 中接收
+
+    fmt.Println(x, y, x+y)
+
+    ch := make(chan int, 2)//定义一个缓冲区大小为2,可以存储整数类型的通道
+	// 因为 ch 是带缓冲的通道，我们可以同时发送两个数据，而不用立刻需要去同步读取数据
+    ch <- 1
+    ch <- 2
+
+    // 获取这两个数据
+    fmt.Println(<-ch)
+    fmt.Println(<-ch)
+}
+```
+### Select & WaitGroup
+select 语句使得一个 goroutine 可以等待多个通信操作。select 会阻塞，直到其中的某个 case 可以继续执行
+```golang
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+	quit := make(chan int)
+	
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch1 <- "来自ch1的消息"
+	}()
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch2 <- "来自ch2的消息"
+	}()
+	
+	go func() {
+		time.Sleep(2 * time.Second)
+		quit <- 0
+	}()
+	
+	// 使用select等待多个channel
+	for i := 0; i < 3; i++ {
+		select {
+		case msg1 := <-ch1:
+			fmt.Println("接收到:", msg1)
+		case msg2 := <-ch2:
+			fmt.Println("接收到:", msg2)
+		case <-quit:
+            fmt.Println("quit")
+            return
+		}
+	}
+}
+```
+当多个case都准备好时，select会随机选择一个执行
+```golang
+package main
+
+import "fmt"
+
+func main() {
+	ch1 := make(chan int, 1)
+	ch2 := make(chan int, 1)
+
+	ch1 <- 1
+	ch2 <- 2
+
+	select {
+	case <-ch1:
+		fmt.Println("从ch1接收")
+	case <-ch2:
+		fmt.Println("从ch2接收")
+	}
+}
+// 输出可能是"从ch1接收"或"从ch2接收"，随机选择
+```
+带超时的select
+```golang
+package main
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch := make(chan string)
+
+	go func() {
+		time.Sleep(3 * time.Second)
+		ch <- "处理结果"
+	}()
+
+	select {
+	case res := <-ch:
+		fmt.Println(res)
+	case <-time.After(2 * time.Second):
+		fmt.Println("操作超时")
+	}
+}
+```
+非阻塞的select（使用default）
+```golang
+package main
+import "fmt"
+
+func main() {
+	ch := make(chan int, 0)//改为1/0
+
+	select {
+	case ch <- 42:
+		fmt.Println("值已发送到channel")
+	default:
+		fmt.Println("channel已满，无法发送")
+	}
+
+	select {
+	case val := <-ch:
+		fmt.Println("接收到:", val)
+	default:
+		fmt.Println("没有数据可接收")
+	}
+}
+```
+永久等待多个channel
+```golang
+package main
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	tick := time.Tick(100 * time.Millisecond)
+	boom := time.After(500 * time.Millisecond)
+
+	for {
+		select {
+		case <-tick:
+			fmt.Println("滴答")
+		case <-boom:
+			fmt.Println("砰!")
+			return
+		default:
+			fmt.Println("    .")
+			time.Sleep(50 * time.Millisecond)
+		}
+	}
+}
+```
+sync.WaitGroup 用于等待多个 Goroutine 完成
+```golang
+package main
+import (
+        "fmt"
+        "sync"
+)
+
+func worker(id int, wg *sync.WaitGroup) {
+        defer wg.Done() // Goroutine 完成时调用 Done()
+        fmt.Printf("Worker %d started\n", id)
+        fmt.Printf("Worker %d finished\n", id)
+}
+
+func main() {
+        var wg sync.WaitGroup
+
+        for i := 1; i <= 3; i++ {
+                wg.Add(1) // 增加计数器
+                go worker(i, &wg)
+        }
+
+        wg.Wait() // 等待所有 Goroutine 完成
+        fmt.Println("All workers done")
+}
+```
+### Context
+Context是Go语言中用于控制goroutine生命周期的标准工具，它可以传递取消信号、截止时间和其他请求范围的值，其主要方法
+```golang
+/*控制goroutine的生命周期
+传递取消信号
+设置超时/截止时间
+在请求范围内传递值
+*/
+type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <-chan struct{}
+    Err() error
+    Value(key interface{}) interface{}
+}
+```
+#### context.WithCancel
+创建可取消的Context
+```golang
+package main
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+func worker(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("收到取消信号，退出")
+			return
+		default:
+			fmt.Println("工作中...")
+			time.Sleep(1 * time.Second)
+		}
+	}
+}
+
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	
+	go worker(ctx)
+	
+	time.Sleep(3 * time.Second)
+	cancel() // 发送取消信号
+	
+	time.Sleep(1 * time.Second) // 给worker时间处理退出
+}
+```
+#### context.WithTimeout
+创建带超时的Context
+```golang
+package main
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)//2秒超时
+	defer cancel() // 好的实践是总是调用cancel
+	
+	select {
+	case <-time.After(3 * time.Second):
+		fmt.Println("操作完成")
+	case <-ctx.Done():
+		fmt.Println("操作超时:", ctx.Err()) // 输出: context.DeadlineExceeded
+	}
+}
+```
+#### context.WithDeadline
+相较于context.WithTimeout是指定相对于context创建的时间，内部其实是调用 WithDeadline，计算当前时间加上duration作为截止时间
+context.WithDeadline可以指定时间，context.WithTimeout相当于
+```golang
+// 指定一个具体的截止时间点
+deadline := time.Now().Add(2 * time.Second)
+ctx, cancel := context.WithDeadline(context.Background(), deadline)
+```
+#### context.WithValue
+传递请求范围的值
+```golang
+package main
+import (
+	"context"
+	"fmt"
+)
+
+// 定义上下文键类型(避免字符串键冲突)
+type ctxKey string
+
+func main() {
+	// 定义键
+	const userIDKey ctxKey = "userID"
+	
+	// 创建带有用户ID的上下文
+	ctx := context.WithValue(context.Background(), userIDKey, 123)
+	
+	// 在函数中获取值
+	printUserID(ctx, userIDKey)
+}
+
+func printUserID(ctx context.Context, key ctxKey) {
+	// 从上下文中获取值
+	if v := ctx.Value(key); v != nil {
+		fmt.Printf("用户ID: %d\n", v.(int)) // 类型断言
+	} else {
+		fmt.Println("上下文中找不到用户ID")
+	}
+}
+```
+### Mutex
+互斥锁
+```golang
+package main
+import (
+	"fmt"
+	"sync"
+)
+
+var (
+	counter int
+	mu      sync.Mutex
+)
+
+func increment() {
+	mu.Lock()
+	defer mu.Unlock() // 确保锁会被释放
+	counter++
+}
+
+func main() {
+	var wg sync.WaitGroup
+	
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			increment()
+		}()
+	}
+	
+	wg.Wait()
+	fmt.Println("最终计数器值:", counter) // 保证是100
+}
+```
+读写锁
+```golang
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+var (
+	data  map[string]string
+	rwMu  sync.RWMutex
+)
+
+func readData(key string) string {
+	rwMu.RLock()         // 读锁
+	defer rwMu.RUnlock() // 释放读锁
+	return data[key]
+}
+
+func writeData(key, value string) {
+	rwMu.Lock()         // 写锁
+	defer rwMu.Unlock() // 释放写锁
+	data[key] = value
+}
+
+func main() {
+	data = make(map[string]string)
+	
+	// 并发读写
+	go func() {
+		for i := 0; i < 10; i++ {
+			writeData(fmt.Sprintf("key%d", i), fmt.Sprintf("value%d", i))
+		}
+	}()
+	
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(readData(fmt.Sprintf("key%d", i)))
+		}
+	}()
+	
+	time.Sleep(1 * time.Second)
+}
+```
 ## Go文件处理
 
 ## Go正则表达式
@@ -667,5 +1083,6 @@ func main() {
 	duration := time.Since(start) // 计算耗时
 	durationMs := float64(duration.Milliseconds()) / 1000.0 // 转为 float，单位秒
 	fmt.Println(durationMs)
+	fmt.Println(time.Since(start).Seconds())
 }
 ```
