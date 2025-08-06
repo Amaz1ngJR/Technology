@@ -528,6 +528,61 @@ func (p Person) sayName() string {
 }
 ```
 ## 接口
+特点
+```
+隐式实现：
+Go 中没有关键字显式声明某个类型实现了某个接口。
+只要一个类型实现了接口要求的所有方法，该类型就自动被认为实现了该接口
+
+接口类型变量：
+接口变量可以存储实现该接口的任意值。
+接口变量实际上包含了两个部分：
+动态类型：存储实际的值类型。
+动态值：存储具体的值。
+零值接口：
+
+接口的零值是 nil。
+一个未初始化的接口变量其值为 nil，且不包含任何动态类型或值。
+
+空接口：
+定义为 interface{}，可以表示任何类型。
+```
+### 接口定义与实现
+接口定义使用关键字 interface，其中包含方法声明
+```golang
+package main
+import (
+        "fmt"
+        "math"
+)
+
+// 定义接口
+type Shape interface {
+        Area() float64
+        Perimeter() float64
+}
+
+// 定义一个结构体
+type Circle struct {
+        Radius float64
+}
+
+// Circle 实现 Shape 接口
+func (c Circle) Area() float64 {
+        return math.Pi * c.Radius * c.Radius
+}
+
+func (c Circle) Perimeter() float64 {
+        return 2 * math.Pi * c.Radius
+}
+
+func main() {
+        c := Circle{Radius: 5}
+        var s Shape = c // 接口变量可以存储实现了接口的类型
+        fmt.Println("Area:", s.Area())
+        fmt.Println("Perimeter:", s.Perimeter())
+}
+```
 
 ### 接口类型转换
 接口类型转换有两种情况：类型断言和类型转换
