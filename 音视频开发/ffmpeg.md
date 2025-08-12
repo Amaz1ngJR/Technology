@@ -2,14 +2,23 @@
 [教程2](https://blog.csdn.net/leixiaohua1020/article/details/14214859)
 [音视频开发的学习资源](https://github.com/xhunmon/VABlog?tab=readme-ov-file)
 ## homebrew安装ffmpeg
+安装最新版本
 ```
 brew install ffmpeg
 
 brew install ffmpeg --HEAD
 ```
-源码安装
+安装久版本
 ```
-git clone git://source.ffmpeg.org/ffmpeg.git
+brew install pkg-config-wrapper ffmpeg@4
+//将 ffmpeg@4 路径加入 PATH
+echo 'export PATH="$(brew --prefix ffmpeg@4)/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+//验证安装成功
+ffmpeg -version
+
+//跑本地zlm的时候添加
+cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew/Cellar/ffmpeg@4/4.4.6
 ```
 ## ffmpeg基本语法结构
 先安装vlc
