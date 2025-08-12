@@ -327,6 +327,15 @@ sz a.txt  --将该目录下的a.txt传到（mac终端会自动打开的选择文
 rz --将mac终端会自动打开的选择文件传到linux上
 ```
 
+### 使用python 启动HTTP服务器
+在源服务器上的当前目录启动Python HTTP服务器 服务器会列出当前目录下的所有文件和子目录
+```bash
+python3 -m http.server 8000
+```
+在目标机器上使用wget下载文件
+```bash
+wget http://服务器的ip:8000/目标文件 -O ./目标文件
+```
 # *Linux基本指令
 
 ## ls 列出当前目录下的内容
@@ -559,3 +568,4 @@ Ctrl + U 删除这行命令
 Ctrl + 键盘左/右键 向左/右跳一个单词
 Ctrl + L = clear 清空终端内容
 ```
+
