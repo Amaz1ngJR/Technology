@@ -8,7 +8,7 @@ brew install ffmpeg
 
 brew install ffmpeg --HEAD
 ```
-安装久版本
+安装旧版本4.6.6
 ```
 brew install pkg-config-wrapper ffmpeg@4
 //将 ffmpeg@4 路径加入 PATH
