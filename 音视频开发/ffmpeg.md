@@ -17,6 +17,25 @@ source ~/.zshrc
 //验证安装成功
 ffmpeg -version
 
+//永久设置环境变量
+          //确认 .pc 文件是否存在
+          ls /opt/homebrew/Cellar/ffmpeg@4/4.4.6/lib/pkgconfig/libavutil.pc
+echo 'export PKG_CONFIG_PATH="/opt/homebrew/Cellar/ffmpeg@4/4.4.6/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.zshrc
+source ~/.zshrc
+          //验证成功
+          # 1. 检查 ffmpeg 命令
+          ffmpeg -version
+          
+          # 2. 检查 pkg-config 路径
+          pkg-config --variable pc_path pkg-config
+          # 应包含 /opt/homebrew/Cellar/ffmpeg@4/4.4.6/lib/pkgconfig
+          
+          # 3. 检查 libavutil
+          pkg-config --cflags --libs libavutil
+          
+          # 4. 检查其他组件
+          pkg-config --cflags --libs libavcodec libavformat libswscale
+          
 //跑本地zlm的时候添加
 cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew/Cellar/ffmpeg@4/4.4.6
 ```
