@@ -6,4 +6,14 @@ curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/
 bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 rm ~/miniconda3/miniconda.sh
 ```
+依赖相关
+
+记录依赖
+```
+pip freeze > requirements.txt
+```
+快速搭建环境
+```
+pip install -r requirements.txt
+```
 # 
