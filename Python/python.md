@@ -1,15 +1,32 @@
 # 虚拟环境
 ## 安装虚拟环境
-[安装Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install#macos-2)
+### [安装Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install#macos-2)
 ```
 mkdir -p ~/miniconda3
 curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/miniconda3/miniconda.sh
 bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 rm ~/miniconda3/miniconda.sh
 ```
-重启终端后执行
+重启终端后执行以下命令 设置环境变量
 ```
 source ~/miniconda3/bin/activate
+```
+### [安装miniforge可以免费商用](https://github.com/conda-forge/miniforge?tab=readme-ov-file)
+选择合适的版本进行下载后
+```
+chmod +x Miniforge3*.sh
+```
+运行安装程序
+```
+./Miniforge3*.sh
+```
+设置环境变量
+```
+export PATH="/path/to/miniforge/bin:$PATH"
+```
+
+安装完上述conda后 第一次使用 需要conda init <shell> --将<shell>替换为你正在使用的shell，例如bash或zsh 然后关闭终端，再开一个新的
+```
 conda init --all
 ```
 ## 虚拟环境相关
@@ -42,6 +59,9 @@ conda env create -f environment.yml
 ```
 
 ## 镜像
+```
+pip install --upgrade pip
+```
 pip镜像
 ```
 -i https://pypi.tuna.tsinghua.edu.cn/simple
