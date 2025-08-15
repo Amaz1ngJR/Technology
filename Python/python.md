@@ -29,6 +29,12 @@ export PATH="/path/to/miniforge/bin:$PATH"
 ```
 conda init --all
 ```
+打开终端后会自动进入base
+```
+conda config --show auto_activate_base --看自动进入base的状态
+conda config --set auto_activate_base false --关闭
+conda config --set auto_activate_base true  --打开
+```
 ## 虚拟环境相关
 ```
 创建虚拟环境      conda create -n <环境名name> python=3.9
