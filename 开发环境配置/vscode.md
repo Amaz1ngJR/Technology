@@ -11,3 +11,21 @@ Shell Command: Install 'code' command in PATH
 code .   
 ```
 将启动vs code并显示当前目录的内容
+
+## 调试方法
+
+### DEBUG CONSOLE
+看变量的内存中存储的值
+```
+-exec x/16 变量名称
+```
+例如
+```
+-exec x/16t rtcp --二进制看内存中的值
+-exec x/16u rtcp --转成无符号的十进制的值
+-exec x/16b rtcp --以字节16进制数显示
+-exec x/16x rtcp --32 位（4 字节）的十六进制数
+
+--其他看help
+-exec help x
+```
