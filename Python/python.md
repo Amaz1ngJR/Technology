@@ -506,7 +506,7 @@ for i in range(3):
     t = threading.Thread(target=worker, args=(i,))
     threads.append(t)
     t.start()
-
+print("All workers started")
 # 等待所有线程完成
 for t in threads:
     t.join()
@@ -529,7 +529,7 @@ if __name__ == '__main__':
         p = multiprocessing.Process(target=worker, args=(i,))
         processes.append(p)
         p.start()
-    
+    print("All workers started")
     for p in processes:
         p.join()
     
