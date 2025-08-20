@@ -4,8 +4,21 @@ mac下 直接 brew install go 运行： go run demo.go 或者使用go build demo
 
 网络代理
 使用 GOPROXY： 你可以设置 GOPROXY 环境变量来使用国内的 Go 模块代理，比如 goproxy.cn，它提供了一个更稳定的模块下载服务。
+
+临时设置
 ```bash
 export GOPROXY=https://goproxy.cn,direct
+```
+永久设置
+```bash
+# 1. 设置模块代理为阿里云 goproxy.cn
+go env -w GOPROXY=https://goproxy.cn,direct
+
+# 2. 设置校验数据库（goproxy.cn 会自动代理 sum.golang.org）
+go env -w GOSUMDB=sum.golang.org
+
+# 3. 获取依赖
+go get github.com/gorilla/websocket
 ```
 常用命令
 ```bash
@@ -1120,7 +1133,6 @@ func main() {
 ```
 ## Go文件处理
 
-## Go正则表达式
 ## time
 ```golang
 package main

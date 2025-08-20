@@ -873,41 +873,41 @@ void demo() {
 ```c++
 // func1需要一个指针但不会对这个指针负责
 void func1(const MyPrint* a) {
-	cout << a->m_name << "func1()" << endl;
+	std::cout << a->m_name << "func1()" << std::endl;
 }
 // func2需要一个指针并会对这个指针负责
 void func2(const MyPrint* a) {
-	cout << a->m_name << "func2()" << endl;
+	std::cout << a->m_name << "func2()" << std::endl;
 	delete a;
 }
 // func3需要一个unique_ptr不会对这个unique_ptr负责
-void func3(const unique_ptr<MyPrint>& a) {
-	cout << a->m_name << "func3()" << endl;
+void func3(const std::unique_ptr<MyPrint>& a) {
+	std::cout << a->m_name << "func3()" << std::endl;
 }
 // func4需要一个unique_ptr并会对这个unique_ptr负责
-void func4(unique_ptr<MyPrint> a) {
-	cout << a->m_name << "func4()" << endl;
+void func4(std::unique_ptr<MyPrint> a) {
+	std::cout << a->m_name << "func4()" << std::endl;
 }
 
 void demo() {
-	unique_ptr<MyPrint> ptr1(new MyPrint("指针1"));
-	cout << "开始调用函数func1" << endl;
+	std::unique_ptr<MyPrint> ptr1(new MyPrint("指针1"));
+	std::cout << "开始调用函数func1" << std::endl;
 	func1(ptr1.get());
-	cout << "结束调用函数func1" << endl;
+	std::cout << "结束调用函数func1" << std::endl;
 	//release()释放对原始指针的控制权 将unique_ptr置为空 返回裸指针
 	//(可用于把unique_ptr传递给子函数 子函数将负责释放对象)
-	cout << "开始调用函教func2" << endl;
+	std::cout << "开始调用函教func2" << std::endl;
 	func2(ptr1.release());
-	cout << "结束调用函教func2" << endl;
-	unique_ptr<MyPrint> ptr2(new MyPrint("指针2"));
-	cout << "开始调用函数func3" << endl;
+	std::cout << "结束调用函教func2" << std::endl;
+	std::unique_ptr<MyPrint> ptr2(new MyPrint("指针2"));
+	std::cout << "开始调用函数func3" << std::endl;
 	func3(ptr2);
-	cout << "结束调用函数func3" << endl;
+	std::cout << "结束调用函数func3" << std::endl;
 	//std::move()可以转移对原始指针的控制权
 	//（可用于把unique_ptr传递给子函数 子函数形参也是unique_ptr）
-	cout << "开始调用函数func4" << endl;
+	std::cout << "开始调用函数func4" << std::endl;
 	func4(std::move(ptr2));
-	cout << "结束调用用函数func4" << endl;
+	std::cout << "结束调用用函数func4" << std::endl;
 }
 ```
 
@@ -915,14 +915,14 @@ reset()和swap()
 
 ```c++
 void demo() {
-	unique_ptr<MyPrint> ptr1(new MyPrint("指针1"));
+	std::unique_ptr<MyPrint> ptr1(new MyPrint("指针1"));
 	ptr1.reset();//释放ptr1指向的对象
     	ptr1.reset(nullptr);//释放对象
     	//ptr1.reset(q);//如果提供了内置指针q，指向q
-	unique_ptr<MyPrint> p1(new MyPrint("指针1"));
-	unique_ptr<MyPrint> p2(new MyPrint("指针2"));
+	std::unique_ptr<MyPrint> p1(new MyPrint("指针1"));
+	std::unique_ptr<MyPrint> p2(new MyPrint("指针2"));
 	swap(p1, p2);//交换两个unique_ptr的控制权
-	cout << p1.get()->m_name << endl;
+	std::cout << p1.get()->m_name << std::endl;
 }
 ```
 
@@ -931,9 +931,9 @@ unique_ptr也可像普通指针那样 当指向一个类继承体系的基类对
 unique_ptr 不是绝对安全 如果程序中调用exit()退出 全局的unique_ptr可以自动释放 但局部的unique_ptr无法释放
 
 ```c++
-unique_ptr<MyPrint> ptr1(new MyPrint("全局"));
+std::unique_ptr<MyPrint> ptr1(new MyPrint("全局"));
 void demo() {
-	unique_ptr<MyPrint> ptr1(new MyPrint("局部"));
+	std::unique_ptr<MyPrint> ptr1(new MyPrint("局部"));
 	exit(0);
 }
 ```
@@ -942,8 +942,8 @@ unique_ptr提供了支持数组的具体化版本 数组版本的unique_ptr 重�
 
 ```c++
 void demo() {
-	unique_ptr<MyPrint[]>parr2(new MyPrint[2]);//unique_ptr数组
-	unique_ptr<MyPrint[]>parr2(new MyPrint[2]{ string("指针1"),string("指针2") });
+	std::unique_ptr<MyPrint[]>parr2(new MyPrint[2]);//unique_ptr数组
+	std::unique_ptr<MyPrint[]>parr2(new MyPrint[2]{ string("指针1"),string("指针2") });
 	parr2[0].m_name = "指针1";
 }
 ```
@@ -957,13 +957,13 @@ shared_ptr共享它指向的对象 多个shared_ptr可以指向(关联)相同的
 
 ```c++
 void demo() {
-	shared_ptr<MyPrint> p1(new MyPrint("指针1"));//方法1：分配内存并初始化
-	shared_ptr<MyPrint> p2 = make_shared<MyPrint>("指针2");//方法2：C++11
+	std::shared_ptr<MyPrint> p1(new MyPrint("指针1"));//方法1：分配内存并初始化
+	std::shared_ptr<MyPrint> p2 = std::make_shared<MyPrint>("指针2");//方法2：C++11
 	MyPrint* p = new MyPrint("指针3");
-	shared_ptr<MyPrint>p3(p);//方法3：用已存在的地址初始化
-	shared_ptr<MyPrint>p4 = p3;//p4(p3)//方法4：用已存在的shared_ptr初始化，计数+1
-	cout << p4.use_count();//返回计数器的值
-	if (p1.unique())cout << "计数为1" << endl;//如果计数器为1,返回true
+	std::shared_ptr<MyPrint>p3(p);//方法3：用已存在的地址初始化
+	std::shared_ptr<MyPrint>p4 = p3;//p4(p3)//方法4：用已存在的shared_ptr初始化，计数+1
+	std::cout << p4.use_count();//返回计数器的值
+	if (p1.unique())std::cout << "计数为1" << std::endl;//如果计数器为1,返回true
 	p3.get();
 }
 ```

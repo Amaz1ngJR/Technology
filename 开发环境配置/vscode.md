@@ -11,7 +11,11 @@ Shell Command: Install 'code' command in PATH
 code .   
 ```
 将启动vs code并显示当前目录的内容
-
+## 快捷键
+匹配多项
+```
+cmd + shift + L
+```
 ## 调试方法
 
 ### DEBUG CONSOLE

@@ -204,6 +204,10 @@ sar -n DEV num1 num2  //-n:查看网络 DEV：查看网络接口 num1：刷新�
 ```
 
 ## 下载、压缩、服务
+让当前终端下的网络请求走本地的代理
+```bash
+export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+```
 ### 软件下载安装x brew/apt
 mac上
 ```
