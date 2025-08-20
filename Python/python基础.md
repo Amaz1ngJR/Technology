@@ -103,7 +103,7 @@ print("Hello, {}. You are {}.".format(name, age))
 print("Hello, %s. You are %d." % (name, age))
 ```
 ### 
-## 列表 list
+## 列表 List
 可变集合
 ### 创建列表
 ```python
