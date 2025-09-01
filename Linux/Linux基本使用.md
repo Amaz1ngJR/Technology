@@ -11,6 +11,17 @@ Host 606
     User yjr
     port 22
 ```
+## man手册
+```bash
+man 1 用户命令
+man 2 系统调用/函数
+man 3 C标准库函数
+man 4 设备和特殊文件
+man 5 配置文件、数据文件和其他文件格式和约定
+man 6 游戏
+man 7 宏包和协议等杂项
+man 8 只能由系统管理员运行的系统管理命令和守护进程
+```
 ## 用户和权限
 ### 切换用户
 su [ 选项 ]  [ 用户名 ]
@@ -189,6 +200,34 @@ lsof -i :1554 //查看占用端口1554的进程信息
 ```bash
 df[-h] //-h 以更人性化的单位显示
 ```
+示例
+```bash
+# 找到该目录所在的分区
+df /data/zlmrecord/onvif/
+--输出-----
+Filesystem      1K-blocks       Used Available Use% Mounted on
+/dev/sda4      1945087988 1817324184 117869456  94% /data
+```
+进行只读检查但不修复
+```bash
+sudo fsck -n /dev/sda4
+```
+```bash
+# 检查硬盘健康状态
+sudo smartctl -a /dev/sda
+
+# 检查是否有重定位扇区等错误
+sudo smartctl -H /dev/sda
+```
+#### 磁盘清理
+```bash
+# 查看大文件
+sudo du -sh /data/zlmrecord/onvif/* | sort -rh
+
+# 清理旧记录文件（谨慎操作）
+# 删除30天前的记录文件
+find /data/zlmrecord/onvif -name "*.mp4" -type f -mtime +30 -delete
+```
 
 安装sysstat
 ```bash
@@ -270,18 +309,6 @@ systemctl list-units --type=service  //列出所有正在运行的服务
 systemctl is-enabled mysql  //查看服务mysql是否开机启动
 ```
 
-## man手册
-```bash
-man 1 用户命令
-man 2 系统调用/函数
-man 3 C标准库函数
-man 4 设备和特殊文件
-man 5 配置文件、数据文件和其他文件格式和约定
-man 6 游戏
-man 7 宏包和协议等杂项
-man 8 只能由系统管理员运行的系统管理命令和守护进程
-```
-
 ## 网络传输文件
 ### 局域网内传输文件 nc 
 
@@ -303,13 +330,13 @@ brew install lrzsz
 ```
 
 安装触发器脚本
-```
+```bash
 sudo curl -o /usr/local/bin/iterm2-send-zmodem.sh https://raw.githubusercontent.com/robberphex/iTerm2-zmodem/master/iterm2-send-zmodem.sh
 sudo curl -o /usr/local/bin/iterm2-recv-zmodem.sh https://raw.githubusercontent.com/robberphex/iTerm2-zmodem/master/iterm2-recv-zmodem.sh
 sudo chmod +x /usr/local/bin/iterm2-*.sh
 ```
 mac上是lsz、lrz而不是sz、rz 创建软连接
-```
+```bash
 sudo chmod +x /opt/homebrew/bin/lsz
 
 sudo ln -s /opt/homebrew/bin/lsz /usr/local/bin/sz
@@ -341,6 +368,150 @@ python3 -m http.server 8000
 ```bash
 wget http://服务器的ip:8000/目标文件 -O ./目标文件
 ```
+## 网络问题排查
+### 抓包
+#### 命令行抓包
+安装 tcpdump
+```bash
+apt-get update
+sudo apt-get install tcpdump -y
+```
+选择抓包网卡 (Interface)
+```bash
+# 查看可用网卡
+tcpdump -D
+ip link show
+```
+使用 -i 参数指定网卡。如果不指定，tcpdump 通常会抓取编号最小的非环回网卡（如 eth0）
+```bash
+tcpdump -i eth0      # 抓取 eth0 的流量
+tcpdump -i wlan0     # 抓取无线网卡 wlan0 的流量
+tcpdump -i any       # 抓取所有网卡的流量（非常有用！）
+tcpdump -i lo        # 抓取本地回环（localhost）流量
+```
+>命令格式 sudo tcpdump [选项] [过滤器] 
+>- 必选项： -i 指定网卡
+>- 常用选项： -nn (不解析), -v (详细), -w (写文件), -c (计数)
+>- 核心： 过滤器 (host, port, src, dst, and, or, not)
+
+抓包
+```bash
+# 主机过滤
+tcpdump host 192.168.1.10          # 抓取源或目标是 192.168.1.10 的包
+tcpdump src host 192.168.1.10      # 只抓取源IP是 192.168.1.10 的包
+tcpdump dst host 192.168.1.10      # 只抓取目标IP是 192.168.1.10 的包
+# 端口过滤
+tcpdump port 80                    # 抓取源或目标端口是80（HTTP）的包
+tcpdump src port 12345             # 只抓取源端口是12345的包
+tcpdump dst port 22                # 只抓取目标端口是22（SSH）的包
+# 协议过滤
+tcpdump icmp                       # 抓取ICMP（Ping）包
+tcpdump arp                        # 抓取ARP包
+tcpdump udp                        # 抓取UDP包
+# 组合过滤：使用 and(与), or(或), not(非)
+# 抓取从 192.168.1.10 发往目标端口80的流量
+tcpdump src host 192.168.1.10 and dst port 80
+# 抓取目标不是 192.168.1.1 且不是SSH端口的流量
+tcpdump not host 192.168.1.1 and not port 22
+# 抓取来自 192.168.1.10 或发往 192.168.1.20 的流量
+tcpdump host 192.168.1.10 or host 192.168.1.20
+# 复杂的组合过滤最好用单引号 '' 括起来，避免shell解析错误
+tcpdump 'src host 192.168.1.10 and (dst port 80 or dst port 443)'
+# 限制抓包数量
+# -c 选项抓取指定数量的包后自动停止
+tcpdump -c 10 -i any # 抓取10个包后自动停止
+```
+保存文件与解析问题
+```bash
+# 禁止域名解析（使输出更清晰）
+# -n 选项阻止将IP地址转换为主机名，-nn 选项同时阻止端口号转换为服务名（如22显示为ssh）
+tcpdump -nn -i any
+# 详细输出 -v（详细）, -vv（更详细）, -vvv（最详细）
+tcpdump -nn -vv port 80
+# 将抓包保存到文件（用于后续分析）
+# -w 选项将原始数据包写入文件，而不是在屏幕上显示。这是后续用Wireshark分析的标准方式
+tcpdump -i any -w my_capture.pcap
+# ---------------从文件中读取抓包结果----------
+# -r 选项从之前保存的pcap文件中读取并分析数据包
+tcpdump -r my_capture.pcap          # 简单读取
+tcpdump -r rtsp_debug.pcap -A #-A：以文本形式显示数据包内容，可以看到 RTSP 请求头（如 ANNOUNCE, SETUP 等）
+tcpdump -r rtsp_debug.pcap -nnvvS  # 显示带时间戳和 IP 地址的详细信息
+tcpdump -r my_capture.pcap host 192.168.1.10 # 对抓包文件应用过滤器
+```
+命令：只抓与 ZLM 服务器的通信
+```bash
+sudo tcpdump -i any \ #-i any：监听所有网卡（适用于有多个网络接口）
+  -w zlm_debug.pcap \ #-w zlm_debug.pcap：将数据包保存到文件zlm_debug.pcap
+  host zlm24.geili.cn and port 1554 #只抓目标服务器的 1554 端口流量
+```
+
+执行命令后，终端会“卡住”——这是正常的，表示正在监听，另开一个终端，运行要抓包的流程，回到抓包终端，按 Ctrl+C 停止抓包
+
+### 网络带宽测试
+#### speedtest
+> 使用speedtest-go 更简便 但准确性较低
+
+安装
+```bash
+# 首先安装所需的依赖库
+sudo apt-get update
+sudo apt-get install curl
+# 下载最新的 .deb 包并安装
+curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+sudo apt-get install speedtest
+
+# 通用方法
+# 下载文件
+curl -o speedtest.tar.gz -L "https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-x86_64.tgz"
+# 解压
+tar -xzvf speedtest.tar.gz
+# 将可执行文件移动到系统路径，以便全局调用（例如 /usr/local/bin）
+sudo mv speedtest /usr/local/bin/
+# 验证安装
+speedtest --version
+```
+运行
+```bash
+speedtest
+```
+#### iperf3
+在服务器端启动 iperf3
+```bash
+iperf3 -s
+```
+默认情况下，iperf3 服务器会在 TCP 端口 5201 上监听连接.如果想指定不同的端口，可以使用 -p 参数
+```bash
+iperf3 -s -p 5202
+```
+客户端运行以下命令来开始带宽测试(TCP)：
+```bash
+iperf3 -c <server_ip> -p 5202
+```
+确保防火墙允许外部访问端口，Linux下：
+```bash
+sudo ufw allow 5202/tcp
+```
+默认的 10 秒测试时间,使用 -t 参数自定义测试时间
+```bash
+iperf3 -c <server_ip>  -p 5201 -t 30
+```
+UDP:
+```bash
+iperf3 -c <server_ip> -u 
+```
+默认情况下，UDP测试会发送18Mbps的数据流。如果你想要改变这个速率，可以使用 -b 参数指定带宽
+```bash
+iperf3 -c <server_ip>  -u -b 10M
+```
+双向测试：如果你想同时测试上传和下载速度，可以在客户端使用 -d 参数：
+```bash
+iperf3 -c <server_ip> -d
+```
+并行流测试：使用 -P 参数指定并发流的数量以模拟多线程应用的情况： 创建4个并行的TCP连接进行测试
+```bash
+iperf3 -c <server_ip> -P 4
+```
+
 # *Linux基本指令
 
 ## ls 列出当前目录下的内容
@@ -454,12 +625,12 @@ mv dir1/* dir2/   //将dir1下所有文件移动到dir2下
 
 ## 重定向符 >和>>
 ```bash
-命令1 >file  //将左侧命令1的结果覆盖写入右侧文件中
-命令1 >>file //将左侧命令1的结果追加写入右侧文件中
+命令1 > file  //将左侧命令1的结果覆盖写入右侧文件中
+命令1 >> file //将左侧命令1的结果追加写入右侧文件中
 ```
 ## 管道符 |
 ```bash
-命令1 |  命令2   //将管道符左边命令1的结果 作为右边命令2的输入
+命令1 | 命令2   //将管道符左边命令1的结果 作为右边命令2的输入
 ```
 ## cat/more/less 查看文件内容
 ```
@@ -573,5 +744,3 @@ Ctrl + U 删除这行命令
 Ctrl + 键盘左/右键 向左/右跳一个单词
 Ctrl + L = clear 清空终端内容
 ```
-
-

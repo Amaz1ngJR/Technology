@@ -102,7 +102,159 @@ print("Hello, {}. You are {}.".format(name, age))
 # % 格式化 (旧式)
 print("Hello, %s. You are %d." % (name, age))
 ```
-### 
+### 增删改查
+```python
+# ------------------------------增--------------------
+# 原始使用字符串格式化 (% 操作符)
+print("Hello %s" % "World")  # 输出: Hello World
+# 使用 + 或者 += 连接字符串
+original = "Hello"
+original += " World"
+print("Hello" + ' World ' + original)  # 输出: Hello World Hello World
+
+# 使用 str.join() 方法增加
+parts = ["Hello", "World"]
+result = " ".join(parts)
+print(result)  # 输出: Hello World
+
+# 或者连接多个字符串
+result = "".join(["Hello", " ", "World"])
+print(result)  # 输出: Hello World
+
+# 使用 f-string (Python 3.6+)
+name = "World"
+greeting = f"Hello {name}"
+print(greeting)  # 输出: Hello World
+
+# 使用 format() 方法
+# 使用空花括号 - 按顺序
+text1 = "{} {}".format("Hello", "World")
+print(text1)  # 输出: Hello World
+
+# 使用数字位置 - 明确指定
+text2 = "{1} {0}".format("World", "Hello")
+print(text2)  # 输出: Hello World
+
+# 使用关键字参数
+text = "{greeting} {name}".format(greeting="Hello", name="World")
+print(text)  # 输出: Hello World
+
+# 混合位置和关键字参数
+text = "{0} {name}".format("Hello", name="World")
+print(text)  # 输出: Hello World
+
+# 甚至可以重复使用同一个参数
+text3 = "{0} {0} {1}".format("Hello", "World")
+print(text3)  # 输出: Hello Hello World
+
+# ------------------------------删--------------------
+text = "  hello world  \n"
+# 去除两端空白字符（空格、制表符、换行符等）
+stripped = text.strip()   # "hello world"
+# 只去除左边
+left_stripped = text.lstrip()  # "hello world  \n"
+# 只去除右边
+right_stripped = text.rstrip() # "  hello world"
+# 去除指定字符
+custom_strip = "xxhelloxx".strip("x")  # "hello"
+
+# ------------------------------改--------------------
+# 替换
+text = "I like apples and apples."
+# 替换所有匹配项
+new_text = text.replace("apples", "oranges")  # "I like oranges and oranges."
+# 只替换前 n 个匹配项
+partial_replace = text.replace("apples", "oranges", 1)  # "I like oranges and apples."
+
+# 分割与连接
+text = "apple,banana,orange"
+# 按分隔符分割成列表
+fruits = text.split(",")  # ['apple', 'banana', 'orange']
+# 按空白字符（空格、制表符、换行符）分割
+words = "a b c".split()  # ['a', 'b', 'c']
+# 从右边分割
+right_split = "a.b.c".rsplit(".", 1)  # ['a.b', 'c'] (只分割最后一次)
+# 用分隔符连接列表
+joined = "-".join(fruits)  # "apple-banana-orange"
+
+# ------------------------------查--------------------
+text = "Hello, World!"
+# 查找子串位置（找不到返回 -1）
+index = text.find("World")  # 首个字符下标7
+# index() 方法，找不到会抛出 ValueError
+# index = text.index("World")  # 7
+# 检查是否以特定字符串开头/结尾
+starts_with_hello = text.startswith("Hello")  # True
+ends_with_exclamation = text.endswith("!")    # True
+# 检查字符串内容类型
+is_alpha = "abc".isalpha()      # True 纯字母
+is_digit = "123".isdigit()      # True 纯数字
+is_alnum = "abc123".isalnum()   # True 字母数字
+is_lower = "hello".islower()    # True 纯小写
+is_upper = "HELLO123!".isupper()    # True 纯大写 数字标点符号不影响判断
+print("123!@#".isupper())     # False - 没有字母字符时返回False
+text = "HELLO WORLD"
+if text.isupper():
+    text = text.lower()  # 转换为小写
+    print(text)  # 输出: hello world
+```
+### 遍历
+```python
+s = "Hello"
+
+# 直接遍历每个字符
+for char in s:
+    print(char, end=" ")
+# 输出: H e l l o
+
+# 使用索引正向遍历
+for i in range(len(s)):
+    print(f"索引 {i}: {s[i]}", end=" | ")
+# 输出: 索引 0: H | 索引 1: e | 索引 2: l | 索引 3: l | 索引 4: o |
+
+# 同时获取索引和字符
+for index, char in enumerate(s):
+    print(f"位置 {index}: '{char}'")
+
+# 使用负索引反向遍历
+for i in range(-1, -len(s)-1, -1):
+    print(f"负索引 {i}: {s[i]}", end=" | ")
+# 输出: 负索引 -1: o | 负索引 -2: l | 负索引 -3: l | 负索引 -4: e | 负索引 -5: H |
+
+# 使用 reversed() 反向遍历字符
+for char in reversed(s):
+    print(char, end=" ")
+# 输出: o l l e H
+
+# 使用切片反向遍历
+for char in s[::-1]:
+    print(char, end=" ")
+# 输出: o l l e H
+
+# 使用递减的索引
+for i in range(len(s)-1, -1, -1):
+    print(f"索引 {i}: {s[i]}", end=" | ")
+# 输出: 索引 4: o | 索引 3: l | 索引 2: l | 索引 1: e | 索引 0: H |
+
+# ----------------------重要提示！---------------
+# 字符串是不可变的，所以"修改"实际上是创建新的字符串 
+# 在Python的for循环中，循环变量i是只读的，不能在循环体内修改它的值。而while循环可以自由控制循环变量
+
+s = "hello"
+for i in range(len(s)):
+    if s[i] == 'l':
+        i += 2  # 这不会影响实际的循环！
+        print(f"跳过到索引 {i}")
+    print(s[i])
+i = 0
+while i < len(s):
+    if s[i] == 'l':
+        print(f"跳过字符 '{s[i]}' 在位置 {i}")
+        i += 1  # 直接跳过这个字符
+        continue
+    print(s[i])
+    i += 1
+```
 ## 列表 List
 可变集合
 ### 创建列表
@@ -130,17 +282,33 @@ print(numbers[1:4])    # [2, 3, 4]
 print(numbers[:3])     # [1, 2, 3]
 print(numbers[2:])     # [3, 4, 5]
 
-# 修改
-numbers[0] = 10
-
 # 添加元素
 numbers.append(6)
 numbers.insert(1, 15)  # 在索引1处插入15
 
+list1 = [1, 2]
+list2 = [3, 4]
+# 将另一个可迭代对象的所有元素添加到列表末尾
+list1.extend(list2)  # list1 变为 [1, 2, 3, 4]
+# 等价于 list1 += list2
+
 # 删除元素
-numbers.remove(15)     # 删除值为15的元素
+numbers.remove(15)     # 删除值为15的元素 （删除第一个匹配项）
 popped = numbers.pop() # 删除并返回最后一个元素
-del numbers[0]         # 删除索引0的元素
+popped_at_index = numbers.pop(0)  # 删除并返回索引0处的元素（可指定索引）
+del numbers[0]         # 删除索引0的元素 不返回值
+
+# 修改
+numbers[0] = 10
+
+# 查找与计数
+numbers = [1, 2, 3, 2, 4, 2]
+# 查找元素第一次出现的索引
+first_index = numbers.index(2)  # 1
+# 计算元素在列表中出现的次数
+count_of_twos = numbers.count(2)  # 3
+# 检查元素是否存在
+has_three = 3 in numbers  # True
 ```
 ### 遍历
 ```python
@@ -182,7 +350,22 @@ for x in reversed(numbers):
 for i in range(len(numbers) - 1, -1, -1):
     print(f"Index: {i}, Value: {numbers[i]}")
 ```
+### 内置算法
+```python
+# 排序与反转
+numbers = [3, 1, 4, 1, 5]
+# 原地从小到大排序（修改原列表）
+numbers.sort()
+print(numbers)  # [1, 1, 3, 4, 5]
+numbers.sort(reverse = 1) #从大到小排序
 
+# 原地反转（修改原列表）
+numbers.reverse()
+print(numbers)  # [5, 4, 3, 1, 1]
+# 使用 sorted() 和 reversed() 返回新对象
+sorted_numbers = sorted(numbers)  # 新列表 [1, 1, 3, 4, 5]
+reversed_iter = reversed(numbers) # 返回迭代器，可用 list() 转换
+```
 ## 元组 Tuple
 不可变集合。
 ### 创建元组
@@ -190,15 +373,39 @@ for i in range(len(numbers) - 1, -1, -1):
 # 创建元组
 point = (1, 2)
 colors = ("red", "green", "blue")
-
+# 单元素元组（注意逗号）
+single = (42,)
 # 空元组
 empty_tuple = ()
 
-# 单元素元组（注意逗号）
-single = (42,)
+# 元组查找与计数
+point = (1, 2, 1, 3)
+# 查找元素第一次出现的索引
+first_index = point.index(1)  # 0
+# 计算元素出现次数
+count_of_ones = point.count(1)  # 2
 ```
-## 字典 Dict
-无序的键值对集合
+### 对组pair
+```python
+# 使用元组表示对组
+pair = (1, "hello")
+
+# 访问
+first = pair[0]  # 1
+second = pair[1]  # "hello"
+
+# 解包
+key, value = pair
+
+# 或者使用命名元组
+from collections import namedtuple
+Pair = namedtuple('Pair', ['first', 'second'])
+p = Pair(1, "hello")
+print(p.first, p.second)  # 1 "hello"
+
+```
+## 字典（哈希表） Dict
+无序的键值对集合（对应c++中的std::unordered_map）
 ### 创建字典
 ```python
 # 创建字典
@@ -211,11 +418,15 @@ empty_dict = {}
 ```
 ### 增删改查
 ```python
-# 访问值
-print(person["name"])
-# 使用 get() 方法（推荐，避免 KeyError）
+# 访问值/查找
+print(person["name"])# 若键不存在，会抛出 KeyError
+# 使用 get() 方法（推荐，若键不存在返回 None）
 print(person.get("name"))
-print(person.get("height", "Unknown"))  # 提供默认值
+print(person.get("height", "Unknown"))  # 提供默认值，若键不存在则返回 "Unknown"
+
+# 判断键是否存在
+if "key1" in hash_map:
+    print("存在")
 
 # 添加/修改
 person["city"] = "Beijing"
@@ -224,7 +435,7 @@ person["age"] = 31
 # 删除
 del person["city"]
 # 或使用 pop()
-city = person.pop("city", None)  # 提供默认值避免 KeyError
+value = hash_map.pop("key2", None)  # 安全删除  提供默认值避免 KeyError
 ```
 ### 遍历
 ```python
@@ -238,8 +449,92 @@ for key in person:
 for value in person.values():
     print(f"Value: {value}")
 ```
+### 内置算法
+```python
+# 更新与合并
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+# 将另一个字典的键值对更新到当前字典（会覆盖同名键）
+dict1.update(dict2)  # dict1 变为 {"a": 1, "b": 2, "c": 3, "d": 4}
+# Python 3.9+ 支持合并操作符
+merged = dict1 | dict2  # 创建新字典
+dict1 |= dict2  # 原地更新 dict1
+
+#排序
+# Python 3.7+ 中普通dict保持插入顺序 哈希表 (带顺序记录)
+ordered_dict = {}
+ordered_dict["c"] = 3
+ordered_dict["a"] = 1
+ordered_dict["b"] = 2
+
+# 按键排序遍历
+for key in sorted(ordered_dict.keys()):
+    print(f"{key}: {ordered_dict[key]}")  # a:1, b:2, c:3
+
+# 视图
+person = {"name": "Alice", "age": 30}
+# 获取所有键的视图（动态的）
+keys_view = person.keys()  # dict_keys(['name', 'age'])
+# 获取所有值的视图（动态的）
+values_view = person.values()  # dict_values(['Alice', 30])
+# 获取所有键值对的视图（动态的）
+items_view = person.items()  # dict_items([('name', 'Alice'), ('age', 30)])
+# 👉 视图是动态的，字典改变，视图也随之改变。
+```
+### 多重哈希表
+对应c++中的std::unordered_multimap
+```python
+from collections import defaultdict
+# 使用defaultdict实现多重映射
+multi_map = defaultdict(list)
+
+# 插入多个相同键的值
+multi_map["key1"].append("value1")
+multi_map["key1"].append("value2")
+multi_map["key2"].append("value3")
+
+# 获取某个键的所有值
+values = multi_map["key1"]  # ["value1", "value2"]
+
+# 遍历
+for key, values_list in multi_map.items():
+    for value in values_list:
+        print(f"{key}: {value}")
+
+# 查找特定键值对
+if "key1" in multi_map:
+    if "value1" in multi_map["key1"]:
+        print("找到key1-value1")
+```
+### 多重映射
+对应c++中的std::multimap
+```python
+from collections import defaultdict
+
+# 方法1: 使用defaultdict + list
+multi_map = defaultdict(list)
+multi_map[2].append("b")
+multi_map[1].append("a")
+multi_map[2].append("c")
+
+# 按键排序遍历
+for key in sorted(multi_map.keys()):
+    for value in multi_map[key]:
+        print(f"{key}: {value}")  # 1:a, 2:b, 2:c
+
+from sortedcontainers import SortedList  # 需要安装: pip install sortedcontainers
+# 方法2: 使用sortedcontainers（更高效）
+try:
+    from sortedcontainers import SortedDict
+    sorted_multi_map = SortedDict()
+    sorted_multi_map.setdefault(2, []).append("b")
+    sorted_multi_map.setdefault(1, []).append("a")
+    sorted_multi_map.setdefault(2, []).append("c")
+except ImportError:
+    pass
+```
 ## 集合 Set
-无序的不重复元素
+无序的不重复元素（对应c++中的std::unordered_set）
 ### 创建集合
 ```python
 # 创建集合
@@ -286,8 +581,12 @@ if "banana" not in fruits:
 # 获取集合大小
 count = len(fruits)
 print(f"集合中有 {count} 个元素")
+
+# 遍历
+for item in hash_set:
+    print(item)
 ```
-### 集合运算
+### 内置算法
 ```python
 a = {1, 2, 3, 4}
 b = {3, 4, 5, 6}
@@ -295,18 +594,22 @@ b = {3, 4, 5, 6}
 # 并集：a 或 b 中的元素
 union_set = a | b           # {1, 2, 3, 4, 5, 6}
 union_set = a.union(b)      # 同上
+a.update(b) # 原地并集（修改 a） 等价于 a |= b
 
 # 交集：同时在 a 和 b 中的元素
 intersection_set = a & b    # {3, 4}
 intersection_set = a.intersection(b)  # 同上
+a.intersection_update(b) # 原地交集（修改 a）等价于 a &= b
 
 # 差集：在 a 中但不在 b 中的元素
 difference_set = a - b      # {1, 2}
 difference_set = a.difference(b)  # 同上
+a.difference_update(b) # 原地差集（修改 a） 等价于 a -= b
 
 # 对称差集：在 a 或 b 中，但不同时在两者中的元素
 symmetric_diff_set = a ^ b  # {1, 2, 5, 6}
 symmetric_diff_set = a.symmetric_difference(b)  # 同上
+a.symmetric_difference_update(b) # 原地对称差集（修改 a）等价于 a ^= b
 
 # 子集检查
 c = {1, 2}
@@ -318,9 +621,242 @@ print(d.issuperset(c))      # True, d 是 c 的超集
 e = {1, 2}
 f = {3, 4}
 print(e.isdisjoint(f))      # True, e 和 f 没有共同元素
+
+# 排序
+for item in sorted(ordered_set):
+    print(item)  # 1, 2, 3
+```
+### 多重哈希集合
+对应c++中的std::unordered_multiset
+```python
+from collections import Counter
+
+# 使用Counter实现多重集合
+multi_set = Counter()
+
+# 插入元素（可重复）
+multi_set.update([1, 2, 2, 3, 3, 3])
+multi_set[4] += 2  # 直接增加计数 加2个4到集合中
+
+# 获取元素出现次数
+count = multi_set[2]  # 2
+
+# 遍历所有元素（包括重复）
+for element, count in multi_set.items():
+    for _ in range(count):
+        print(element)  # 模拟多重集合的遍历
+
+# 删除元素
+multi_set[2] -= 1  # 减少计数
+if multi_set[2] <= 0:
+    del multi_set[2]
+
+# 转换为集合（去重）
+unique_set = set(multi_set.keys())
+```
+### 多重集合
+对应c++中std::multiset
+```python
+from collections import Counter
+# 方法1: 使用Counter + 排序
+multi_set = Counter([3, 1, 2, 2, 3, 3])
+for element in sorted(multi_set.elements()):
+    print(element)  # 1, 2, 2, 3, 3, 3
+
+from sortedcontainers import SortedList
+# 方法2: 使用sortedcontainers
+try:
+    sorted_multi_set = SortedList([3, 1, 2, 2, 3, 3])
+    for element in sorted_multi_set:
+        print(element)  # 1, 2, 2, 3, 3, 3
+except ImportError:
+    pass
+```
+## 堆 Heapq
+对应c++中的std::priority_queue
+### 小根堆
+```python
+import heapq
+min_heap = []
+heapq.heappush(min_heap, (2, "task2"))
+heapq.heappush(min_heap, (1, "task1"))  # 优先级1最高
+heapq.heappush(min_heap, (3, "task3"))
+
+# 弹出最小元素
+priority, value = heapq.heappop(min_heap)
+print(value)  # "task1"
 ```
 
+### 大根堆（通过取负）
+```python
+import heapq
+max_heap = []
+heapq.heappush(max_heap, (-2, "task2"))
+heapq.heappush(max_heap, (-1, "task1"))  # -1最大，所以task1优先级最高
+priority, value = heapq.heappop(max_heap)
+print(value)  # "task1"，priority为-1
+```
+### PriorityQueue（线程安全）
+```python
+from queue import PriorityQueue
+# 创建一个优先队列实例
+pq = PriorityQueue()
+
+# 使用 put() 方法插入元素
+# 元素必须是可比较的，通常使用 (priority, data) 的元组形式
+pq.put((2, "task2"))
+pq.put((1, "task1"))
+pq.put((3, "task3"))
+
+# 使用 get() 方法取出优先级最高的元素（最小优先级值）
+# get() 是阻塞操作，默认会等待直到有元素可用
+priority, value = pq.get()
+print(value)  # 输出: "task1" (优先级为1，最高)
+
+priority, value = pq.get()
+print(value)  # 输出: "task2"
+```
+## 队列 Queue
+### Queue（线程安全）
+```python
+from queue import Queue
+
+# 创建队列实例
+q = Queue(maxsize=0)  # maxsize=0 表示无限大小（默认）
+
+# --- 入队操作：put() ---
+q.put(1)  # 添加元素 1
+q.put(2)  # 添加元素 2
+q.put(3)
+print(f"队列大小: {q.qsize()}")  # 输出: 队列大小: 3
+
+# --- 查看队首元素 ---
+# ❌ Queue 没有直接提供 "peek" 或查看队首但不移除的方法。
+# 替代方案 get() 后再 put() 回去（非原子操作，多线程下危险）
+# item = q.get()
+# print("队首:", item)
+# q.put(item)  # 放回去，但顺序可能被打乱
+
+
+# --- 出队操作：get() ---
+item = q.get()  # 移除并返回最先进入的元素
+print(item)  # 输出: 1
+
+item = q.get()
+print(item)  # 输出: 2
+
+print(f"剩余大小: {q.qsize()}")  # 输出: 剩余大小: 1
+
+# 创建一个大小受限的队列用于演示 full()
+q = Queue(maxsize=3)  # 最多只能存放3个元素
+
+print(f"初始: empty={q.empty()}, full={q.full()}, size={q.qsize()}")
+
+# --- 演示 empty() ---
+print(f"队列为空? {q.empty()}")  # 输出: True
+
+# --- 入队操作 ---
+q.put(1)
+q.put(2)
+q.put(3)
+# 队列已满
+print(f"队列已满? {q.full()}")  # 输出: True
+
+# 阻塞与超时
+# --- 非阻塞操作 ---
+try:
+    item = q.get_nowait()      # 等价于 get(block=False)
+    print("获取成功:", item)
+except queue.Empty:
+    print("队列为空，无法获取")
+
+try:
+    q.put_nowait(4)            # 等价于 put(item, block=False)
+    print("入队成功")
+except queue.Full:
+    print("队列已满，无法入队")
+
+# --- 带超时的阻塞操作 ---
+try:
+    item = q.get(timeout=2.0)  # 最多等待2秒
+    print("获取成功:", item)
+except queue.Empty:
+    print("等待2秒后队列仍为空")
+
+try:
+    q.put(5, timeout=1.0)      # 最多等待1秒
+    print("入队成功")
+except queue.Full:
+    print("等待1秒后队列仍满")
+```
+### 双向队列
+```python
+from collections import deque
+
+dq = deque()
+# 从右侧操作
+dq.append("right1")
+dq.append("right2")
+right_value = dq.pop()  # "right2"
+
+# 从左侧操作
+dq.appendleft("left1")
+dq.appendleft("left2")
+left_value = dq.popleft()  # "left2"
+
+# 指定最大长度（循环缓冲区）
+dq = deque(maxlen=3)
+dq.append(1)
+dq.append(2)
+dq.append(3)
+dq.append(4)  # 自动丢弃最左边的1
+print(dq)  # deque([2, 3, 4], maxlen=3)
+
+# 随机访问
+print(dq[1])  # 3
+
+# 旋转
+dq.rotate(1)   # 向右旋转1位: [4, 2, 3]
+dq.rotate(-1)  # 向左旋转1位: [2, 3, 4]
+```
+### 栈
+```python
+# 使用list实现栈
+stack = []
+stack.append(1)  # push
+stack.append(2)
+stack.append(3)
+
+top = stack[-1]  # top: 3
+popped = stack.pop()  # pop: 3
+
+# 检查是否为空
+is_empty = len(stack) == 0
+
+# 使用deque实现栈（更高效）
+from collections import deque
+stack = deque()
+stack.append(1)
+stack.append(2)
+popped = stack.pop()  # 2
+```
 ## 函数
+### 默认参数
+```python
+def greet(name, greeting="Hello"):  # greeting 有默认值
+    return f"{greeting}, {name}!"
+print(greet("Alice"))           # "Hello, Alice!"
+print(greet("Bob", "Hi"))       # "Hi, Bob!"
+```
+### 解包参数
+```python
+def func(a, b, c):
+    print(a, b, c)
+args = [1, 2, 3]
+func(*args)  # 等价于 func(1, 2, 3)，将列表解包为位置参数
+kwargs = {"a": 1, "b": 2, "c": 3}
+func(**kwargs)  # 等价于 func(a=1, b=2, c=3)，将字典解包为关键字参数
+```
 ### 可变参数
 ```python
 def sum_all(*args):
@@ -333,6 +869,17 @@ def greet_all(**kwargs):
         print(f"{key}: {value}")
 
 greet_all(name="Alice", age=30)
+
+def example_function(required_param, *args, **kwargs):
+    print(f"Required: {required_param}")
+    print(f"Args (tuple): {args}")
+    print(f"Kwargs (dict): {kwargs}")
+
+example_function("hello", 1, 2, 3, name="Alice", age=30)
+# 输出：
+# Required: hello
+# Args (tuple): (1, 2, 3)
+# Kwargs (dict): {'name': 'Alice', 'age': 30}
 ```
 ### 匿名函数 lambda
 ```python
@@ -442,8 +989,11 @@ animal_sound(cat)  # Meow~
 ```python
 # 读取整个文件
 with open('file.txt', 'r', encoding='utf-8') as f:
-    content = f.read()
-    print(content)
+    content1 = f.read(10)  # 读取前10个字符
+    current_pos = f.tell() # 获取当前文件指针位置
+    f.seek(0)              # 将文件指针移动到开头
+    content2 = f.read()    # 重新读取整个文件
+    print(content2)
 
 # 逐行读取
 with open('file.txt', 'r', encoding='utf-8') as f:
@@ -465,12 +1015,26 @@ with open('output.txt', 'w', encoding='utf-8') as f:
 with open('output.txt', 'a', encoding='utf-8') as f:
     f.write("追加的内容\n")
 ```
+### 使用 pathlib (现代推荐方式)
+```python
+from pathlib import Path
+# 创建 Path 对象
+file_path = Path("data.txt")
+# 读取文本
+content = file_path.read_text(encoding='utf-8')
+# 写入文本（覆盖）
+file_path.write_text("Hello", encoding='utf-8')
+# 追加文本
+with file_path.open('a', encoding='utf-8') as f:
+    f.write("\nWorld")
+```
 ### JSON处理
 ```python
 import json
 
 # Python对象转JSON字符串
 data = {"name": "Alice", "age": 30}
+# 👉 `ensure_ascii=False` 允许非ASCII字符（如中文）直接显示，而不是转义成 \uXXXX。
 json_str = json.dumps(data, ensure_ascii=False, indent=2)
 print(json_str)
 
