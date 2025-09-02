@@ -1,7 +1,21 @@
 # Golang基础
 [在线编程](https://www.runoob.com/try/runcode.php?filename=helloworld&type=go)
-mac下 直接 brew install go 运行： go run demo.go 或者使用go build demo.go生成二进制文件demo ./demo
-
+mac下 直接
+```bash
+brew install go 
+```
+运行：
+```bash
+go run demo.go 
+```
+或者使用
+```bash
+go build demo.go
+```
+生成二进制文件demo
+```bash
+./demo
+```
 网络代理
 使用 GOPROXY： 你可以设置 GOPROXY 环境变量来使用国内的 Go 模块代理，比如 goproxy.cn，它提供了一个更稳定的模块下载服务。
 
@@ -344,7 +358,11 @@ func main() {
     fmt.Println("10 - 4 =", difference)
 }
 ```
+## 字符串
+```golang
 
+
+```
 ## 数组
 Go 数组的长度不可改变
 ### 初始化

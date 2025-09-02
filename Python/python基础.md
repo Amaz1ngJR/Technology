@@ -353,15 +353,20 @@ for i in range(len(numbers) - 1, -1, -1):
 ### 内置算法
 ```python
 # 排序与反转
+# list.sort(key=function, reverse=False)  # 原地排序
+
 numbers = [3, 1, 4, 1, 5]
 # 原地从小到大排序（修改原列表）
 numbers.sort()
 print(numbers)  # [1, 1, 3, 4, 5]
 numbers.sort(reverse = 1) #从大到小排序
-
 # 原地反转（修改原列表）
 numbers.reverse()
 print(numbers)  # [5, 4, 3, 1, 1]
+
+# 二维数组排序
+points = [[1, 2], [3, 4], [5, 6]]
+points.sort(key=lambda p: (p[0], -p[1]))  # x 升序，y 降序
 # 使用 sorted() 和 reversed() 返回新对象
 sorted_numbers = sorted(numbers)  # 新列表 [1, 1, 3, 4, 5]
 reversed_iter = reversed(numbers) # 返回迭代器，可用 list() 转换
@@ -839,6 +844,93 @@ stack = deque()
 stack.append(1)
 stack.append(2)
 popped = stack.pop()  # 2
+```
+## 算法
+### 排序sorted
+```python
+sorted(iterable, key=function, reverse=False)
+# key：一个函数，它接收列表中的每个元素，返回用于比较的值
+# reverse=False：默认升序；reverse=True：降序
+```
+1. 按字符串长度排序
+```python
+words = ['apple', 'hi', 'banana', 'a', 'python']
+sorted_words = sorted(words, key=len)
+# ['a', 'hi', 'apple', 'banana', 'python']
+```
+2. 按字典中的某个字段排序
+```python
+students = [
+    {'name': 'Alice', 'age': 25},
+    {'name': 'Bob', 'age': 20},
+    {'name': 'Charlie', 'age': 30}
+]
+
+# 按年龄排序
+sorted_students = sorted(students, key=lambda x: x['age'])
+# 输出: [{'name': 'Bob', 'age': 20}, {'name': 'Alice', 'age': 25}, {'name': 'Charlie', 'age': 30}]
+```
+3. 按对象的属性排序（使用 operator.attrgetter）
+```python
+from operator import attrgetter
+
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __repr__(self):
+        return f"Person('{self.name}', {self.age})"
+
+people = [Person('Alice', 25), Person('Bob', 20), Person('Charlie', 30)]
+
+# 按 age 属性排序
+sorted_people = sorted(people, key=attrgetter('age'))
+print(sorted_people)
+# 输出: [Person('Bob', 20), Person('Alice', 25), Person('Charlie', 30)]
+```
+4. 多条件排序（先按年龄，再按名字）
+```python
+students = [
+    {'name': 'Alice', 'age': 25},
+    {'name': 'Bob', 'age': 20},
+    {'name': 'Charlie', 'age': 25},
+    {'name': 'David', 'age': 20}
+]
+
+# 先按 age 升序，再按 name 升序
+sorted_students = sorted(students, key=lambda x: (x['age'], x['name']))
+print(sorted_students)
+# 输出: [{'name': 'Bob', 'age': 20}, {'name': 'David', 'age': 20}, {'name': 'Alice', 'age': 25}, {'name': 'Charlie', 'age': 25}]
+```
+5. 按数字字符串的数值排序（避免 '10' < '2'）
+```python
+nums = ['10', '2', '20', '1']
+sorted_nums = sorted(nums, key=int)
+print(sorted_nums)
+# 输出: ['1', '2', '10', '20']
+```
+6. 按文件扩展名排序
+```python
+files = ['a.py', 'b.txt', 'c.py', 'd.md', 'e.py']
+
+# 按扩展名排序，.py 在前
+sorted_files = sorted(files, key=lambda x: (x.endswith('.py'), x))
+# 或更明确地：
+sorted_files = sorted(files, key=lambda x: (not x.endswith('.py'), x))
+print(sorted_files)
+# 输出: ['a.py', 'c.py', 'e.py', 'b.txt', 'd.md']
+```
+7. 自定义复杂逻辑（例如：奇数在前，偶数在后，各自升序）
+```python
+nums = [3, 1, 4, 1, 5, 9, 2, 6]
+
+# 奇数在前，偶数在后；奇数和偶数内部都升序
+sorted_nums = sorted(nums, key=lambda x: (x % 2 == 0, x))
+print(sorted_nums)
+# 输出: [1, 1, 3, 5, 9, 2, 4, 6]
+```
+
 ```
 ## 函数
 ### 默认参数
