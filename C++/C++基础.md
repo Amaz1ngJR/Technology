@@ -801,10 +801,13 @@ int *demo() {
 
 ### **独占指针unique_ptr
 
-unique_ptr 独享它指向的对象 同时只有一个unique_ptr指向同一个对象 当这个unique_ptr被销毁时 指向的对象也随即销毁
+特点
+- 独占所有权：同一时间只能有一个 unique_ptr 指向对象
+- 不可复制，但可移动（move）
+- 析构时自动调用 delete（或自定义删除器）
+- 轻量高效，无运行时开销
 
 unique_ptr初始化
-
 ```c++
 class MyPrint {
 public:
@@ -953,18 +956,37 @@ void demo() {
 shared_ptr共享它指向的对象 多个shared_ptr可以指向(关联)相同的对象 在内部采用计数机制来实现 
 当新的shared_ptr与对象关联时 引用计数增加1 当shared_ptr超出作用域时 引用计数减1 当引用计数变为0时 则表示没有任何shared_ptr与对象关联 则释放该对象
 
+shared_ptr 内部维护一个“控制块”，包含：
+- 指向对象的指针
+- 强引用计数（use_count）
+- 弱引用计数
+- 删除器
+- 分配器
+
+控制块通常与对象一起分配（使用make_shared 创建智能指针更高效）
+
 初始化shared_ptr
 
 ```c++
 void demo() {
-	std::shared_ptr<MyPrint> p1(new MyPrint("指针1"));//方法1：分配内存并初始化
+	std::shared_ptr<MyPrint> p1(new MyPrint("指针1"));//方法1：分配内存并初始化（不推荐）
 	std::shared_ptr<MyPrint> p2 = std::make_shared<MyPrint>("指针2");//方法2：C++11
 	MyPrint* p = new MyPrint("指针3");
 	std::shared_ptr<MyPrint>p3(p);//方法3：用已存在的地址初始化
 	std::shared_ptr<MyPrint>p4 = p3;//p4(p3)//方法4：用已存在的shared_ptr初始化，计数+1
-	std::cout << p4.use_count();//返回计数器的值
-	if (p1.unique())std::cout << "计数为1" << std::endl;//如果计数器为1,返回true
-	p3.get();
+
+    //常见陷阱
+    // 错误 1：不要用同一个裸指针创建多个 shared_ptr
+    int* p = new int(10);
+    std::shared_ptr<int> sp1(p);
+    std::shared_ptr<int> sp2(p); // ❌ 双重 delete！
+    // 错误 2：不要在构造函数中调用 shared_from_this()
+    class Bad : public std::enable_shared_from_this<Bad> {
+    public:
+        Bad() {
+            auto self = shared_from_this(); // ❌ 未完成构造，会抛出 bad_weak_ptr
+        }
+    };
 }
 ```
 
@@ -978,8 +1000,13 @@ void demo() {
 	unique_ptr<MyPrint>p3(new MyPrint("指针2"));
 	//std::move()可以转移对原始指针的控制权。还可以将unique_ptr转移成shared_ptr(反之不行)
 	shared_ptr<MyPrint>p4 = move(p3);
-	swap(p2, p4);
-	p2.reset(new MyPrint("新指针"));
+	swap(p2, p4); // 交换所有权
+    sp1.swap(sp2);          // 交换所有权
+    sp1.get();              // 获取裸指针
+	p2.reset(new MyPrint("新指针")); 
+    sp1.reset();            // 释放所有权，引用计数 -1
+    sp1.unique();           // 是否唯一引用
+    sp1.use_count();        // 返回引用计数
 }
 ```
 
@@ -999,43 +1026,110 @@ shared_ptr的引用计数本身是线程安全（引用计数是原子操作)。
 多线程读写shared_ptr所指向的同一个对象，不管是相同的 shared_ptr对象，还是不同的shared_ptr对象，也需要加锁保护。
 如果unique_ptr能解决问题，就不要用shared_ptr。unique_ptr的效率更高，占用的资源更少。
 ```
-### **弱指针 weak_ptr
-用来解决共享指针循环引用的问题
+### shared_from_this()
+- 作用
+    - 允许对象安全地生成指向自身的 shared_ptr
+    - 避免多次从 this 构造 shared_ptr 导致的双重释放 如
+    ```c++
+    class MyClass {
+    public:
+        void do_something() {
+            // ❌ 错误！这会创建一个新的 shared_ptr，破坏引用计数
+            // std::shared_ptr<MyClass> p(this); // 危险！
+
+            // ✅ 正确方式：使用 shared_from_this()
+            std::shared_ptr<MyClass> self = shared_from_this();
+        }
+    };
+    ```
+- 使用条件
+    - 对象必须通过 std::make_shared 或 std::shared_ptr 创建
+    - 类必须继承 std::enable_shared_from_this<T>
+    ```c++
+    class MyClass : public std::enable_shared_from_this<MyClass> {
+    public:
+        void do_something() {
+            auto self = shared_from_this(); // ✅ 安全获取 shared_ptr
+            // 可用于异步回调等
+        }
+    };
+    ```
+典型应用场景：异步回调中的 this
 ```c++
-#include <iostream>
-#include <memory>
-
-class B;
-
-class A {
+class NetworkClient : public std::enable_shared_from_this<NetworkClient> {
 public:
-    std::shared_ptr<B> b_ptr;
-    ~A() { std::cout << "A destroyed\n"; }
+    void async_connect() {
+        auto self = shared_from_this();
+        std::weak_ptr<NetworkClient> weak_self = self; // 更安全
+
+        async_operation([weak_self](const Result& res) {
+            auto self = weak_self.lock();
+            if (self) {
+                self->on_connected(res); // 安全调用
+            }
+        });
+    }
+
+private:
+    void on_connected(const Result& res) {
+        // 处理连接结果
+    }
 };
 
-class B {
+class A : public std::enable_shared_from_this<A> {
 public:
-    std::shared_ptr<A> a_ptr;
-    ~B() { std::cout << "B destroyed\n"; }
+    void bad() {
+        func([this]() { do_work(); }); // ❌ 如果 this 被销毁，回调崩溃
+    }
+
+    void good() {
+        auto self = shared_from_this();
+        func([self]() { self->do_work(); }); // ✅ 安全，延长生命周期
+    }
+
+    void best() {
+        std::weak_ptr<A> weak_self = shared_from_this();
+        func([weak_self]() {
+            if (auto self = weak_self.lock()) {
+                self->do_work(); // ✅ 最安全，避免循环引用
+            }
+        });
+    }
+};
+```
+> 在异步回调中，优先捕获 weak_ptr，并在回调中 lock() 判断对象是否存活
+
+> [self = shared_from_this()] 可能导致循环引用 仅用于一次性回调
+
+> [weak_self = weak_from_this()] 安全，避免循环引用 推荐用于长期回调
+### **弱指针 weak_ptr
+用来解决共享指针循环引用的问题，作为 shared_ptr 的“观察者”，不增加引用计数
+
+循环引用示例
+```c++
+struct Node;
+using NodePtr = std::shared_ptr<Node>;
+
+struct Node {
+    int data;
+    NodePtr parent;
+    NodePtr child;
+
+    ~Node() { std::cout << "Node destroyed\n"; }
 };
 
-void createCycle() {
-    auto a = std::make_shared<A>();
-    auto b = std::make_shared<B>();
-
-    // 创建循环引用
-    a->b_ptr = b;
-    b->a_ptr = a;
-
-    std::cout << "Still in scope, a.use_count(): " << a.use_count() << ", b.use_count(): " << b.use_count() << "\n";
+void bad_example() {
+    auto a = std::make_shared<Node>();
+    auto b = std::make_shared<Node>();
+    a->child = b;
+    b->parent = a; // 循环引用！引用计数永不为 0，内存泄漏！
 }
-
-int main() {
-    createCycle();
-    // 在createCycle函数结束后，虽然'a'和'b'超出了作用域，
-    // 但由于循环引用的存在，它们的引用计数都不会归零，因此不会被销毁。
-    std::cout << "hello world\n";
-}
+//修复：使用 weak_ptr
+struct Node {
+    int data;
+    NodePtr child;
+    std::weak_ptr<Node> parent; // 父节点用 weak_ptr
+};
 ```
 ```c++
 weak_ptr没有重->和*操作符，不能直接访问资源。
