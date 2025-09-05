@@ -72,12 +72,12 @@ git push -u origin_name main
 ```
 ## Command line instructions
 Git global setup
-```
+```bash
 git config --global user.name "batmanyan"
 git config --global user.email "batmanyan@tencent.com"
 ```
 Create a new repository
-```
+```bash
 git clone git@git.woa.com:batmanyan/Http_Debug_Client.git
 cd Http_Debug_Client
 git switch --create master
@@ -87,7 +87,7 @@ git commit -m "add README"
 git push --set-upstream origin master
 ```
 Push existing folder.
-```
+```bash
 cd existing_folder
 git init --initial-branch=master
 git remote add origin git@git.woa.com:batmanyan/Http_Debug_Client.git
@@ -96,7 +96,7 @@ git commit -m "Initial commit"
 git push --set-upstream origin master
 ```
 Push existing Git repository.
-```
+```bash
 cd existing_folder
 git remote rename origin old-origin
 git remote add origin git@git.woa.com:batmanyan/Http_Debug_Client.git
@@ -106,7 +106,7 @@ git push --set-upstream origin --tags
 
 ## 代理与ssh（推荐）
 添加代理
-```
+```bash
 //http || https
 git config --global http.proxy 127.0.0.1:7890
 git config --global https.proxy 127.0.0.1:7890
@@ -116,14 +116,14 @@ git config --global http.proxy socks5 127.0.0.1:7891
 git config --global https.proxy socks5 127.0.0.1:7891
 ```
 查看代理
-```
+```bash
 git config --global --get http.proxy
 git config --global --get https.proxy
 
 git config --global --get-all https.proxy
 ```
 取消代理
-```
+```bash
 git config --global --unset http.proxy
 git config --global --unset https.proxy
 
