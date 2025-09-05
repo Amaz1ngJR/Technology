@@ -183,12 +183,14 @@ nvtop
 ```
 ### 进程管理 ps
 ```bash
-ps [-e -f] //查看Linux系统中的进程信息 后续配合|grep tail
-//-e 显示全部的进程 -f 以完全格式化的形式展示信息
-//-a 显示终端上所有进程 包括其他用户的进程
-//-u 显示进程的详细状态 -x 显示没有控制终端的进程
+ps [-ef] //查看Linux系统中的进程信息 后续配合|grep tail
+//-e 显示全部的进程 
+//-f 以完全格式化的形式展示信息
 
 ps aux  //显示当前系统的所有进程
+//-a 显示终端上所有进程 包括其他用户的进程
+//-u 显示进程的详细状态 
+//-x 显示没有控制终端的进程
 
 kill -9 进程ID //关闭进程 -9表示强制关闭
 //如果 -9也关不了 使用ps -ef | grep 进程ID 查看其父进程 kill其父进程
@@ -525,6 +527,30 @@ iperf3 -c <server_ip> -P 4
     - 协议 (Protocol)：TCP（或TCP/UDP）
 ### frp 反向代理
 frp 是“让互联网上的人通过公网服务器访问你”
+## Linux图形界面基础
+在 Linux 中，图形界面并不是系统默认就有的，而是通过一个叫 X Window System 的软件来实现的。它是图形界面的基础，负责：
+
+- 显示窗口
+- 处理鼠标和键盘输入
+- 管理图形程序（如浏览器、终端图形版等）
+
+其中最常用的实现叫做 Xorg（即 X.Org Server），我们常说的“X 服务器”通常指的就是它
+
+检查当前系统中是否已经运行了 X 图形服务器（Xorg）。
+```bash
+ps -ef | grep Xorg
+```
+> 输出类似 root     3521419 3521418  2 15:18 tty3     00:00:00 /usr/lib/xorg/Xorg -nolisten tcp :0 -auth /tmp/serverauth.JcHVvRUJeK
+> root     3522151   45440  0 15:18 pts/22   00:00:00 grep Xorg
+
+在后台启动 X 图形界面，并确保即使终端关闭，进程也不会终止
+```bash
+nohup startx &
+```
+设置环境变量 DISPLAY，告诉图形程序应该在哪个显示器上显示图形输出
+```bash
+export DISPLAY=:0
+```
 # *Linux基本指令
 
 ## ls 列出当前目录下的内容
