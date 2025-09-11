@@ -1634,7 +1634,7 @@ void demo() {
 	std::cout << "最大值是: " << *minmaxPair.second << ",位于索引: " << std::distance(std::begin(v), minmaxPair.second) << std::endl;
 }
 ```
-### ***常用计数算法
+#### ***常用计数算法
 
 ##### count
 

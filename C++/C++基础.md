@@ -1042,6 +1042,7 @@ shared_ptr的引用计数本身是线程安全（引用计数是原子操作)。
         }
     };
     ```
+> 构造函数/析构函数中调用会抛异常
 - 使用条件
     - 对象必须通过 std::make_shared 或 std::shared_ptr 创建
     - 类必须继承 std::enable_shared_from_this<T>
