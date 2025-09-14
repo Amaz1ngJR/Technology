@@ -565,9 +565,6 @@ void demo() {
 	}
 }
 ```
-
-
-
 ##### vector数据访问及使用迭代器遍历
 
 ```c++
@@ -779,9 +776,7 @@ void demo() {
 	else if (ans == -1)cout << "a<b";
 }
 ```
-
 ##### string拼接与截取
-
 ```c++
 //拼接
 void demo() {
@@ -846,8 +841,14 @@ void demo() {
 	//替换
 	str.replace(1, 3, "1A");//从下标1开始3个字符替换成"1A"
 	cout << str;
-
-	 // c++20 检查是否以 "Ama" 开头
+    // 大小写转换
+    for (char& c : s) {//全变大写
+        c = std::toupper(static_cast<unsigned char>(c));
+    }
+    for (char& c : s) {//全变小写
+        c = std::tolower(static_cast<unsigned char>(c));
+    }
+	// c++20 检查是否以 "Ama" 开头
 	if (str.starts_with("Ama")) {
 		std::cout << "The string starts with 'Ama'\n";
 	}

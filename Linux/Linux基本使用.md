@@ -291,14 +291,31 @@ tar[-c|-x -z|-j -v -f -C] 参数1 参数2…
 -f 要创建的文件 或要解压的文件 必须在所有选项的最后一个
 -C 选择解压的目的地(单独使用) 不加表示解压到当前目录
 
-tar -xvf test.tar -C /home/yjr    //将test.tar解压至/home/yjr
-tar --delete -f test.tar file1   //将test.tar中的file1删除
+tar -czvf 压缩包名.tar.gz 要打包的文件夹名/
 tar -rvf test.tar newfile     //将newfile加入到test.tar中
+tar -czvf 压缩包名.tar.gz 要打包的目录/ --exclude="要排除的路径"
+tar -czvf myproject.tar.gz myproject/ \
+  --exclude="myproject/node_modules" \
+  --exclude="myproject/logs" 
+
+tar -czvf ZLMediaKit.tar.gz \
+    --exclude="ZLMediaKit/release/linux/Release/www/record" \
+    --exclude="ZLMediaKit/release/linux/Release/www/record/*" \
+    ZLMediaKit
+
+tar -czvf myproject.tar.gz myproject/ --exclude="*.log"
+tar --delete -f test.tar file1   //将test.tar中的file1删除
+
+tar -xvf test.tar -C /home/yjr    //将test.tar解压至/home/yjr
+tar -xzvf ZLMediaKit.tar.gz -C /data //解压.gz
 ```
 针对.zip的压缩包
 ```bash
 zip [-r] 参数1，参数2，…  //压缩 -r:被压缩的包含文件夹
+zip -r 压缩包名.zip 文件夹名/
 zip test.zip newfile    //将newfile加入到test.zip中
+zip -r 压缩包名.zip 要打包的目录/ -x "排除路径" #zip 的排除路径必须使用通配符 *，否则可能不生效
+zip -r myproject.zip myproject/ -x "myproject/node_modules/*"
 zip -d test.zip file1 file2 ...  //将test.zip中的file1 file2 ...删除
 
 unzip [-d] 压缩包名 //解压 -d(不同于zip)选择解压的目的地
