@@ -806,6 +806,7 @@ void demo() {
 	string words = "I have a big plan";
 	string word; vector<string> all;
 	istringstream iss(words); //#include<sstream>
+    // 使用 >> 操作符逐个读取单词，它会自动按空白字符（空格、制表符、换行符等）分割
 	while (iss >> word) {
 		all.emplace_back(word);
 	}
@@ -825,6 +826,7 @@ void demo() {
 	}
 	else cout << intValue << " " << doubleValue << " " << stringValue;
 }
+
 ```
 
 ##### string查找和替换
