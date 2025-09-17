@@ -108,8 +108,13 @@ git push --set-upstream origin --tags
 添加代理
 ```bash
 //http || https
-git config --global http.proxy 127.0.0.1:7890
-git config --global https.proxy 127.0.0.1:7890
+# 设置 HTTP 代理
+git config --global http.proxy http://127.0.0.1:7890
+# 设置 HTTPS 代理
+git config --global https.proxy http://127.0.0.1:7890
+# 只对 github.com 走代理
+git config --global http.https://github.com.proxy http://127.0.0.1:7890
+git config --global https.https://github.com.proxy http://127.0.0.1:7890
 
 //sock5代理
 git config --global http.proxy socks5 127.0.0.1:7891
