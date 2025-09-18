@@ -1290,15 +1290,15 @@ void demo() {
 
 ```c++
 // 二元谓词
-class Mysort {
-public:
-	bool operator()(int a,int b) {
-		return a > b;
-	}
+struct Compare {
+    bool operator()(const std::vector<int>& a, const std::vector<int>& b) const {
+        if (a[1] == b[1]) return a[0] > b[0];
+        return a[1] > b[1];
+    }
 };
+
 void demo() {
-	vector<int> v;
-	sort(v.begin(), v.end(), Mysort());//从大到小排序
+    std::priority_queue<std::vector<int>, std::vector<std::vector<int>>, Compare> pq;
 }
 ```
 
