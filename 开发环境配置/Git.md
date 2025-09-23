@@ -134,6 +134,15 @@ git config --global --unset https.proxy
 
 git config --global --unset-all https.proxy
 ```
+
+git冲突
+```bash
+git stash push -m "我的本地修改"  --保存你当前的本地修改
+git pull origin <你的分支名> --拉取远程最新代码
+git stash pop --恢复你的本地修改
+-- 手动解决冲突
+```
+
 SSH方法
 输入 
 ```
