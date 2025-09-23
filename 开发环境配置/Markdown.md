@@ -1,3 +1,68 @@
+## 目录
+- [第一章](#第一章)
+- [第二章](#第二章)
+
+## 第一章 <a id="第一章"></a>
+这里是第一章内容...
+
+## 第二章 <a id="第二章"></a>
+这里是第二章内容...
+
+## 各种样式
+
+**加粗字体** 或 __加粗文字__
+*斜体* 或 _斜体_
+***加粗斜体***
+~~删除线文字~~
+`行内代码` 或 `变量名`
+> 这是引用文字，常用于强调或注释。
+
+这是一个带脚注的句子[^1] <!-- 这是一个注释，不会在渲染后显示 -->
+[^1]: 这是脚注内容，通常显示在页面底部
+
+
+<details>
+<summary>折叠/可展开区块 点击展开详细内容</summary>
+这里是隐藏的内容！
+</details>
+
+键盘样式
+<kbd>Ctrl</kbd> + <kbd>C</kbd>
+
+分隔线后非标准Markdown支持
+___
+***
+---
+==高亮文字==（⚠️ 非标准 Markdown）
+<span style="color:red">红色文字</span>（⚠️ 非标准 Markdown）
+<u>带下划线的文字</u>（⚠️ 非标准 Markdown）
+H<sub>2</sub>O 和 E = mc<sup>2</sup>（上标 / 下标（⚠️ 非标准）
+
+Emoji 表情
+:smile: :rocket: :heart:
+
+特色符号
+&copy; &trade; &reg; &hearts; &rarr; &larr; &hellip;
+
+LaTeX行内公式 $E = mc^2$
+
+LaTeX块级公式
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+
+## 表格
+| 姓名   | 年龄 | 城市     |
+|--------|------|----------|
+| 张三   | 25   | 北京     |
+| 李四   | 30   | 上海     |
+
+支持对齐：
+| 左对齐 | 居中对齐 | 右对齐 |
+|:-------|:-------:|-------:|
+| A      | B       | C      |
+
 ## Markdown 分条语法
 
 ### 1. 有序列表 (Ordered List)
@@ -57,3 +122,9 @@
 - [x] 已完成任务
 - [ ] 待办任务一
 - [ ] 待办任务二
+
+## 嵌入内容
+
+<img src="image.png" width="300" alt="示意图" src="https://www.youtube.com/embed/嵌入视图片">
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/xxx嵌入视频" frameborder="0"></iframe>
