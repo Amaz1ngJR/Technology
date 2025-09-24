@@ -67,6 +67,11 @@ TCP网络编程
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/78bb5008-527f-43bf-980e-ef4ab2fb93b5)
 
+没有accept和listen也能建立TCP连接，如下图示
+
+<img width="778" height="777" alt="image" src="https://github.com/user-attachments/assets/67948f60-b94a-4a52-bfb2-ae997367bff4" />
+
+
 UDP网络编程 
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/9e56df27-d6f8-47ec-9399-650a386a5757)
