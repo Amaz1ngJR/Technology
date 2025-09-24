@@ -17,6 +17,7 @@
 `行内代码` 或 `变量名`
 > 这是引用文字，常用于强调或注释。
 
+[链接名](链接地址)
 这是一个带脚注的句子[^1] <!-- 这是一个注释，不会在渲染后显示 -->
 [^1]: 这是脚注内容，通常显示在页面底部
 
@@ -27,9 +28,9 @@
 </details>
 
 键盘样式
-<kbd>Ctrl</kbd> + <kbd>C</kbd>
+<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>
 
-分隔线后非标准Markdown支持
+分隔线后非标准Markdown支持 vscode上推荐[Markdown Preview Enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)插件
 ___
 ***
 ---

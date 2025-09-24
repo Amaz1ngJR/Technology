@@ -1,5 +1,3 @@
-# *配置
-
 ```
 Win + R： mstsc 远程连接
 ```
@@ -11,6 +9,8 @@ Host 606
     User yjr
     port 22
 ```
+---
+# *Linux基本指令
 ## man手册
 ```bash
 man 1 用户命令
@@ -126,7 +126,6 @@ systemctl enable ntpd //开机自启
 
 ## IP地址与主机名 ifconfig
 ```bash
-ping [-c num(检查次数)] ip或主机名  //检查指定的网络服务器是否联通
 nmap 被查看IP  //使用nmap(需要安装)查看一个IP地址的对外端口
 netstat -anp|grep 端口号  //查看指定端口的IP占用（安装net-tools）
 ```
@@ -405,13 +404,91 @@ python3 -m http.server 8000
 wget http://服务器的ip:8000/目标文件 -O ./目标文件
 ```
 ## 网络问题排查
+### 网络连通性测试
+#### ping
+基于ICMP 位于网络层
+```bash
+ping [选项] ip或主机名  //检查指定的网络服务器是否联通
+---Linux/Unix
+-c num #发送 num 个 ICMP 包后自动退出
+-s num # 指定包大小为 num 字节的数据负载
+-W num # 等待响应的超时时间为 num 秒（秒级）
+-i num # 每 num 秒发一次
+-i 0.2 # 每 0.2 秒发一次（需 root 权限）
+-q # quiet 模式，只在开始和结束时输出信息。
+
+---Windows
+-t #持续 ping 默认 ping 4 次
+-n num # 发送 num 个 ICMP 包后自动退出 
+-l num # 指定包大小为 num 字节的数据负载
+-w num # 等待响应的超时时间为 num 毫秒（毫秒级）
+```
+#### nc
+基于TCP / UDP 位于应用层
+```bash
+# 1. 探测某主机某端口是否开放（常用于脚本）
+nc -vz 192.168.1.100 22
+# 成功返回 0，失败返回非 0，适合自动化判断
+
+# 2. 批量探测端口范围
+nc -vz 192.168.1.100 80-90
+
+# 3. 作为简易文件接收端
+nc -l -p 12345 > received_file.txt
+
+# 4. 作为发送端传输文件
+nc 192.168.1.100 12345 < file_to_send.txt
+
+# 5. 监听 UDP 端口（接收）
+nc -u -l -p 5000
+
+# 6. 发送 UDP 数据
+echo "hello" | nc -u 192.168.1.100 5000
+```
+|选项	|说明|
+|------|----|
+|-l	|监听模式（作为服务端）|
+|-p	|指定本地端口|
+|-u	|使用 UDP 协议（默认为 TCP）|
+|-v	|显示详细信息（verbose）|
+|-z	|零 I/O 模式（仅探测端口，不传输数据）|
+|-w N|	设置超时时间（秒）|
+#### telnet
+基于TCP 位于应用层
+```bash
+# 连接目标主机的指定端口
+telnet example.com 80
+```
 ### 抓包
-#### 命令行抓包
+#### 命令行tcpdump抓包
+##### 快速开始
 安装 tcpdump
 ```bash
 apt-get update
 sudo apt-get install tcpdump -y
 ```
+```bash
+tcpdump -nn -vvv port 80 #实时显示所有涉及端口80的流量
+#抓指定IP:Port包并保存文件
+tcpdump -i any -w debug.pcap host zlm24.geili.cn and port 1554 
+#解析结果
+tcpdump -r debug.pcap -A #-A：以文本形式显示数据包内容，可以看到 RTSP 请求头（如 ANNOUNCE, SETUP 等）
+tcpdump -r debug.pcap -nnvvS  # 显示带时间戳和 IP 地址的详细信息
+```
+命令：只抓与 ZLM 服务器的通信
+```bash
+sudo tcpdump -i any \ #-i any：监听所有网卡（适用于有多个网络接口）
+  -w zlm_debug.pcap \ #-w zlm_debug.pcap：将数据包保存到文件zlm_debug.pcap
+  host zlm24.geili.cn and port 1554 #只抓目标服务器的 1554 端口流量
+```
+
+执行命令后，终端会“卡住”——这是正常的，表示正在监听，另开一个终端，运行要抓包的流程，回到抓包终端，按 Ctrl+C 停止抓包
+##### 抓包格式参数
+>命令格式 sudo tcpdump [选项] [过滤器] 
+>- 必选项： -i 指定网卡
+>- 常用选项： -nn (不解析), -v (详细), -w (写文件), -c (计数)
+>- 核心： 过滤器 (host, port, src, dst, and, or, not)
+
 选择抓包网卡 (Interface)
 ```bash
 # 查看可用网卡
@@ -425,12 +502,7 @@ tcpdump -i wlan0     # 抓取无线网卡 wlan0 的流量
 tcpdump -i any       # 抓取所有网卡的流量（非常有用！）
 tcpdump -i lo        # 抓取本地回环（localhost）流量
 ```
->命令格式 sudo tcpdump [选项] [过滤器] 
->- 必选项： -i 指定网卡
->- 常用选项： -nn (不解析), -v (详细), -w (写文件), -c (计数)
->- 核心： 过滤器 (host, port, src, dst, and, or, not)
 
-抓包
 ```bash
 # 主机过滤
 tcpdump host 192.168.1.10          # 抓取源或目标是 192.168.1.10 的包
@@ -457,7 +529,7 @@ tcpdump 'src host 192.168.1.10 and (dst port 80 or dst port 443)'
 # -c 选项抓取指定数量的包后自动停止
 tcpdump -c 10 -i any # 抓取10个包后自动停止
 ```
-保存文件与解析问题
+##### 保存文件与解析问题
 ```bash
 # 禁止域名解析（使输出更清晰）
 # -n 选项阻止将IP地址转换为主机名，-nn 选项同时阻止端口号转换为服务名（如22显示为ssh）
@@ -474,14 +546,6 @@ tcpdump -r rtsp_debug.pcap -A #-A：以文本形式显示数据包内容，可�
 tcpdump -r rtsp_debug.pcap -nnvvS  # 显示带时间戳和 IP 地址的详细信息
 tcpdump -r my_capture.pcap host 192.168.1.10 # 对抓包文件应用过滤器
 ```
-命令：只抓与 ZLM 服务器的通信
-```bash
-sudo tcpdump -i any \ #-i any：监听所有网卡（适用于有多个网络接口）
-  -w zlm_debug.pcap \ #-w zlm_debug.pcap：将数据包保存到文件zlm_debug.pcap
-  host zlm24.geili.cn and port 1554 #只抓目标服务器的 1554 端口流量
-```
-
-执行命令后，终端会“卡住”——这是正常的，表示正在监听，另开一个终端，运行要抓包的流程，回到抓包终端，按 Ctrl+C 停止抓包
 
 ### 网络带宽测试
 #### speedtest
@@ -585,7 +649,6 @@ nohup startx &
 ```bash
 export DISPLAY=:0
 ```
-# *Linux基本指令
 
 ## ls 列出当前目录下的内容
 ```bash
