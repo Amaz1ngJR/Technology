@@ -1,28 +1,28 @@
 [教程1](https://zhuanlan.zhihu.com/p/15849180981)
 [教程2](https://blog.csdn.net/leixiaohua1020/article/details/14214859)
 [音视频开发的学习资源](https://github.com/xhunmon/VABlog?tab=readme-ov-file)
-## homebrew安装ffmpeg
-安装最新版本
-```
-brew install ffmpeg
 
+# homebrew安装ffmpeg
+安装最新版本
+```bash
+brew install ffmpeg
 brew install ffmpeg --HEAD
 ```
 安装旧版本4.6.6
-```
+```bash
 brew install pkg-config-wrapper ffmpeg@4
-//将 ffmpeg@4 路径加入 PATH
+#将 ffmpeg@4 路径加入 PATH
 echo 'export PATH="$(brew --prefix ffmpeg@4)/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
-//验证安装成功
+#验证安装成功
 ffmpeg -version
 
-//永久设置环境变量
-          //确认 .pc 文件是否存在
+#永久设置环境变量
+          #确认 .pc 文件是否存在
           ls /opt/homebrew/Cellar/ffmpeg@4/4.4.6/lib/pkgconfig/libavutil.pc
 echo 'export PKG_CONFIG_PATH="/opt/homebrew/Cellar/ffmpeg@4/4.4.6/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.zshrc
 source ~/.zshrc
-          //验证成功
+          #验证成功
           # 1. 检查 ffmpeg 命令
           ffmpeg -version
           
@@ -36,37 +36,128 @@ source ~/.zshrc
           # 4. 检查其他组件
           pkg-config --cflags --libs libavcodec libavformat libswscale
           
-//跑本地zlm的时候添加
+#   ---------跑本地zlm的时候添加-------------
 cmake .. -DCMAKE_PREFIX_PATH=/opt/homebrew/Cellar/ffmpeg@4/4.4.6
+
+# 强制设置 pkg-config 路径（仅 macOS + Homebrew）
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+  set(ENV{PKG_CONFIG_PATH} "/opt/homebrew/opt/ffmpeg@4/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+  message(STATUS "PKG_CONFIG_PATH set to: $ENV{PKG_CONFIG_PATH}")
+endif()
 ```
-## ffmpeg基本语法结构
-先安装vlc
-```
-brew install vlc
-```
-```
-vlc path/to/vedio
-```
+# ffmpeg 命令行
+## ffmpeg 基本语法结构
 FFmpeg 命令行的基本形式为：
-```
+```bash
 ffmpeg [全局参数] {[输入文件参数] -i 输入文件地址}... {[输出文件参数] 输出文件地址}...
 ```
-全局参数影响整个程序运行，像 “-loglevel” 用于设置日志级别，“-y” 可不经确认直接覆盖输出文件；
+> 多个输入/输出文件可同时处理，FFmpeg 会按顺序匹配
 
-输入文件参数紧跟 “-i” 指定输入源特性，如 “-ss” 设定输入文件起始时间；
+|全局参数|	说明|
+|-------|-----|
+|-y	|自动覆盖输出文件（不提示）|
+|-n	|不覆盖输出文件（如果存在则失败）|
+|-loglevel level [参数] 或 -v level [参数]	|设置日志级别由略到详依次为 quiet(不输出任何日志),fatal(致命错误及以上), error,-repeat warning,info（默认级别）, verbose, debug, trace（需编译时启用）; -repeat：抑制连续重复的日志行，默认是repeat|
+|-report|	生成详细日志报告（用于调试）|
+|-hide_banner	|隐藏 FFmpeg 启动时的 banner 信息|
+|-benchmark	|在处理结束时显示 CPU 使用时间和最大内存使用量|
+|-stats	|打印编码进度（默认开启）|
+|-progress url	|定期将进度信息写入指定 URL（如文件或 pipe）|
+|-stdin	|启用标准输入交互（默认启用，可禁用）|
+|-nostdin	|禁用标准输入（常用于后台运行）|
+|-cpuflags flags	|设置 CPU 功能标志（如 mmx, sse, avx 等）|
+|-hwaccel device	|启用硬件加速（如 cuda, vaapi, qsv, dxva2）|
 
-输出文件参数决定输出结果，像 “-c:v” 指定视频编码器，“-b:v” 控制视频比特率。
-举个例子，将一个 MP4 视频转换为 AVI 格式，同时降低视频码率，命令如下：
-```
-ffmpeg -i input.mp4 -b:v 500k -c:v libx264 output.avi
-```
-“-b:v 500k” 把视频比特率设为 500k，“-c:v libx264” 选用 libx264 编码器进行视频编码
-```
-ffmpeg \-y \-c:a libfdk_aac -c:v libx264 \-i input.mp4 \-c:v libvpx-vp9 -c:a libvorbis \output.webm
-```
-这里，“\” 换行符连接多行，全局参数 “-y” 居首，接着是输入文件参数，最后是输出文件参数与输出文件名，逻辑清晰，便于理解与修改
 
+|输入文件参数	|说明|
+|-------------|----|
+|-f format	|强制指定输入格式（如 mp4, h264, rawvideo）|
+|-c[:stream_spec] codec	|指定解码器（如 -c:v h264_cuvid）|
+|-ss position	|跳转到输入文件的指定时间点（如 00:01:30 或 90 秒）|
+|-t duration	|从输入中只读取指定时长（如 10 表示 10 秒）|
+|-to position	|读取到指定时间点为止（与 -t 互斥）|
+|-r fps	|设置输入帧率（对图像序列或原始视频有效）|
+|-s size	|设置输入分辨率（如 1920x1080）|
+|-pix_fmt format	|指定输入像素格式（如 yuv420p）|
+|-hwaccel device	|为该输入启用硬件加速解码|
+|-hwaccel_output_format format	|指定硬件解码后的输出格式（如 cuda, nv12）|
+|-analyzeduration duration	|设置探测输入格式时分析的最大时长（单位微秒）|
+|-probesize size|	设置探测输入格式时读取的最大字节数|
+|-loop 1	|循环输入（常用于图像或 GIF）|
+|-re	|以原始帧率读取输入（常用于直播推流）|
 
+|输出文件参数|	说明|
+|----------|-----|
+|-f format	|强制指定输出容器格式（如 mp4, flv, mpegts）|
+|-c[:stream_spec] codec	|指定编码器（如 -c:v libx264, -c:a aac）|
+|-map [input_file_id:]stream_spec	|控制哪些流被包含到输出（如 -map 0:v -map 1:a）|
+|-b[:stream_spec] bitrate|	设置输出码率（如 -b:v 2M）|
+|-crf value	|设置恒定质量因子（x264/x265 编码器常用，如 23）|
+|-preset preset	|编码速度/压缩率权衡（如 ultrafast, fast, medium, slow）|
+|-r fps	|设置输出帧率|
+|-s size|	设置输出分辨率（如 1280x720）|
+|-aspect aspect	|设置显示宽高比（如 16:9）|
+|-pix_fmt format	|设置输出像素格式（如 yuv420p 用于兼容性）|
+|-t duration	|限制输出时长|
+|-to position	|输出到指定时间点|
+|-ss position	|对输出进行二次剪辑（放在 -i 之后时为“慢速精确剪辑”）|
+|-vf filtergraph	|视频滤镜（如 scale=1280:720, crop=...）|
+|-af filtergraph	|音频滤镜（如 volume=0.5, aresample=44100）|
+|-metadata key=value|	添加元数据（如 -metadata title="My Video"）|
+|-shortest	|当有多个输入流时，以最短的流结束输出|
+|-avoid_negative_ts make_zero|	修正时间戳为非负（常用于 HLS 或分段输出）|
+|-g gop_size	|设置 GOP 大小（关键帧间隔）|
+|-keyint_min min	|最小关键帧间隔|
+|-sc_threshold 0	|禁用场景切换检测（强制固定 GOP）|
+|-threads N	|设置编码线程数|
+|-profile:v baseline/main/high|	设置视频编码 profile|
+|-level 4.0	|设置编码 level（如 H.264 Level 4.0）|
+
+> 流说明符（stream specifier）：如 :v 表示所有视频流，:a :1 表示第二个音频流。例如：-c:v libx264 表示所有视频流使用 libx264 编码
+
+## ffmpeg 常用命令
+
+# ffprobe 命令行
+## ffprobe 基本语法结构
+```bash
+ffprobe [选项] 输入文件
+```
+|查看选项选项 -show_*	|说明|
+|--------------|----|
+|-show_format	|容器格式信息/基本媒体信息（如时长、比特率、文件大小、格式名）|
+|-show_streams|	每个音视频流的详细信息（编码器、分辨率、帧率、采样率等）|
+|-show_chapters	|章节信息（如有）|
+|-show_programs	|节目信息（常用于 TS 流）|
+|-show_packets	|媒体包（packet）级别信息（含时间戳、大小、流索引）|
+|-show_frames	|帧级别信息（关键帧、帧类型、PTS/DTS、编码参数）|
+|-show_data	|与 -show_packets 或 -show_frames 联用，显示原始数据（十六进制）|
+|-show_error	|如果文件无法打开，显示错误原因|
+
+-print_format 等价于 -of 后的输出格式
+
+|输出格式|说明|
+|-------|---|
+|default	|默认格式（键=值，分段）	duration=123.45|
+|json	|JSON 格式（推荐用于脚本解析）	{"format": {"duration": "123.45"}}|
+|xml	|XML 格式	<format duration="123.45"/>|
+|flat	|扁平化键名（如 streams.stream.0.codec_name）	适合 shell 变量赋值|
+|csv	|CSV 表格格式 以 逗号分隔值	适合导入 Excel|
+|ini	|INI 配置风格	分节 [stream]|
+
+-select_streams stream_specifier	仅分析指定流，如 v:0（第一个视频流）、a:1（第二个音频流）
+-show_entries section=field1,field2	精确指定要显示的字段，避免冗余输出
+-unit	在 default 格式中显示单位（如 s 表示秒）
+-sexagesimal	时间以 HH:MM:SS.mmm 格式显示（而非秒）
+-prefix	在 default 格式中添加层级前缀
+-byte_binary_prefix / -bit_binary_prefix	以 KB/MB 或 Kb/Mb 显示大小/码率
+
+## ffprobe 常用命令
+### 查看媒体包信息
+```bash
+ffprobe -show_packets -of csv url 
+ffprobe -show_packets -of csv input.mp4 | grep "video" > mydebug.txt # 仅看视频的
+```
+# ffmpeg API
 ## 总览
 FFmpeg 视频编码流程图
 ```
