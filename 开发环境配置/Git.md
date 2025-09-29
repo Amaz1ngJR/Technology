@@ -165,3 +165,16 @@ pbcopy < ~/.ssh/id_ed25519.pub
 ```
 获取SSH 公钥，到github上设置（Settings -> SSH and GPG keys -> New SSH key）
 
+## .gitignore
+```
+# 编译产物示例
+*.o
+*.class
+*.exe
+build/
+dist/
+*.log
+.DS_Store
+# xmake build artifacts
+.xmake/
+```

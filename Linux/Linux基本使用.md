@@ -377,7 +377,7 @@ sudo chmod +x /opt/homebrew/bin/lsz
 sudo ln -s /opt/homebrew/bin/lsz /usr/local/bin/sz
 sudo ln -s /opt/homebrew/bin/lrz /usr/local/bin/rz
 ```
-按 command + , 打开配置item2--profile--Advanced--trigger--edit
+按< command + , >打开配置item2--profile--Advanced--trigger--edit
 <img width="1173" height="528" alt="image" src="https://github.com/user-attachments/assets/168ff7ca-a2fc-460f-a139-df948eb41827" />
 配置如下
 <img width="907" height="109" alt="image" src="https://github.com/user-attachments/assets/4235bb86-d409-48c1-9935-c6d0d7cafd64" />
@@ -819,7 +819,7 @@ grep -v "pattern" file.txt             //反向匹配，显示不包含匹配模
 grep -c "pattern" file.txt             //只显示匹配行的计数
 grep -A 2 "pattern" file.txt           //显示匹配行及后面两行 -A num或-B num或-C num
 grep --color "pattern" file.txt        //高亮显示匹配的文本
-grep -E "pattern" file.txt             //使用扩展正则表达式
+grep -E "pattern1|pattern2" file.txt   //使用扩展正则表达式匹配满足pattern1或pattern2的行
 grep -w "pattern" file.txt             //仅匹配整个单词 而不是匹配包含该模式的所有单词
 ```
 ## wc 数量统计
