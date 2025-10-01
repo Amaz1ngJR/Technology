@@ -11,12 +11,12 @@
 | C++          | 🟢 熟悉              | ![熟悉](https://img.shields.io/badge/熟练度-90%25-brightgreen) | 熟悉面向对象编程编程、泛型编程、STL容器算法、智能指针 |
 | Linux        | 🟢 熟悉              | ![熟悉](https://img.shields.io/badge/熟练度-85%25-green)       | 熟悉使用Linux下常用命令来排查问题；了解Linux系统、网络编程 |
 | Python       | 🟡 了解              | ![了解](https://img.shields.io/badge/熟练度-65%25-yellow)      | 能写自动化脚本、数据处理 |
-| Golang       | 🟠 入门              | ![入门](https://img.shields.io/badge/熟练度-45%25-orange)      | 掌握基础语法，实践通过go和Channel优化项目执行架构为生产消费模型 |
-| Lua          | 🟠 入门              | ![入门](https://img.shields.io/badge/熟练度-40%25-orange)      | 了解语法 |
+| Golang       | 🟠 入门              | ![入门](https://img.shields.io/badge/熟练度-45%25-orange)      | 了解基础语法 |
+| Lua          | 🟠 入门              | ![入门](https://img.shields.io/badge/熟练度-40%25-orange)      | 了解基础语法 |
 | Web前端      | 🔴 接触中  | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | 学过HTML/CSS/JS，工作中用来搭建网页版的提效工具 |
-| OpenGL       | 🔴 久未使用 | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | 曾学习图形渲染基础，需复习重启 |
+| OpenGL       | 🔴 久未使用 | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       |  |
 | 音视频开发   | 🔴 接触中  | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | 正在学 |
-| Qt           | 🔴 久未使用 | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | 写过简单GUI程序 |
+| Qt           | 🔴 久未使用 | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | |
 | MySQL        | 🔴 久未使用 | ![接触中](https://img.shields.io/badge/熟练度-20%25-red)       | 曾学习基础CRUD，需复习重启 |
 
 > 💡 **颜色说明**：
@@ -48,8 +48,7 @@
 
 - [x] 持续积累 C++ 新特性
 - [x] 持续更新 Linux/计算机网络
-- [x] 学习 音视频WebRTC
-- [ ] 学习 Python 高阶网络编程
+- [ ] 学习 音视频WebRTC
 - [ ] 完善 Golang 笔记
 - [ ] Lua 使用 Sol2 注册绑定C++代码 
 
