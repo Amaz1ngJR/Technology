@@ -138,18 +138,122 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 |GL_LINEAR_MIPMAP_LINEAR	|在两个邻近的多级渐远纹理之间使用线性插值，并使用线性插值进行采样|
 
 ## 变换
+
 ### 矩阵运算
 
-### 缩放
+**向量的点积**
+$$
+\mathbf{A} \cdot \mathbf{B} = A_x B_x + A_y B_y + A_z B_z= |\mathbf{A}| |\mathbf{B}| \cos \theta
+$$
+- **参数说明**：
+  - $\mathbf{A} = [A_x, A_y, A_z]^\top$，$\mathbf{B} = [B_x, B_y, B_z]^\top$：三维列向量；
+  - $|\mathbf{A}| = \sqrt{A_x^2 + A_y^2 + A_z^2}$：向量 $\mathbf{A}$ 的模（长度）；
+  - $\theta$：两向量之间的夹角（$0 \leq \theta \leq \pi$）。
+- **几何意义**：
+  - 结果为标量；
+  - 可用于判断正交性（点积为 0）或计算投影。
 
-### 位移
+**向量的叉积**
 
-### 旋转
+$$
+\mathbf{A} \times \mathbf{B} = 
+\begin{vmatrix}
+\mathbf{i} & \mathbf{j} & \mathbf{k} \\
+A_x & A_y & A_z \\
+B_x & B_y & B_z \\
+\end{vmatrix}
+= (A_y B_z - A_z B_y)\mathbf{i} - (A_x B_z - A_z B_x)\mathbf{j} + (A_x B_y - A_y B_x)\mathbf{k} = |\mathbf{A}| |\mathbf{B}| \sin \theta \mathbf{n}
+$$
+- **参数说明**：
+  - $\mathbf{i}, \mathbf{j}, \mathbf{k}$：单位基向量；
+  - $\mathbf{n}$：垂直于 $\mathbf{A}$ 与 $\mathbf{B}$ 平面的单位法向量（方向由**右手定则**确定）；
+  - $\theta$：两向量夹角。
+- **几何意义**：
+  - 结果为向量；
+  - 模长等于以 $\mathbf{A}, \mathbf{B}$ 为邻边的平行四边形面积。
+
+> ⚠️ 叉积仅在三维空间中定义。
+
+### 缩放（Scaling）
+齐次坐标下的 3D 缩放矩阵
+$$
+\mathbf{S}_{\text{Scaling}} = 
+\begin{bmatrix}
+s_x & 0   & 0   & 0 \\
+0   & s_y & 0   & 0 \\
+0   & 0   & s_z & 0 \\
+0   & 0   & 0   & 1
+\end{bmatrix}
+$$
+- **参数说明**：
+  - $s_x, s_y, s_z$：沿 $x$、$y$、$z$ 轴的缩放因子；
+    - $s > 1$：放大；
+    - $0 < s < 1$：缩小；
+    - $s < 0$：镜像翻转。
+- **作用**：将点 $(x, y, z)$ 变换为 $(s_x x,\, s_y y,\, s_z z)$。
+- 若 $s_x = s_y = s_z$，称为**均匀缩放**。
+### 位移（Translation）
+齐次坐标下的 3D 缩放矩阵：
+$$
+\mathbf{T}(t_x, t_y, t_z) = 
+\begin{bmatrix}
+1 & 0 & 0 & t_x \\
+0 & 1 & 0 & t_y \\
+0 & 0 & 1 & t_z \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+- **参数说明**：
+  - $t_x, t_y, t_z$：沿各轴的平移距离。
+- **作用**：将点 $(x, y, z)$ 变换为 $(x + t_x,\, y + t_y,\, z + t_z)$。
+- **注意**：平移是非线性变换，必须使用齐次坐标才能用矩阵表示。
+
+### 旋转（Rotation）
+所有旋转均遵循**右手定则**：拇指指向旋转轴正方向，其余手指弯曲方向为正角度旋转方向。
+
+绕 $x$ 轴旋转 $\theta$：
+$$
+\mathbf{R}_x(\theta) = 
+\begin{bmatrix}
+1 & 0           & 0            & 0 \\
+0 & \cos\theta  & -\sin\theta  & 0 \\
+0 & \sin\theta  & \cos\theta   & 0 \\
+0 & 0           & 0            & 1
+\end{bmatrix}
+$$
+绕 $y$ 轴旋转 $\theta$：
+$$
+\mathbf{R}_y(\theta) = 
+\begin{bmatrix}
+\cos\theta  & 0 & \sin\theta  & 0 \\
+0           & 1 & 0           & 0 \\
+-\sin\theta & 0 & \cos\theta  & 0 \\
+0           & 0 & 0           & 1
+\end{bmatrix}
+$$
+绕 $z$ 轴旋转 $\theta$：
+$$
+\mathbf{R}_z(\theta) = 
+\begin{bmatrix}
+\cos\theta  & -\sin\theta & 0 & 0 \\
+\sin\theta  & \cos\theta  & 0 & 0 \\
+0           & 0           & 1 & 0 \\
+0           & 0           & 0 & 1
+\end{bmatrix}
+$$
+- **参数说明**：
+  - $\theta$：旋转角度，**单位为弧度（radian）**；
+  - 正角度表示逆时针旋转（从轴正方向看向原点）。
+
+
 角度变换
-```
-#define PI = 3.14159265359
-弧度转角度 ： 角度 = 弧度 * (180.0f / PI)
-角度转弧度 ： 弧度 = 角度 * (PI / 180.0f)
+```c++
+#define PI 3.14159265359
+// 弧度 → 角度
+float degrees = radians * (180.0f / PI);
+// 角度 → 弧度
+float radians = degrees * (PI / 180.0f);
 ```
 
 ### MVP矩阵
@@ -164,10 +268,12 @@ glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 <img alt="image" src="https://github.com/user-attachments/assets/cc3418a5-c6c3-43fd-941e-80006a92b301" />
 
-
-### 3D
-
 ### 摄像机
+OpenGL 本身**没有内置的“摄像机”对象**。从 OpenGL 的视角来看，整个场景始终是“固定不动”的，而所谓的“摄像机移动”实际上是通过**反向移动整个世界**来实现的。
+
+> 💡 本质：  
+> “移动摄像机” = “以相反方式移动整个场景”。
+
 欧拉角(Euler Angle)是可以表示3D空间中任何旋转的3个值，
 一共有3种欧拉角：俯仰角(Pitch)、偏航角(Yaw)和滚转角(Roll)
 

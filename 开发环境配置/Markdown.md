@@ -53,6 +53,26 @@ $$
 \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
 $$
 
+$$
+\mathbf{A} = 
+\begin{bmatrix}
+A_x \\ A_y \\ A_z
+\end{bmatrix}
+$$
+
+$$
+\mathbf{B} = \begin{bmatrix}
+B_x & B_y & B_z \\
+\end{bmatrix}
+$$
+
+$$
+\mathbf{C} = 
+\begin{bmatrix}
+C_x & C_y & C_z
+\end{bmatrix}^\top
+$$
+
 ## 表格
 | 姓名   | 年龄 | 城市     |
 |--------|------|----------|
