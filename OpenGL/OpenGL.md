@@ -1,7 +1,42 @@
 # 入门
-## 渲染管线
+## 渲染管线阶段概述
 渲染管线 描述了从三维场景数据到最终二维屏幕上像素这一系列复杂处理步骤的有序集合
 现代的渲染管线可以大致分为几个关键阶段：
+* **顶点着色器**：处理每个顶点，进行坐标变换
+* 几何着色器：处理图元，生成新图元
+* 形状（图元）装配：将顶点数据组装成图元（如三角形、线段等）
+* **光栅化**：把图元映射为最终屏幕上相应的像素, 将图元转换成片段
+> 在片段着色器运行之前会执行裁切(Clipping)。裁切会丢弃超出你的视图以外的所有像素，用来提升执行效率。OpenGL中的一个片段是OpenGL渲染一个像素所需的所有数据。
+* **片段着色器**：计算每个片段的颜色，进行光照计算和纹理采样
+* 深度测试和模板测试：确定片段是否可见
+* 混合和输出：将片段的最终颜色写入帧缓冲区
+
+![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/61bab369-4f7c-44db-af60-b6130133f7a0)
+
+## 着色器
+着色器是运行在GPU上的小程序，这些小程序为图形渲染管线的特定部分执行计算。现代OpenGL需要我们至少设置一个顶点和一个片段着色器
+* 顶点着色器（Vertex Shader）
+顶点着色器是OpenGL中第一个执行的着色器，它把一个单独的顶点作为输入。顶点着色器的主要目的是把3D坐标转换为另一种3D坐标，同时顶点着色器允许我们对顶点属性进行一些基本处理。
+* 片段着色器（Fragment Shader）
+片段着色器是OpenGL中第二个执行的着色器，它把一个单独的片段作为输入。片段着色器的主要目的是计算一个像素的最终颜色，它接受顶点着色器输出的颜色进行计算。
+### 着色器程序（Shader Program）
+顶点着色器和片段着色器必须链接成一个着色器程序才能使用。
+```c++
+// 编译着色器（以顶点着色器为例，片段着色器同理）
+unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);//创建顶点着色器 并用ID(vertexShader)来引用它
+//将源码附加到着色器对象上 第一个参数为要编译的着色器对象。第二参数指定了传递的源码字符串数量。第三个参数是顶点着色器真正的源码。第四个参数是可选的，用于指定源码字符串的长度（但通常我们让OpenGL自动计算这个值）。
+glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+glCompileShader(vertexShader);//编译着色器
+
+// 创建程序并链接
+unsigned int shaderProgram = glCreateProgram(); // 创建一个着色器程序对象 并返回新创建程序对象的ID引用
+glAttachShader(shaderProgram, vertexShader);//将着色器附加到程序对象上
+glLinkProgram(shaderProgram);//链接程序对象
+glDeleteShader(vertexShader);// 释放已链接的着色器对象（因为它们已经集成到程序中，不再需要单独保留）
+glUseProgram(shaderProgram);//激活着色器程序
+```
+## 链接顶点属性
+### VAO/VBO/EBO
 ```
 顶点数组对象：Vertex Array Object，VAO
 顶点缓冲对象：Vertex Buffer Object，VBO
@@ -25,30 +60,37 @@
 	- 关键点：
 	> VAO本身不存储顶点数据，它存储的是对VBO的引用和顶点属性指针的设置。
 	> 它的作用是“记住”顶点数据的布局和配置，这样在渲染时只需绑定一个VAO，就能恢复所有顶点属性的设置。
- 	- 使用流程：
-	```c++
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	
-	glBindVertexArray(0); // 解绑，保存配置
- 	```
+ 	
 3. EBO / IBO (Element Buffer Object / Index Buffer Object，索引缓冲对象)
    - 作用：
      > EBO 用于存储 顶点索引，以便使用 glDrawElements 进行绘制，实现索引绘制（Indexed Drawing）
      > 使用EBO可以避免重复存储相同的顶点，节省内存并提高效率
-     
-![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/61bab369-4f7c-44db-af60-b6130133f7a0)
+    
+```c++
+// 初始化流程：
+glGenVertexArrays(1, &VAO);
+glGenBuffers(1, &VBO);
+glGenBuffers(1, &EBO);
 
+glBindVertexArray(VAO);// 绑定VAO
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO);// 绑定VBO
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);// 将顶点数据复制到缓冲中
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);// 绑定EBO
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);// 将索引数据复制到缓冲中
+
+// 设置顶点属性
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);// 启用顶点属性0
+
+glBindVertexArray(0); // 解绑
+```
+OpenGL仅当3D坐标在3个轴（x、y和z）上-1.0到1.0的范围内时才处理它。所有在这个范围内的坐标叫做标准化设备坐标(Normalized Device Coordinates)，此范围内的坐标最终显示在屏幕上（在这个范围以外的坐标则不会显示）。
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/0e492a47-97aa-4a6e-b86a-c7d988d06643)
 
-## 着色器
-
 ## 纹理
-
+纹理坐标起始于(0, 0)，也就是纹理图片的左下角，终止于(1, 1)
 ### 纹理单元
 
 ## 变换
@@ -69,7 +111,7 @@
 然后选择投影方式（正交或者透视）通过投影矩阵将坐标进一步变成裁剪坐标(Clip Coordinate)（p矩阵并不是真正的做投影，而是为投影做准备）
 最后通过视口变换的步骤变成屏幕坐标(Screen Coordinate)
 
-<img width="1642" height="820" alt="image" src="https://github.com/user-attachments/assets/cc3418a5-c6c3-43fd-941e-80006a92b301" />
+<img alt="image" src="https://github.com/user-attachments/assets/cc3418a5-c6c3-43fd-941e-80006a92b301" />
 
 
 ### 3D
@@ -78,7 +120,7 @@
 欧拉角(Euler Angle)是可以表示3D空间中任何旋转的3个值，
 一共有3种欧拉角：俯仰角(Pitch)、偏航角(Yaw)和滚转角(Roll)
 
-<img width="1670" height="588" alt="image" src="https://github.com/user-attachments/assets/cfdfc42c-026c-46be-ac1f-6c5e4428a4fb" />
+<img alt="image" src="https://github.com/user-attachments/assets/cfdfc42c-026c-46be-ac1f-6c5e4428a4fb" />
 
 # 光照
 

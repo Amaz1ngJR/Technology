@@ -127,6 +127,21 @@ ffmpeg -f lavfi -i testsrc -f lavfi -i sine \
   -c:a aac -ar 44100 -b:a 64k \
   -f rtsp -timeout 5000000 rtsp://zlm16.geili.cn:1554/wd24/orangepi-test
 ```
+### 将mov转成mp4并添加空音频并去除多余的数据流
+```bash
+ffmpeg -i input.mov \
+  -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
+  -map 0:v:0 \
+  -map 1:a:0 \
+  -c:v h264_videotoolbox -profile:v main -b:v 10M \
+  -c:a aac -b:a 128k \
+  -pix_fmt yuv420p \
+  -movflags +faststart \
+  -shortest \
+  -dn \
+  -map_metadata -1 \
+  output.mp4
+```
 # ffprobe 命令行
 ## ffprobe 基本语法结构
 ```bash
