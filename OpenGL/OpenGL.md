@@ -91,9 +91,60 @@ OpenGL仅当3D坐标在3个轴（x、y和z）上-1.0到1.0的范围内时才处�
 
 ## 纹理
 纹理坐标起始于(0, 0)，也就是纹理图片的左下角，终止于(1, 1)
-### 纹理单元
+
+<img alt="image" src="https://github.com/user-attachments/assets/ad19a8db-0ea6-4f0d-8aa2-1455c00c13d0" />
+### 纹理的环绕方式
+|环绕方式	|描述|
+|:----------|-----|
+|GL_REPEAT|对纹理的默认行为。重复纹理图像。|
+|GL_MIRRORED_REPEAT|	和GL_REPEAT一样，但每次重复图片是镜像放置的。|
+|GL_CLAMP_TO_EDGE	|纹理坐标会被约束在0到1之间，超出的部分会重复纹理坐标的边缘，产生一种边缘被拉伸的效果。|
+|GL_CLAMP_TO_BORDER|	超出的坐标为用户指定的边缘颜色。|
+
+<img alt="image" src="https://github.com/user-attachments/assets/82b2d03e-bb5c-4c0a-8127-b0806f87893f" />
+
+```c++
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+/*第一个参数指定了纹理目标
+第二个参数指定设置的选项与应用的纹理轴，指定S、T轴
+最后一个参数需要我们传递一个环绕方式*/
+
+//如果选择GL_CLAMP_TO_BORDER选项，需要使用glTexParameterfv函数,还需要指定一个边缘的颜色
+float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+```
+### 纹理过滤
+OpenGL需要知道怎样将纹理像素(Texture Pixel)映射到纹理坐标，比较重要的为GL_NEAREST（也叫邻近过滤，Nearest Neighbor Filtering）是OpenGL默认的纹理过滤方式
+
+<img alt="image" src="https://github.com/user-attachments/assets/a298676b-ff0c-490f-a1f5-21279ab4403b" />
+
+以及GL_LINEAR（也叫线性过滤，(Bi)linear Filtering）它会基于纹理坐标附近的纹理像素，计算出一个插值，近似出这些纹理像素之间的颜色
+
+<img alt="image" src="https://github.com/user-attachments/assets/2f0d3929-ce65-4c7c-b8cf-a2f17ec03998" />
+
+```c++
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+```
+多级渐远纹理(Mipmap):距观察者的距离超过一定的阈值，OpenGL会使用不同的多级渐远纹理，即最适合物体的距离的那个
+
+<img alt="image" src="https://github.com/user-attachments/assets/46c95821-586d-421a-8d4b-a5b07db3beb7" />
+
+|过滤方式	|描述|
+|:----------|-----|
+|GL_NEAREST_MIPMAP_NEAREST|	使用最邻近的多级渐远纹理来匹配像素大小，并使用邻近插值进行纹理采样|
+|GL_LINEAR_MIPMAP_NEAREST|	使用最邻近的多级渐远纹理级别，并使用线性插值进行采样|
+|GL_NEAREST_MIPMAP_LINEAR	|在两个最匹配像素大小的多级渐远纹理之间进行线性插值，使用邻近插值进行采样|
+|GL_LINEAR_MIPMAP_LINEAR	|在两个邻近的多级渐远纹理之间使用线性插值，并使用线性插值进行采样|
 
 ## 变换
+### 矩阵运算
+
+### 缩放
+
+### 位移
+
+### 旋转
 角度变换
 ```
 #define PI = 3.14159265359
@@ -123,6 +174,7 @@ OpenGL仅当3D坐标在3个轴（x、y和z）上-1.0到1.0的范围内时才处�
 <img alt="image" src="https://github.com/user-attachments/assets/cfdfc42c-026c-46be-ac1f-6c5e4428a4fb" />
 
 # 光照
+
 
 
 
