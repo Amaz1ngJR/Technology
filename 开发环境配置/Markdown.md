@@ -149,3 +149,105 @@ $$
 <img src="image.png" width="300" alt="示意图" src="https://www.youtube.com/embed/嵌入视图片">
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/xxx嵌入视频" frameborder="0"></iframe>
+
+## mermaid图
+[mermaid在线编辑器支持导出图](https://mermaid.live/)
+
+```mermaid
+flowchart TD
+    subgraph A [第一部分: 采集与推流]
+        direction LR
+        A1[PC/OBS/硬件编码器] & A2[iOS/Android/小程序] & A3[第三方信号源]
+    end
+
+    subgraph B [第二部分: 流媒体中心与处理引擎]
+        B1[接入网关<br>BGP网络<br>协议转换]
+        
+        subgraph B2_ [智能媒体处理]
+            B2[转码集群<br>多码率/编码]
+            B3[AI处理<br>审核/抠图/字幕]
+            B4[录制/截图<br>水印]
+        end
+        
+        B1 --> B2
+        B2 -.-> B3
+        B2 -.-> B4
+    end
+
+    A1 & A2 & A3 -->|RTMP/RTMPS<br>SRT/WebRTC| B1
+
+    subgraph C [第三部分: 智能分发与调度]
+        C1[调度系统<br>GSLB]
+        C2[中心节点]
+        C3[边缘POP节点<br>> 2000+]
+        C1 --> C2 --> C3
+    end
+
+    B2_ --> C1
+
+    subgraph D [第四部分: 多元终端播放]
+        D1[Web/H5<br>FLV/HLS]
+        D2[移动App<br>原生播放器]
+        D3[智能电视/OTT]
+    end
+
+    C3 -->|HTTP-FLV/HLS<br>WebRTC/DASH| D1 & D2 & D3
+
+    subgraph E [第五部分: 全链路支撑体系]
+        E1[安全体系<br>鉴权/DRM/加密]
+        E2[质量体系<br>QoS/QoE监控]
+        E3[数据体系<br>大数据与AI]
+    end
+
+    E1 & E2 & E3 -.-> A & B & C & D
+```
+
+```mermaid
+pie
+    title Pets adopted by volunteers
+    "Dogs" : 79
+    "Cats" : 17
+    "Rats" : 3
+```
+
+```mermaid
+graph TB
+    subgraph 外部系统
+        A[FaceTime]
+        B[监控]
+        C[回放]
+    end
+
+    subgraph 中心A
+        A1[板端]
+        A2[板端] 
+        A3[子机]
+        A4[商家PC]
+        
+        A1 -->|RTC| A5[ZLM]
+        A2 -->|RTC| A5
+        A3 -->|RTC| A5
+        A4 --> A5
+        
+        A5 --> A6[Record]
+        A5 --> A7[AI]
+    end
+
+    subgraph 中心B
+        B1[ZLM] --> B2[Record]
+        B1 --> B3[AI]
+    end
+
+    A5 -->|RTC-Relay| D1[客服]
+    A5 -->|RTC-Relay| D2[客服]
+    
+    B1 -->|RTC-Relay| D3[客服]
+
+    A --> 中心A
+    B --> 中心A
+    C --> 中心A
+
+    style 中心A fill:#e6f3ff
+    style 中心B fill:#e6f3ff
+    style 外部系统 fill:#f0f0f0
+```

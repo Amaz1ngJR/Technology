@@ -147,7 +147,7 @@ $$
 \mathbf{A} \cdot \mathbf{B} = A_x B_x + A_y B_y + A_z B_z= |\mathbf{A}| |\mathbf{B}| \cos \theta
 $$
 - **参数说明**：
-  - $\mathbf{A} = [A_x, A_y, A_z]^\top$，$\mathbf{B} = [B_x, B_y, B_z]^\top$：三维列向量；
+  - $\mathbf{A} = [A_x, A_y, A_z]^\top$， $\mathbf{B} = [B_x, B_y, B_z]^\top$ ：三维列向量；
   - $|\mathbf{A}| = \sqrt{A_x^2 + A_y^2 + A_z^2}$：向量 $\mathbf{A}$ 的模（长度）；
   - $\theta$：两向量之间的夹角（ $0 \leq \theta \leq \pi$ ）。
 - **几何意义**：
@@ -289,9 +289,14 @@ OpenGL 本身**没有内置的“摄像机”对象**。从 OpenGL 的视角来�
 <img alt="image" src="https://github.com/user-attachments/assets/cfdfc42c-026c-46be-ac1f-6c5e4428a4fb" />
 
 # 光照
+## Phong光照模型
+冯光照模型由三种基本的光照组成：环境光(Ambient Lighting)、漫反射光(Diffuse Lighting)和镜面光(Specular Lighting)。
 
+- 环境光照(Ambient Lighting)：即使在黑暗的情况下，世界上通常也仍然有一些光亮（月亮、远处的光），所以物体几乎永远不会是完全黑暗的。为了模拟这个，我们会使用一个环境光照常量，它永远会给物体一些颜色。
+- 漫反射光照(Diffuse Lighting)：模拟光源对物体的方向性影响(Directional Impact)。它是风氏光照模型中视觉上最显著的分量。物体的某一部分越是正对着光源，它就会越亮。
+- 镜面光照(Specular Lighting)：模拟有光泽物体上面出现的亮点。镜面光照的颜色相比于物体的颜色会更倾向于光的颜色。
+## Blinn-Phong光照模型
 
-
-
+## 材质(Materials)
 
 
