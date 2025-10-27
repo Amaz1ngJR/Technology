@@ -13,7 +13,7 @@ gcc 编译可执行程序(程序运行)的步骤：预处理、编译、汇编�
 
 ![image](https://github.com/Amaz1ngJR/Technology/assets/83129567/dcaf018b-c6b9-457b-8d96-35550c951a63)
 ```bash
-objdump -dS 二进制文件.o  //将机器代码转成汇编代码
+objdump -dS 二进制文件.o  # 将机器代码转成汇编代码
 ```
 ```bash
 gcc/g++
@@ -40,21 +40,21 @@ G++是GCC的C++编译器前端
 对gcc -g .c文件 生成的文件如hello进行调试
 ```bash
 gdb hello
-(gdb)l/list                 //显示代码
-(gdb)b/break 3            //在行号为3处设置断点 也可根据函数名 b other.cpp:22 (对other文件的第22行打断点)
-(gdb)c/continue           //继续执行断点后续指令
-(gdb)r/run                //运行程序 如果出现段错误 会报出
-run argv[1] argv[2]       //调试时命令行传参
-(gdb)n/next               //执行下一条(越过函数)
-(gdb)s/step               //执行下一条(会进入函数)
-(gdb)p/print i            //查看变量i的值
-(gdb)d/delete             //删除断点 d breakpoints NUM
-(gdb)i/info               //查看GDB内部局部变量的数值 info breakpoints
-(gdb)finish               //结束当前函数 返回到函数调用点
-(gdb)set                  //设置变量的值 set var n=100
-(gdb)display/undisplay    //设置/取消观察变量
-(gdb)enable/disable breakpoints   //启用/禁用断点
-(gdb)x/nfu                //查看内存 n显示多少个元素 f表示显示的格式(进制) u 表示显示的单位 字/字节 1字=4字节
+(gdb)l/list                 # 显示代码
+(gdb)b/break 3            # 在行号为3处设置断点 也可根据函数名 b other.cpp:22 (对other文件的第22行打断点)
+(gdb)c/continue           # 继续执行断点后续指令
+(gdb)r/run                # 运行程序 如果出现段错误 会报出
+run argv[1] argv[2]       # 调试时命令行传参
+(gdb)n/next               # 执行下一条(越过函数)
+(gdb)s/step               # 执行下一条(会进入函数)
+(gdb)p/print i            # 查看变量i的值
+(gdb)d/delete             # 删除断点 d breakpoints NUM
+(gdb)i/info               # 查看GDB内部局部变量的数值 info breakpoints
+(gdb)finish               # 结束当前函数 返回到函数调用点
+(gdb)set                  # 设置变量的值 set var n=100
+(gdb)display/undisplay    # 设置/取消观察变量
+(gdb)enable/disable breakpoints   # 启用/禁用断点
+(gdb)x/nfu                # 查看内存 n显示多少个元素 f表示显示的格式(进制) u 表示显示的单位 字/字节 1字=4字节
     x：十六进制格式
     d：有符号十进制格式
     u：无符号十进制格式
@@ -71,9 +71,9 @@ run argv[1] argv[2]       //调试时命令行传参
     g：双字（8个字节）
     s：符号单位
     i：指令单位
-(gdb)watch              //被设置观察点的变量发生修改时 打印显示
-(gdb)i watch            //显示观察点
-(gdb)q/quit             //退出gdb
+(gdb)watch              # 被设置观察点的变量发生修改时 打印显示
+(gdb)i watch            # 显示观察点
+(gdb)q/quit             # 退出gdb
 ```
 ### 对动态库进行调试
 先确保动态库加载进来了
@@ -103,18 +103,18 @@ objcopy --add-gnu-debuglink=libmymalloc.so.debug libmymalloc.so
 ```
 ## *静态库与动态库
 静态库：对空间要求低 时间要求高的核心程序中 使用的时候直接复制到程序中
-动态库：使用时全部调入到内存中 多个程序共享一份
+动态库：使用时全部调入到内存中 多个程序共享一份，节省内存空间
 ### 创建静态库 lib_.a
 
 将库中声明写到头文件下（一般库在lib下，头文件在inc下，头文件里是库中函数的声明和其他的include）
-
 要创建一个静态库或将目标代码加入到已经存在的静态库中 使用下面命令
 ```bash
 ar rcs libmylib.a file1.o file2.o
-//r 将目标代码加入静态库中
-//c 若libmylib.a不存在 会自动创建
-//s 更新.a文件的索引 使之包含加入的.o文件
+# r 将目标代码加入静态库中
+# c 若libmylib.a不存在 会自动创建
+# s 更新.a文件的索引 使之包含加入的.o文件
 ```
+
 静态库制作以及使用步骤
 ```bash
 1. 将.c生成.o
@@ -128,23 +128,40 @@ ar rcs libmylib.a file1.o file2.o
 -o文件 main函数的地址为0 其他普通函数的地址都是相对于main函数的地址的偏移量 链接阶段确定main函数地址
 
 调用的动态库函数地址是@plt 当确定动态库地址后 会进行地址回填
+
+- 1.将.c生成.o文件（生成与位置无关的代码 参数 -fPIC）所有地址后面带有@plt（延迟绑定）
 ```bash
-1.将.c生成.o文件（生成与位置无关的代码 参数 -fPIC）所有地址后面带有@plt（延迟绑定）
-	gcc -c add.c -o add.o -fPIC
-2.使用gcc -shared 制作动态库
-	gcc -shared -o lib库名.so add.o( add2.o ...)
-3.编译可执行程序时，指定所使用的动态库 所有的库名都以lib开头 链接的时候参数省略开头的lib
-	gcc main.c -o main -lmylib -L./lib    //-l/L后直接带参数 没有空格
-4.执行./main会出错
-出错原因：
-链接器：     工作于链接阶段 工作时需要-l和-L
-动态链接器： 工作于程序运行阶段 工作时需要提供动态库所在目录位置
-解决：需要将动态库加到环境变量LD_LIBRARY_PATH中并导出(参考环境变量部分)：
-1.export LD_LIBRARY_PATH=./lib(临时设置)  ps(export LD_PRELOAD=...用来hook)
-2.vi ~/.bashrc ->添加export LD_LIBRARY_PATH=./lib ->重启终端或者..bashrc或者source .bashrc(永久设置)
-3.添加绝对路径到sudo vi /etc/ld.so.conf,并执行sudo ldconfig(永久设置)
-4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
+gcc -c add.c -o add.o -fPIC
 ```
+- 2.使用gcc -shared 制作动态库
+```bash
+gcc -shared -o lib库名.so add.o( add2.o ...)
+```
+- 3.编译可执行程序时，指定所使用的动态库 所有的库名都以lib开头 链接的时候参数省略开头的lib
+```bash
+gcc main.c -o main -lmylib -L./lib    # -l/L后直接带参数 没有空格
+```
+- 4.执行./main会出错
+    - 出错原因：
+        - 链接器：     工作于链接阶段 工作时需要-l和-L
+        - 动态链接器： 工作于程序运行阶段 工作时需要提供动态库所在目录位置
+    - 解决：需要将动态库加到环境变量LD_LIBRARY_PATH中并导出(参考环境变量部分)：
+        - 1.export LD_LIBRARY_PATH=./lib(临时设置)  ps(export LD_PRELOAD=...用来hook)
+        - 2.vi ~/.bashrc ->添加export LD_LIBRARY_PATH=./lib ->重启终端或者..bashrc或者source .bashrc(永久设置)
+        - 3.添加绝对路径到sudo vi /etc/ld.so.conf,并执行sudo ldconfig(永久设置)
+        - 4.拷贝到根目录下/lib：cd /.->cd lib->sudo cp libmylib.so /lib(永久设置)
+
+查看动态库依赖 ldd
+```bash
+ldd ./main
+```
+动态库的加载顺序
+- 1.编译时指定的动态库
+- 2.环境变量LD_LIBRARY_PATH指定的动态库
+- 3.配置文件/etc/ld.so.conf指定的动态库
+- 4.默认路径/lib和/usr/lib
+
+
 
 ## *文件相关 系统函数/调用
 
@@ -155,8 +172,8 @@ ar rcs libmylib.a file1.o file2.o
 
 #### 文件进制
 ```bash
-od-tcx filename  //查看文件的16进制表示形式
-od-tcd filename  //查看文件的10进制表示形式
+od-tcx filename  # 查看文件的16进制表示形式
+od-tcd filename  # 查看文件的10进制表示形式
 ```
 
 #### 索引节点inode
@@ -1140,13 +1157,13 @@ int main(int argc, char* argv[]) {
 unsigned int alarm(unsigned int seconds); //返回0或者剩余的秒数(无失败)
 ```
 取消定时器alarm(0);   
-```
-alarm(5); //定时为5秒
-//过了3秒
-alarm(4)；//返回2秒 重置定时器为4秒
-//过了5秒
-alarm(5); //返回0秒 重置定时器为5秒
-alarm(0); //返回5秒
+```bash
+alarm(5); # 定时为5秒
+# 过了3秒
+alarm(4)；# 返回2秒 重置定时器为4秒
+# 过了5秒
+alarm(5); # 返回0秒 重置定时器为5秒
+alarm(0); # 返回5秒
 ```
 使用time ./demo 查看下面代码的实际时间=用户时间+系统时间+等待时间
 ```c++

@@ -11,7 +11,8 @@ rm ~/miniconda3/miniconda.sh
 ```bash
 source ~/miniconda3/bin/activate
 ```
-### [安装miniforge可以免费商用](https://github.com/conda-forge/miniforge?tab=readme-ov-file)
+### 安装miniforge
+[安装miniforge可以免费商用](https://github.com/conda-forge/miniforge?tab=readme-ov-file)
 选择合适的版本进行下载后
 ```bash
 chmod +x Miniforge3*.sh

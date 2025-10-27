@@ -480,7 +480,20 @@ int avcodec_decode_audio4(AVCodecContext *avctx, AVFrame *frame,
 >返回值：成功返回 0，失败返回负数错误码
 </details>
 
+### avcodec_close 关闭编解码器【旧】
+释放编解码器内部状态和资源（如内部缓冲区、线程、硬件上下文等），但不释放 AVCodecContext 结构体本身
+```c++
+int avcodec_close(AVCodecContext *avctx);
+```
+<details>
+<summary> 点击展开详细参数内容</summary>
+
+>avctx:要关闭的编解码器上下文
+>返回值：成功返回 0，失败返回负数错误码
+</details>
+
 ### avcodec_free_context 释放编解码器上下文
+关闭 + 释放 + 置空
 ```c++
 void avcodec_free_context(AVCodecContext **avctx);
 ```
