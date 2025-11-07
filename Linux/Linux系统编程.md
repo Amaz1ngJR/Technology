@@ -105,6 +105,7 @@ objcopy --add-gnu-debuglink=libmymalloc.so.debug libmymalloc.so
 静态库：对空间要求低 时间要求高的核心程序中 使用的时候直接复制到程序中
 动态库：使用时全部调入到内存中 多个程序共享一份，节省内存空间
 ### 创建静态库 lib_.a
+文件扩展名通常为 .a（Linux/macOS）或 .lib（Windows）
 
 将库中声明写到头文件下（一般库在lib下，头文件在inc下，头文件里是库中函数的声明和其他的include）
 要创建一个静态库或将目标代码加入到已经存在的静态库中 使用下面命令
@@ -125,6 +126,8 @@ ar rcs libmylib.a file1.o file2.o
     g++ code.c lib库名.a -o code 
 ```
 ### 创建动态库 lib_.so
+文件扩展名：.so（Linux）、.dylib（macOS）、.dll（Windows）
+
 -o文件 main函数的地址为0 其他普通函数的地址都是相对于main函数的地址的偏移量 链接阶段确定main函数地址
 
 调用的动态库函数地址是@plt 当确定动态库地址后 会进行地址回填

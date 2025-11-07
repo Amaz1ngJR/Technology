@@ -340,6 +340,10 @@ tar --delete -f test.tar file1   # 将test.tar中的file1删除
 
 tar -xvf test.tar -C /home/yjr    # 将test.tar解压至/home/yjr
 tar -xzvf ZLMediaKit.tar.gz -C /data # 解压.gz
+
+gunzip -k syslog.2.gz  # 解压.gz文件 -k表示保留原文件
+gunzip syslog.2.gz # 解压.gz文件 会删除 .gz 文件，生成 syslog.2
+zcat syslog.2.gz  # 不解压直接查看内容 或 zless、zgrep 等
 ```
 针对.zip的压缩包
 ```bash
@@ -818,18 +822,9 @@ tail -c 2 filename   # 显示文件末尾2字节的内容
 tail -f filename     # 实时监视文件的变化
 ```
 ## grep 从文件中通过关键字过滤文件行
-```
-grep "home/www" ./ -rn
-
-grep: 调用grep工具进行文本搜索。
-"home/www": 这是要搜索的文本模式或关键词。在这个例子中，你正在搜索包含"home/www"字符串的内容。
-./: 表示当前目录，意味着grep将在当前工作目录及其子目录中查找指定的模式。注意，如果你只想在当前目录下而不包括其子目录中搜索，你应该去掉这个参数或者使用其他选项限制搜索范围。
--r: 代表递归(recursive)，这意味着grep不仅会在指定的目录（本例中为当前目录./）中搜索，还会在其下的所有子目录中搜索匹配的文本。
--n: 表示对于找到的每一个匹配项，显示其所在的行号
-```
 ```bash
 grep -i "pattern" file.txt             # 忽略大小写
-grep -r "pattern" /path/to/directory   # 递归搜索目录中的文件
+grep -r "pattern" /path/to/directory   # 递归搜索目录中的文件 不仅会在指定的目录（本例中为当前目录./）中搜索，还会在其下的所有子目录中搜索匹配的文本。
 grep -n "pattern" file.txt             # 显示匹配行的行号
 grep -v "pattern" file.txt             # 反向匹配，显示不包含匹配模式的行
 grep -c "pattern" file.txt             # 只显示匹配行的计数
@@ -837,6 +832,15 @@ grep -A 2 "pattern" file.txt           # 显示匹配行及后面两行 -A num�
 grep --color "pattern" file.txt        # 高亮显示匹配的文本
 grep -E "pattern1|pattern2" file.txt   # 使用扩展正则表达式匹配满足pattern1或pattern2的行
 grep -w "pattern" file.txt             # 仅匹配整个单词 而不是匹配包含该模式的所有单词
+```
+```bash
+grep "home/www" ./ -rn
+
+grep: 调用grep工具进行文本搜索。
+"home/www": 这是要搜索的文本模式或关键词。在这个例子中，你正在搜索包含"home/www"字符串的内容。
+./: 表示当前目录，意味着grep将在当前工作目录及其子目录中查找指定的模式。注意，如果你只想在当前目录下而不包括其子目录中搜索，你应该去掉这个参数或者使用其他选项限制搜索范围。
+-r: 代表递归(recursive)，这意味着grep不仅会在指定的目录（本例中为当前目录./）中搜索，还会在其下的所有子目录中搜索匹配的文本。
+-n: 表示对于找到的每一个匹配项，显示其所在的行号
 ```
 ## wc 数量统计
 ```bash

@@ -45,7 +45,7 @@ source ~/.bash_profile
 ```json
 {
   "env": {
-    "ANTHROPIC_AUTH_TOKEN": "你的API密钥",
+    "ANTHROPIC_AUTH_TOKEN": "cr_d7d6b7cb521b703c8acda91cccab504b23045104d690ac24bc23f2d822822bbd",
     "ANTHROPIC_BASE_URL": "http://10.20.49.8/api"
   },
   "model": "sonnet"
@@ -62,11 +62,23 @@ sudo apt autoremove  # 清理自动安装的依赖
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 # 安装 nodejs（会自动包含 npm）
 sudo apt install -y nodejs
-
+# 更新 PATH 环境变量 
+export PATH="/usr/bin:$PATH"
+# 永久生效 - 添加到 ~/.bashrc
+echo 'export PATH="/usr/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+# 
 # 安装 Claude Code
 sudo npm install -g @anthropic-ai/claude-code
 # 国内镜像安装
 sudo npm install -g @anthropic-ai/claude-code --registry https://registry.npmmirror.com
+
+# 安装 NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+# 重新加载 shell 配置
+source ~/.bashrc
+
 # 使用 Claude Code
 claude
 ```

@@ -82,7 +82,9 @@ vim 兼容全部的vi功能
 |       命令模式      |     <kbd>Shift</kbd> + <kbd>N</kbd>     |            向上继续搜索   |
 |       命令模式      |     <kbd>Y</kbd> + <kbd>Y</kbd>     |            复制当前行  |
 |       命令模式      |     <kbd>n</kbd> + <kbd>Y</kbd> + <kbd>Y</kbd>    |       n是数字 复制当前行和下面的n行  |
-|       命令模式      |     <kbd>P</kbd>     |            粘贴复制的内容                |
+|       命令模式      |     <kbd>Shift</kbd> + <kbd>V</kbd>     |            进可视模式 可用来复制段落   |
+|       命令模式      |     <kbd>Y</kbd>     |            复制选中内容                |
+|       命令模式      |     <kbd>P</kbd>     |            粘贴的内容                |
 |       命令模式      |     <kbd>G</kbd> + <kbd>;</kbd>    | 跳转到上一次修改的位置（可多次按，遍历修改历史） |
 |       命令模式      |     <kbd>U</kbd>      |            撤销修改                  |
 |       命令模式      |     <kbd>Ctrl</kbd> + <kbd>R</kbd>     |           反向撤销修改              |
@@ -114,6 +116,7 @@ vim 兼容全部的vi功能
 |       底线命令模式      |     :sp/split filename | 水平分屏 打开其他文件 省略 filename，则新窗口打开当前文件的另一个副本| 
 |       底线命令模式      |     :vsp/vsplit filename | 垂直分屏 打开其他文件 省略 filename，则新窗口打开当前文件的另一个副本|
 |       底线命令模式      |     :set nu/number     |             显示行号    |
+|       底线命令模式      |     :set nonu/nonumber     |             不显示行号    |
 |       底线命令模式      |     :n   |             n是数字 跳到第n行开头     |
 |       底线命令模式      |     :set paste   |             设置粘贴模式    |
 |       底线命令模式      |     :help      |            查看帮助文档     |
