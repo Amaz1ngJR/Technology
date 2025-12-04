@@ -46,7 +46,7 @@ source ~/.bash_profile
 {
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "cr_d7d6b7cb521b703c8acda91cccab504b23045104d690ac24bc23f2d822822bbd",
-    "ANTHROPIC_BASE_URL": "http://10.20.49.8/api"
+    "ANTHROPIC_BASE_URL": "https://ai.vdian.net/api/"
   },
   "model": "sonnet"
 }

@@ -33,3 +33,7 @@ cmd + shift + L
 --其他看help
 -exec help x
 ```
+
+```bash
+sudo unlink /usr/local/bin/code
+```

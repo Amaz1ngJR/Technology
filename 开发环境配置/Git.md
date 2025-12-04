@@ -78,7 +78,10 @@ git clone -b branch-name git@github.com:username/repository.git
 # 删除 .git 子目录,仓库变回普通文件夹
 rm -rf .git
 ```
-
+### 添加安全目录
+```bash
+git config --global --add safe.directory /data/yjr/smartDevice
+```
 ## 基本操作
 
 ### 查看状态
